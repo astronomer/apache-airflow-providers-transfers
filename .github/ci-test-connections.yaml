@@ -15,14 +15,6 @@ connections:
     password: postgres
     port: 5432
     extra:
-  - conn_id: postgres_benchmark_conn
-    conn_type: postgres
-    host: postgres
-    schema:
-    login: postgres
-    password: postgres
-    port: 5432
-    extra:
   - conn_id: snowflake_conn
     conn_type: snowflake
     host: https://gp21411.us-east-1.snowflakecomputing.com
@@ -71,12 +63,6 @@ connections:
     conn_type: aws
     description: null
     extra: null
-  - conn_id: s3_conn_benchmark
-    conn_type: aws
-    description: null
-    extra:
-      aws_access_key_id: $AWS_ACCESS_KEY_ID
-      aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
   - conn_id: gcp_conn_project
     conn_type: google_cloud_platform
     description: null
@@ -85,7 +71,7 @@ connections:
       project_id: "astronomer-dag-authoring"
   - conn_id: sftp_conn
     conn_type: sftp
-    host: localhost
-    login: foo
-    password: pass
+    host: $SFTP_HOSTNAME
+    login: $SFTP_USERNAME
+    password: $SFTP_PASSWORD
     port: 2222

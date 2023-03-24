@@ -1,0 +1,50 @@
+.git
+coverage.xml
+**/.coverage*
+**/.python-version
+universal_transfer_operator/test-connections.yaml
+.idea
+.env
+airflow_settings.yaml
+*.pyc
+*/__pycache__/*
+.idea%
+/build/
+/dist/
+**/dist/
+venv
+dumps
+.vscode
+.nox
+
+# Benchmark
+airflow.db
+airflow.cfg
+unittests.db
+unittests.cfg
+
+# VIM
+*.sw[a-z]
+
+# MacOS
+.DS_Store
+*/.DS_Store
+
+# Terraform
+**/.terraform/*
+**/.terraform.lock.hcl
+
+**/dev/dags
+**/dev/logs
+**/dev/plugins
+
+# Airflow
+**/.airflowignore
+
+*.egg-info/
+
+# universal transfer operator sphinx-related
+/docs/_build/
+/docs/_build/*
+/docs/autoapi/
+/.nox/
