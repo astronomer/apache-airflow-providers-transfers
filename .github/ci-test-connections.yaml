@@ -25,7 +25,7 @@ connections:
     extra:
       account: "gp21411"
       region: "us-east-1"
-      role: "PROVIDERSUSER"
+      role: "AIRFLOW_TEST_USER"
       warehouse: ROBOTS
       database: SANDBOX
   - conn_id: snowflake_conn_1
