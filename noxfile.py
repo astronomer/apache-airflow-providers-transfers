@@ -7,7 +7,7 @@ nox.options.sessions = ["dev"]
 nox.options.reuse_existing_virtualenvs = True
 
 
-@nox.session(python="3.10")
+@nox.session(python="3.9")
 def dev(session: nox.Session) -> None:
     """Create a dev environment with everything installed.
 
@@ -81,3 +81,12 @@ def build_docs(session: nox.Session) -> None:
     session.install("-e", ".[doc]")
     session.chdir("./docs")
     session.run("make", "html")
+
+
+@nox.session()
+def release(session: nox.Session) -> None:
+    """Publish a release."""
+    session.install("twine")
+    # TODO: Better artifact checking.
+    session.run("twine", "check", *session.posargs)
+    session.run("twine", "upload", *session.posargs)
