@@ -72,7 +72,7 @@ https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/exampl
     make container target=build-run
     ```
 
-   Copy the example DAGs to `AIRFLOW_HOME` DAG folder and run the DAG.
+   Copy this [example DAGs](https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_universal_transfer_operator.py) to `AIRFLOW_HOME` DAG folder. Set the relevant airflow connections and run the DAG.
 
 - Clone repository and run using `nox`
 
