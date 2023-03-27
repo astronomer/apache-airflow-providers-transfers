@@ -24,9 +24,9 @@ Universal transfer operator also supports the transfers using third-party platfo
 
 With universal transfer operator, users can perform data transfers using the following transfer modes:
 
-1. non-native
-2. native
-3. third-party
+1. Non-native
+2. Native
+3. Third-party
 
 ### Non-native transfer
 
