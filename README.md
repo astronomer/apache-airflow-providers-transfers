@@ -24,9 +24,9 @@ Universal transfer operator also supports the transfers using third-party platfo
 
 With universal transfer operator, users can perform data transfers using the following transfer modes:
 
-1. non-native
-2. native
-3. third-party
+1. Non-native
+2. Native
+3. Third-party
 
 ### Non-native transfer
 
@@ -93,6 +93,8 @@ https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/exampl
 ## Documentation
 
 The documentation is a work in progress -- we aim to follow the [Diátaxis](https://diataxis.fr/) system.
+
+- **[Reference guide](https://apache-airflow-provider-transfers.readthedocs.io/)**: Commands, modules, classes and methods
 
 - **[Getting Started Tutorial](https://apache-airflow-provider-transfers.readthedocs.io/en/latest/getting-started/GETTING_STARTED.html)**: A hands-on introduction to the Universal Transfer Operator
 - **[Reference guide](https://apache-airflow-provider-transfers.readthedocs.io/en/latest/)**: Commands, modules, classes and methods
