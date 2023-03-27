@@ -5,15 +5,9 @@
 transfers made easy<br><br>
 </h3>
 
-[![Python versions](https://img.shields.io/pypi/pyversions/astro-sdk-python.svg)](https://pypi.org/pypi/astro-sdk-python)
-[![License](https://img.shields.io/pypi/l/astro-sdk-python.svg)](https://pypi.org/pypi/astro-sdk-python)
-[![Development Status](https://img.shields.io/pypi/status/astro-sdk-python.svg)](https://pypi.org/pypi/astro-sdk-python)
-[![PyPI downloads](https://img.shields.io/pypi/dm/astro-sdk-python.svg)](https://pypistats.org/packages/astro-sdk-python)
-[![Contributors](https://img.shields.io/github/contributors/astronomer/astro-sdk)](https://github.com/astronomer/astro-sdk)
-[![Commit activity](https://img.shields.io/github/commit-activity/m/astronomer/astro-sdk)](https://github.com/astronomer/astro-sdk)
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/astronomer/astro-sdk/main.svg)](https://results.pre-commit.ci/latest/github/astronomer/astro-sdk/main)
-[![CI](https://github.com/astronomer/astro-sdk/actions/workflows/ci-python-sdk.yaml/badge.svg)](https://github.com/astronomer/astro-sdk)
-[![codecov](https://codecov.io/gh/astronomer/astro-sdk/branch/main/graph/badge.svg?token=MI4SSE50Q6)](https://codecov.io/gh/astronomer/astro-sdk)
+
+
+[![CI](https://github.com/astronomer/apache-airflow-provider-transfers/actions/workflows/ci-uto.yaml/badge.svg)](https://github.com/astronomer/apache-airflow-provider-transfers)
 
 The **Universal Transfer Operator** allows data transfers between any supported source and target Datasets in [Apache Airflow](https://airflow.apache.org/). It offers a consistent agnostic interface, simplifying the users' experience, so they do not need to use specific providers or operators for transfers. The Astro Python SDK is maintained by [Astronomer](https://astronomer.io).
 
