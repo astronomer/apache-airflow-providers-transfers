@@ -94,6 +94,8 @@ https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/exampl
 
 The documentation is a work in progress -- we aim to follow the [Diátaxis](https://diataxis.fr/) system.
 
+- **[Reference guide](https://apache-airflow-provider-transfers.readthedocs.io/)**: Commands, modules, classes and methods
+
 - **[Getting Started Tutorial](https://apache-airflow-provider-transfers.readthedocs.io/en/latest/getting-started/GETTING_STARTED.html)**: A hands-on introduction to the Universal Transfer Operator
 - **[Reference guide](https://apache-airflow-provider-transfers.readthedocs.io/en/latest/)**: Commands, modules, classes and methods
 
