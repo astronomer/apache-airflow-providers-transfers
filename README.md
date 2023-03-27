@@ -9,7 +9,7 @@ transfers made easy<br><br>
 
 [![CI](https://github.com/astronomer/apache-airflow-provider-transfers/actions/workflows/ci-uto.yaml/badge.svg)](https://github.com/astronomer/apache-airflow-provider-transfers)
 
-The **Universal Transfer Operator** allows data transfers between any supported source and target Datasets in [Apache Airflow](https://airflow.apache.org/). It offers a consistent agnostic interface, simplifying the users' experience, so they do not need to use specific providers or operators for transfers. The Astro Python SDK is maintained by [Astronomer](https://astronomer.io).
+The **Universal Transfer Operator** allows data transfers between any supported source and target Datasets in [Apache Airflow](https://airflow.apache.org/). It offers a consistent agnostic interface, simplifying the users' experience, so they do not need to use specific providers or operators for transfers. The Universal Transfer Operator is maintained by [Astronomer](https://astronomer.io).
 
 This ensures a consistent set of data providers that can read from and write to dataset. The Universal Transfer
 Operator can use the respective data providers to transfer between as a source and a destination. It also takes advantage of any existing fast and
