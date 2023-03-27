@@ -52,7 +52,7 @@ Steps:
 - Request destination dataset to ingest data from the file dataset.
 - Destination dataset request source dataset for data.
 
-This is a faster way for datasets of larger size as there is only one network call involved and usually the bandwidth between vendors is high. Also, there is no requirement for memory/processing power of the worker node, since data never gets on the node. There is significant performance improvement due to native transfers.
+This is a faster way to transfer datasets of larger size as there is only one network call involved and usually the bandwidth between vendors is high. Also, there is no requirement for memory/processing power of the worker node, since data never gets on the node. There is significant performance improvement due to native transfers.
 
 > **_NOTE:_**
    Native implementation is in progress and will be added in upcoming releases.
