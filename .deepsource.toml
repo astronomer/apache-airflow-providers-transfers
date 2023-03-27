@@ -1,0 +1,13 @@
+version = 1
+
+test_patterns = [
+  "universal_transfer_operator/tests/**",
+  "universal_transfer_operator/tests_integration/**"
+]
+
+[[analyzers]]
+name = "python"
+enabled = true
+
+  [analyzers.meta]
+  runtime_version = "3.x.x"
