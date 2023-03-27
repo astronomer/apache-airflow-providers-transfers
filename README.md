@@ -82,19 +82,13 @@ https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/exampl
 
 ## Supported technologies
 
-| Databases       |
-|-----------------|
-| Google BigQuery |
-| Snowflake       |
-| SQLite          |
+- Databases supported:
 
+    https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/src/universal_transfer_operator/constants.py#L72-L74
 
-| File stores |
-|------------ |
-| Amazon S3   |
-| Filesystem  |
-| Google GCS  |
-| SFTP        |
+- File store supported:
+
+    https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/src/universal_transfer_operator/constants.py#L26-L32
 
 ## Documentation
 
