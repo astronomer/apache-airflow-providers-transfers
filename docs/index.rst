@@ -8,16 +8,9 @@ Welcome to the Universal Transfer Operator documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Getting Started With Universal Transfer Operator:
    :glob:
 
    getting-started/*
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Universal Transfer Operator:
-   :glob:
-
    universal_transfer_operator/operator.rst
 
 .. toctree::
