@@ -1,12 +1,8 @@
 .. _universal_transfer_operator:
 
-========================================================================================================
-:py:mod:`universal_transfer_operator operator <universal_transfer_operator.universal_transfer_operator>`
-========================================================================================================
-
 When to use the ``universal_transfer_operator`` operator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The Universal Transfer Operator allows data transfers between any supported source :ref:`dataset` and destination :ref:`dataset`. It offers a consistent agnostic interface, simplifying the users' experience, so they do not need to use specific providers or operators for transfers.
+The :py:mod:`universal_transfer_operator operator <universal_transfer_operator.universal_transfer_operator>` allows data transfers between any supported source :ref:`dataset` and destination :ref:`dataset`. It offers a consistent agnostic interface, simplifying the users' experience, so they do not need to use specific providers or operators for transfers.
 
 This ensures a consistent set of :py:mod:`Data Providers <universal_transfer_operator.data_providers>` that can read from and write to :ref:`dataset`. The Universal Transfer
 Operator can use the respective :py:mod:`Data Providers <universal_transfer_operator.data_providers>` to transfer between as a source and a destination. It also takes advantage of any existing fast and
