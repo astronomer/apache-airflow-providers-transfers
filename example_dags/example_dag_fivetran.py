@@ -11,6 +11,9 @@ from universal_transfer_operator.universal_transfer_operator import UniversalTra
 
 s3_bucket = os.getenv("S3_BUCKET", "s3://astro-sdk-test")
 gcs_bucket = os.getenv("GCS_BUCKET", "gs://uto-test")
+snowflake_database = os.getenv("SNOWFLAKE_DATABASE", "dummy-database")
+snowflake_schema = os.getenv("SNOWFLAKE_SCHEMA", "dummy-schema")
+
 
 connector_config = {
     "schema": "s3",
@@ -43,7 +46,7 @@ destination_config = {
 }
 
 with DAG(
-    "example_universal_transfer_operator",
+    "example_universal_transfer_operator_fivetran",
     schedule_interval=None,
     start_date=datetime(2022, 1, 1),
     catchup=False,
@@ -65,9 +68,7 @@ with DAG(
         destination_dataset=Table(
             name="fivetran_test",
             conn_id="snowflake_conn",
-            metadata=Metadata(
-                database=os.environ["SNOWFLAKE_DATABASE"], schema=os.environ["SNOWFLAKE_SCHEMA"]
-            ),
+            metadata=Metadata(database=snowflake_database, schema=snowflake_schema),
         ),
         transfer_mode=TransferMode.THIRDPARTY,
         transfer_params=FiveTranOptions(
