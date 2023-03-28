@@ -20,7 +20,7 @@ with DAG(
     start_date=datetime(2022, 1, 1),
     catchup=False,
 ) as dag:
-    # transfer file from S3 to GCS using universal transfer operator
+    # [START howto_transfer_file_from_s3_to_gcs_using_universal_transfer_operator]
     uto_transfer_non_native_s3_to_gs = UniversalTransferOperator(
         task_id="uto_transfer_non_native_s3_to_gs",
         source_dataset=File(path=f"{s3_bucket}/uto/", conn_id="aws_default"),
@@ -29,8 +29,9 @@ with DAG(
             conn_id="google_cloud_default",
         ),
     )
+    # [END howto_transfer_file_from_s3_to_gcs_using_universal_transfer_operator]
 
-    # transfer files from S3 to GCS using traditional S3ToGCSOperator
+    # [START howto_transfer_file_from_s3_to_gcs_using_traditional_S3ToGCSOperator]
     traditional_s3_to_gcs_transfer = S3ToGCSOperator(
         task_id="traditional_s3_to_gcs_transfer",
         bucket="astro-sdk-test",
@@ -40,8 +41,9 @@ with DAG(
         dest_gcs=f"{gcs_bucket}/uto/",
         replace=False,
     )
+    # [END howto_transfer_file_from_s3_to_gcs_using_traditional_S3ToGCSOperator
 
-    # transfer data from S3 to Snowflake using universal transfer operator
+    # [START howto_transfer_data_from_s3_to_snowflake_using_universal_transfer_operator]
     uto_transfer_non_native_s3_to_snowflake = UniversalTransferOperator(
         task_id="uto_transfer_non_native_s3_to_snowflake",
         source_dataset=File(
@@ -49,17 +51,19 @@ with DAG(
         ),
         destination_dataset=Table(name="uto_s3_table_to_snowflake", conn_id="snowflake_conn"),
     )
+    # [END howto_transfer_data_from_s3_to_snowflake_using_universal_transfer_operator]
 
-    # transfer data from S3 to Snowflake using S3ToSnowflakeOperator
+    # [START howto_transfer_data_from_s3_to_snowflake_using_S3ToSnowflakeOperator]
     traditional_copy_from_s3_to_snowflake = S3ToSnowflakeOperator(
         task_id="traditional_copy_from_s3_to_snowflake",
         snowflake_conn_id="snowflake_conn",
         s3_keys="s3://astro-sdk-test/uto/csv_files/",
-        table="traditional_s3_table_to_snowflake",
-        stage="stage_name",
+        table="homes_reporting_data",
+        stage="WORKSPACE_STAGE_ONE",
         file_format="(type = 'CSV',field_delimiter = ';')",
         pattern=".*[.]csv",
     )
+    # [END howto_transfer_data_from_s3_to_snowflake_using_S3ToSnowflakeOperator]
 
     (
         uto_transfer_non_native_s3_to_gs
