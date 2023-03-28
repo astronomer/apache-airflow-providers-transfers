@@ -23,11 +23,15 @@ create_table = """
 
 create_stage = """
     CREATE OR REPLACE STAGE WORKSPACE_STAGE_ONE
-    URL='s3://astro-sdk-test/uto/csv_files/'
+    URL='s3://astro-sdk-test/uto/csv_files/homes2.csv'
     FILE_FORMAT=(TYPE=CSV, TRIM_SPACE=TRUE,SKIP_HEADER=1)
     COPY_OPTIONS=(ON_ERROR = CONTINUE)
     storage_integration = aws_int_python_sdk;
     """
+
+drop_table = """
+    DROP TABLE IF EXISTS {{ params.table_name }};
+"""
 
 with DAG(
     "transfer_comparison_with_tradition_transfer_operator",
@@ -62,7 +66,7 @@ with DAG(
     uto_transfer_non_native_s3_to_snowflake = UniversalTransferOperator(
         task_id="uto_transfer_non_native_s3_to_snowflake",
         source_dataset=File(
-            path="s3://astro-sdk-test/uto/csv_files/", conn_id="aws_default", filetype=FileType.CSV
+            path="s3://astro-sdk-test/uto/csv_files/homes2.csv", conn_id="aws_default", filetype=FileType.CSV
         ),
         destination_dataset=Table(name="uto_s3_table_to_snowflake", conn_id="snowflake_conn"),
     )
@@ -72,7 +76,7 @@ with DAG(
     snowflake_create_table = SnowflakeOperator(
         task_id="snowflake_create_table",
         sql=create_table,
-        params={"table_name": "uto_s3_table_to_snowflake"},
+        params={"table_name": "s3_to_snowflake_table"},
         snowflake_conn_id="snowflake_conn",
     )
 
@@ -83,11 +87,12 @@ with DAG(
     traditional_copy_from_s3_to_snowflake = S3ToSnowflakeOperator(
         task_id="traditional_copy_from_s3_to_snowflake",
         snowflake_conn_id="snowflake_conn",
-        s3_keys="s3://astro-sdk-test/uto/csv_files/",
-        table="uto_s3_table_to_snowflake",
+        s3_keys="s3://astro-sdk-test/uto/csv_files/homes2.csv",
+        table="s3_to_snowflake_table",
         stage="WORKSPACE_STAGE_ONE",
         file_format="(type = 'CSV',field_delimiter = ';')",
     )
+
     # [END howto_transfer_data_from_s3_to_snowflake_using_S3ToSnowflakeOperator]
 
     (
