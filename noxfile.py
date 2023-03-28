@@ -106,5 +106,4 @@ def build(session: nox.Session) -> None:
             "You can use `git clean -fxdi -- dist` command to do this."
         )
     dist.mkdir(exist_ok=True)
-
     session.run("python", "-m", "build", *session.posargs)
