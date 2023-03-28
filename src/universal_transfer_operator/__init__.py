@@ -1,6 +1,6 @@
 """An Operator that allows transfers between different datasets."""
 
-__version__ = "0.1.0dev1"
+__version__ = "0.1.0"
 
 
 # This is needed to allow Airflow to pick up specific metadata fields it needs
