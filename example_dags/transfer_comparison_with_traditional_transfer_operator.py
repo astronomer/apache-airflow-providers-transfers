@@ -87,7 +87,6 @@ with DAG(
         table="uto_s3_table_to_snowflake",
         stage="WORKSPACE_STAGE_ONE",
         file_format="(type = 'CSV',field_delimiter = ';')",
-        pattern=".*[.]csv",
     )
     # [END howto_transfer_data_from_s3_to_snowflake_using_S3ToSnowflakeOperator]
 
