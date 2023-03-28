@@ -3,12 +3,12 @@ on:
   push:
     branches: [ 'main', 'release-**' ]
     paths:
-      - '*'
+      - '**'
 
   pull_request:
     branches: [ 'main', 'release-**' ]
     paths:
-      - '*'
+      - '**'
   # Run on PRs from forks
   pull_request_target:
     branches: [ 'main' ]
