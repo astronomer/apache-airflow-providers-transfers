@@ -28,6 +28,8 @@
 | Google GCS  | non-native, third-party | [#1492](https://github.com/astronomer/apache-airflow-provider-transfers/commit/62c895a93c746a1536557701af90195c09653948), [#1621](https://github.com/astronomer/apache-airflow-provider-transfers/commit/01a8fc6356937debd0d702fdf689338a70b0f0d9) |
 | SFTP        | non-native              | [#1725](https://github.com/astronomer/apache-airflow-provider-transfers/commit/8554233807623eb17c6fde9020ed96c154c7821e), [#1866](https://github.com/astronomer/apache-airflow-provider-transfers/commit/251ed96f72f039a5f71ff907521f06084d7fa3ad) |
 
+* Add support for cross-database transfers.  [#1732](https://github.com/astronomer/apache-airflow-provider-transfers/commit/32afcef05e034d1ddffbf16804b2c81e0308901f), [#1731](https://github.com/astronomer/apache-airflow-provider-transfers/commit/9a311e7cff7adef37210d1721c3c4e3f115e054b), [#1735](https://github.com/astronomer/apache-airflow-provider-transfers/commit/35376b3f8d4f61a7a6b169499d4ba9cdd19e8cb5)
+
 ### Docs
 
 * Add Sphinx documentation and update the
