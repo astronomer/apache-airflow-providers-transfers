@@ -77,7 +77,7 @@ Comparison with traditional transfer Operator
            :start-after: [START howto_transfer_data_from_s3_to_snowflake_using_universal_transfer_operator]
            :end-before: [END howto_transfer_data_from_s3_to_snowflake_using_universal_transfer_operator]
 
-    Following example transfers data from S3 to Snowflake using traditional S3ToSnowflakeOperator:
+    Following example transfers data from S3 to Snowflake using traditional S3ToSnowflakeOperator. Table and stage needs to be created before the transfer. This is not handled by ``S3ToSnowflakeOperator``.
 
         .. literalinclude:: ../../example_dags/transfer_comparison_with_traditional_transfer_operator.py
            :language: python
