@@ -144,7 +144,9 @@ with DAG(
     transfer_non_native_local_to_sftp = UniversalTransferOperator(
         task_id="transfer_non_native_local_to_sftp",
         source_dataset=File(path=f"{DATA_DIR}sample.csv", filetype=FileType.CSV),
-        destination_dataset=File(path="sftp://upload/sample.csv", conn_id="sftp_conn", filetype=FileType.CSV),
+        destination_dataset=File(
+            path="sftp://upload/sample_1.csv", conn_id="sftp_conn", filetype=FileType.CSV
+        ),
     )
 
     transfer_non_native_s3_to_gs >> [
