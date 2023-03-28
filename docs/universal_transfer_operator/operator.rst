@@ -38,3 +38,48 @@ Case 3: Transfer using third-party platform
        :language: python
        :start-after: [START fivetran_transfer_with_setup]
        :end-before: [END fivetran_transfer_with_setup]
+
+.. _cross_database_transfers:
+
+Cross database transfers
+~~~~~~~~~~~~~~~~~~~~~~~~
+Universal transfer operators can be used to transfer data between databases. For examples:
+
+.. literalinclude:: ../../example_dags/example_universal_transfer_operator.py
+   :language: python
+   :start-after: [START transfer_non_native_bigquery_to_snowflake]
+   :end-before: [END transfer_non_native_bigquery_to_snowflake]
+
+
+Comparison with traditional transfer Operator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1. File to File transfers
+    Following example transfers data from S3 to GCS using Universal transfer Operator:
+
+        .. literalinclude:: ../../example_dags/transfer_comparison_with_traditional_transfer_operator.py
+           :language: python
+           :start-after: [START howto_transfer_file_from_s3_to_gcs_using_universal_transfer_operator]
+           :end-before: [END howto_transfer_file_from_s3_to_gcs_using_universal_transfer_operator]
+
+
+    Following example transfers data from S3 to GCS using traditional S3ToGCSOperator:
+
+        .. literalinclude:: ../../example_dags/transfer_comparison_with_traditional_transfer_operator.py
+           :language: python
+           :start-after: [START howto_transfer_file_from_s3_to_gcs_using_traditional_S3ToGCSOperator]
+           :end-before: [END howto_transfer_file_from_s3_to_gcs_using_traditional_S3ToGCSOperator]
+
+2. File to Table transfers
+    Following example transfers data from S3 to Snowflake using Universal transfer Operator:
+
+        .. literalinclude:: ../../example_dags/transfer_comparison_with_traditional_transfer_operator.py
+           :language: python
+           :start-after: [START howto_transfer_data_from_s3_to_snowflake_using_universal_transfer_operator]
+           :end-before: [END howto_transfer_data_from_s3_to_snowflake_using_universal_transfer_operator]
+
+    Following example transfers data from S3 to Snowflake using traditional S3ToSnowflakeOperator:
+
+        .. literalinclude:: ../../example_dags/transfer_comparison_with_traditional_transfer_operator.py
+           :language: python
+           :start-after: [START howto_transfer_data_from_s3_to_snowflake_using_S3ToSnowflakeOperator]
+           :end-before: [END howto_transfer_data_from_s3_to_snowflake_using_S3ToSnowflakeOperator]

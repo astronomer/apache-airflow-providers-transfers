@@ -41,7 +41,7 @@ with DAG(
         dest_gcs=f"{gcs_bucket}/uto/",
         replace=False,
     )
-    # [END howto_transfer_file_from_s3_to_gcs_using_traditional_S3ToGCSOperator
+    # [END howto_transfer_file_from_s3_to_gcs_using_traditional_S3ToGCSOperator]
 
     # [START howto_transfer_data_from_s3_to_snowflake_using_universal_transfer_operator]
     uto_transfer_non_native_s3_to_snowflake = UniversalTransferOperator(
