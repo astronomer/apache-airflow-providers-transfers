@@ -8,7 +8,7 @@ transfers made easy<br><br>
 
 [![CI](https://github.com/astronomer/apache-airflow-provider-transfers/actions/workflows/ci-uto.yaml/badge.svg)](https://github.com/astronomer/apache-airflow-provider-transfers)
 
-The **Universal Transfer Operator** simplifies how users transfer data from a source to a destination using [Apache Airflow](https://airflow.apache.org/). It offers a consistent agnostic interface, improving the users' experience, so they do not need to use explicilty specific providers or operators.
+The **Universal Transfer Operator** simplifies how users transfer data from a source to a destination using [Apache Airflow](https://airflow.apache.org/). It offers a consistent agnostic interface, improving the users' experience so they do not need to use explicitly specific providers or operators.
 
 At the moment, it supports transferring data between [file locations](https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/src/universal_transfer_operator/constants.py#L26-L32) and [databases](https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/src/universal_transfer_operator/constants.py#L72-L74) (in both directions) and cross-database transfers.
 
