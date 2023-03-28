@@ -3,7 +3,7 @@ requires = ["flit_core ~=3.2"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "universal-transfer-operator"
+name = "apache-airflow-provider-transfers"
 dynamic = ["version"]
 description = """Universal Transfer Operator transfers all the data that could be read from the source Dataset into
 the destination Dataset. From a DAG author standpoint, all transfers would be performed through the invocation of
