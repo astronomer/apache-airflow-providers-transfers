@@ -1,6 +1,6 @@
 """An Operator that allows transfers between different datasets."""
 
-__version__ = "0.0.1dev1"
+__version__ = "0.1.0dev1"
 
 
 # This is needed to allow Airflow to pick up specific metadata fields it needs
@@ -10,7 +10,7 @@ __version__ = "0.0.1dev1"
 def get_provider_info() -> dict:
     return {
         # Required.
-        "package-name": "universal-transfer-operator",
+        "package-name": "apache-airflow-provider-transfers",
         "name": "Universal Transfer Operator",
         "description": __doc__,
         "versions": [__version__],
