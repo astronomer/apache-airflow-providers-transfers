@@ -22,7 +22,7 @@ pip install apache-airflow-provider-transfers
 
 ## Example DAGs
 
-See the [example_dags](./example_dags) folder for examples of how you can use the UniversalTransfeOperator.
+See the [example_dags](./example_dags) folder for examples of how you can use the UniversalTransferOperator.
 
 ## How the UniversalTransferOperator works
 
