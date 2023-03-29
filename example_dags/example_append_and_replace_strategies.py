@@ -49,7 +49,7 @@ with DAG(
     uto_transfer_non_native_s3_to_snowflake_append = UniversalTransferOperator(
         task_id="uto_transfer_non_native_s3_to_snowflake_append",
         source_dataset=File(
-            path="s3://astro-sdk-test/uto/csv_files/home2.csv", conn_id="aws_default", filetype=FileType.CSV
+            path="s3://astro-sdk-test/uto/csv_files/homes2.csv", conn_id="aws_default", filetype=FileType.CSV
         ),
         destination_dataset=Table(name="uto_s3_table_to_snowflake_append", conn_id="snowflake_conn"),
         transfer_params=TransferIntegrationOptions(if_exists="append"),
