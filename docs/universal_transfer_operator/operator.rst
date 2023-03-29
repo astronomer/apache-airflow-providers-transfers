@@ -83,3 +83,38 @@ Comparison with traditional transfer Operator
            :language: python
            :start-after: [START howto_transfer_data_from_s3_to_snowflake_using_S3ToSnowflakeOperator]
            :end-before: [END howto_transfer_data_from_s3_to_snowflake_using_S3ToSnowflakeOperator]
+
+
+.. _load_strategies:
+
+Load Strategies
+~~~~~~~~~~~~~~~
+
+Following are the load strategies supported for :ref:`table` transfers:
+
+.. literalinclude:: ../../src/universal_transfer_operator/constants.py
+   :language: python
+   :start-after: [START LoadExistStrategy]
+   :end-before: [END LoadExistStrategy]
+
+
+If the table you trying to create already exists, you can specify whether you want to replace the table or append the new data by specifying either if_exists='append' or if_exists='replace'.
+
+1. ``if_exists="replace"``
+    By default if ``transfer_params`` if not passed as an argument to :py:mod:`universal_transfer_operator operator <universal_transfer_operator.universal_transfer_operator>`, it sets if_exists='replace' by default.
+
+    .. literalinclude:: ../../example_dags/example_append_and_replace_strategies.py
+       :language: python
+       :start-after: [START howto_transfer_data_from_s3_to_snowflake_using_replace]
+       :end-before: [END howto_transfer_data_from_s3_to_snowflake_using_replace]
+
+    .. note::
+        If you use if_exists='replace', the existing table will be dropped and the schema of the new data will be used.
+
+2. ``if_exists="append"``
+    User can set ``if_exists="append"`` passing an argument ``transfer_params=TransferIntegrationOptions(if_exists="append")`` to :py:mod:`universal_transfer_operator operator <universal_transfer_operator.universal_transfer_operator>` as the example below:
+
+    .. literalinclude:: ../../example_dags/example_append_and_replace_strategies.py
+       :language: python
+       :start-after: [START howto_transfer_data_from_s3_to_snowflake_using_append]
+       :end-before: [END howto_transfer_data_from_s3_to_snowflake_using_append]
