@@ -17,7 +17,7 @@ from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.file.types import create_file_type
 from universal_transfer_operator.universal_transfer_operator import TransferIntegrationOptions
 from universal_transfer_operator.utils import get_dataset_connection_type
-
+from universal_transfer_operator.exceptions import DatabaseCustomError
 
 @attr.define
 class TempFile:
@@ -84,6 +84,8 @@ class BaseFilesystemProviders(DataProviders[File]):
 
     def read(self) -> Iterator[DataStream]:
         """Read the remote or local file dataset and returns i/o buffers"""
+        if self.transfer_mode.NATIVE:
+            yield DataStream(actual_file=self.dataset, remote_obj_buffer=io.BytesIO(), actual_filename="")
         return self.read_using_smart_open()
 
     def read_using_smart_open(self) -> Iterator[DataStream]:
@@ -221,3 +223,13 @@ class BaseFilesystemProviders(DataProviders[File]):
         Given a dataset, check if the dataset has metadata.
         """
         pass
+
+    def get_snowflake_stage_auth_sub_statement(self) -> str:  # skipcq: PYL-R0201
+        raise DatabaseCustomError("In order to create a stage, `storage_integration` is required.")
+
+    @property
+    def snowflake_stage_path(self) -> str:
+        """
+        Get the altered path if needed for stage creation in snowflake stage creation
+        """
+        return self.dataset.path

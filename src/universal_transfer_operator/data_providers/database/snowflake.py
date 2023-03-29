@@ -265,7 +265,6 @@ class SnowflakeDataProvider(DatabaseDataProvider):
         table: Table,
         file: File | None = None,
         dataframe: pd.DataFrame | None = None,
-        columns_names_capitalization: ColumnCapitalization = "original",
     ) -> None:  # skipcq PYL-W0613
         """
         Create a SQL table, automatically inferring the schema using the given file.
@@ -274,8 +273,6 @@ class SnowflakeDataProvider(DatabaseDataProvider):
         :param table: The table to be created.
         :param file: File used to infer the new table columns.
         :param dataframe: Dataframe used to infer the new table columns if there is no file
-        :param columns_names_capitalization: determines whether to convert all columns to lowercase/uppercase
-            in the resulting dataframe
         """
         if file is None:
             if dataframe is None:
@@ -399,18 +396,19 @@ class SnowflakeDataProvider(DatabaseDataProvider):
         """
         return f"{self.openlineage_dataset_namespace}{self.openlineage_dataset_name}"
 
-    def is_native_load_file_available(
-        self, source_file: File, target_table: Table  # skipcq PYL-W0613, PYL-R0201
+    def is_native_path_available(
+        self, source_dataset: File | Table,  # skipcq PYL-W0613, PYL-R0201
     ) -> bool:
         """
         Check if there is an optimised path for source to destination.
 
-        :param source_file: File from which we need to transfer data
-        :param target_table: Table that needs to be populated with file data
+        :param source_dataset: File | Table from which we need to transfer data
         """
-        is_file_type_supported = source_file.type.name in NATIVE_LOAD_SUPPORTED_FILE_TYPES
+        if isinstance(source_dataset, Table):
+            return False
+        is_file_type_supported = source_dataset.type.name in NATIVE_LOAD_SUPPORTED_FILE_TYPES
         is_file_location_supported = (
-            source_file.location.location_type in NATIVE_LOAD_SUPPORTED_FILE_LOCATIONS
+            source_dataset.location.location_type in NATIVE_LOAD_SUPPORTED_FILE_LOCATIONS
         )
         return is_file_type_supported and is_file_location_supported
 
@@ -514,8 +512,8 @@ class SnowflakeDataProvider(DatabaseDataProvider):
 
         file_format = ASTRO_SDK_TO_SNOWFLAKE_FILE_FORMAT_MAP[file.type.name]
         copy_options = []
-        copy_options.extend([f"{k}={v}" for k, v in self.transfer_params["copy_options"].items()])
-        file_options = [f"{k}={v}" for k, v in self.transfer_params["file_options"].items()]
+        copy_options.extend([f"{k}={v}" for k, v in self.transfer_params.get("copy_options", {}).items()])
+        file_options = [f"{k}={v}" for k, v in self.transfer_params.get("file_options", {}).items()]
         file_options.extend([f"TYPE={file_format}", "TRIM_SPACE=TRUE"])
         file_options_str = ", ".join(file_options)
         copy_options_str = ", ".join(copy_options)
@@ -560,7 +558,7 @@ class SnowflakeDataProvider(DatabaseDataProvider):
     ) -> None:
         """Validate COPY INTO command to tests the files for errors but does not load them."""
         if self.transfer_params:
-            if self.transfer_params["validation_mode"] is None:
+            if self.transfer_params.get("validation_mode") is None:
                 return
             table_name = self.get_table_qualified_name(target_table)
             file_path = os.path.basename(source_file.path) or ""

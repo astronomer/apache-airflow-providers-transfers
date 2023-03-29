@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Callable, Iterator
 
+import io
 import pandas as pd
 import sqlalchemy
 
@@ -199,6 +200,8 @@ class DatabaseDataProvider(DataProviders[Table]):
 
     def read(self) -> Iterator[pd.DataFrame]:
         """Convert a Table into a Pandas DataFrame"""
+        if self.transfer_mode.NATIVE:
+            yield DataStream(actual_file=File, remote_obj_buffer=io.BytesIO(), actual_filename="")
         yield self.export_table_to_pandas_dataframe()
 
     def write(self, source_ref: DataStream | pd.DataFrame) -> str:
@@ -218,6 +221,35 @@ class DatabaseDataProvider(DataProviders[Table]):
         return self.load_dataframe_to_table(
             input_dataframe=source_ref, output_table=self.dataset, if_exists=self.if_exists
         )
+
+    def load_dataframe_to_table(
+            self,
+            input_dataframe: pd.DataFrame,
+            output_table: Table,
+            if_exists: LoadExistStrategy = "replace",
+            chunk_size: int = DEFAULT_CHUNK_SIZE,
+    ) -> str:
+        """
+        Load content of dataframe in output_table.
+        :param input_dataframe: dataframe
+        :param output_table: Table to create
+        :param if_exists: Overwrite file if exists
+        :param chunk_size: Specify the number of records in each batch to be written at a time
+        :param normalize_config: pandas json_normalize params config
+        """
+
+        self.create_schema_and_table_if_needed_from_dataframe(
+            table=output_table,
+            dataframe=input_dataframe,
+            if_exists=if_exists,
+        )
+        self.load_pandas_dataframe_to_table(
+            input_dataframe,
+            output_table,
+            chunk_size=chunk_size,
+            if_exists=if_exists,
+        )
+        return self.get_table_qualified_name(output_table)
 
     @property
     def openlineage_dataset_namespace(self) -> str:
@@ -334,7 +366,6 @@ class DatabaseDataProvider(DataProviders[Table]):
         table: Table,
         file: File | None = None,
         dataframe: pd.DataFrame | None = None,
-        columns_names_capitalization: ColumnCapitalization = "original",  # skipcq
     ) -> None:
         """
         Create a SQL table, automatically inferring the schema using the given file.
@@ -342,8 +373,6 @@ class DatabaseDataProvider(DataProviders[Table]):
         :param table: The table to be created.
         :param file: File used to infer the new table columns.
         :param dataframe: Dataframe used to infer the new table columns if there is no file
-        :param columns_names_capitalization: determines whether to convert all columns to lowercase/uppercase
-            in the resulting dataframe
         """
         if file is None:
             if dataframe is None:
@@ -368,7 +397,6 @@ class DatabaseDataProvider(DataProviders[Table]):
         table: Table,
         file: File | None = None,
         dataframe: pd.DataFrame | None = None,
-        columns_names_capitalization: ColumnCapitalization = "original",
         use_native_support: bool = True,
     ) -> None:
         """
@@ -378,8 +406,6 @@ class DatabaseDataProvider(DataProviders[Table]):
         :param table: The table to be created
         :param file: (optional) File used to infer the table columns.
         :param dataframe: (optional) Dataframe used to infer the new table columns if there is no file
-        :param columns_names_capitalization: determines whether to convert all columns to lowercase/uppercase
-            in the resulting dataframe
         """
         if table.columns:
             self.create_table_using_columns(table)
@@ -390,7 +416,6 @@ class DatabaseDataProvider(DataProviders[Table]):
                 table,
                 file=file,
                 dataframe=dataframe,
-                columns_names_capitalization=columns_names_capitalization,
             )
 
     def create_table_from_select_statement(
@@ -429,7 +454,6 @@ class DatabaseDataProvider(DataProviders[Table]):
         table: Table,
         file: File,
         normalize_config: dict | None = None,
-        columns_names_capitalization: ColumnCapitalization = "original",
         if_exists: LoadExistStrategy = "replace",
         use_native_support: bool = True,
     ):
@@ -438,7 +462,6 @@ class DatabaseDataProvider(DataProviders[Table]):
         :param table: Table to create
         :param file: File path and conn_id for object stores
         :param normalize_config: pandas json_normalize params config
-        :param columns_names_capitalization:  determines whether to convert all columns to lowercase/uppercase
         :param if_exists:  Overwrite file if exists
         :param use_native_support: Use native support for data transfer if available on the destination
         """
@@ -471,7 +494,6 @@ class DatabaseDataProvider(DataProviders[Table]):
                 table,
                 # We only use the first file for inferring the table schema
                 files[0],
-                columns_names_capitalization=columns_names_capitalization,
                 use_native_support=use_native_support,
             )
 
@@ -479,7 +501,6 @@ class DatabaseDataProvider(DataProviders[Table]):
         self,
         table: Table,
         dataframe: pd.DataFrame,
-        columns_names_capitalization: ColumnCapitalization = "original",
         if_exists: LoadExistStrategy = "replace",
         use_native_support: bool = True,
     ):
@@ -488,7 +509,6 @@ class DatabaseDataProvider(DataProviders[Table]):
 
         :param table: Table to create
         :param dataframe: dataframe object to be used as a source of data
-        :param columns_names_capitalization:  determines whether to convert all columns to lowercase/uppercase
         :param if_exists:  Overwrite file if exists
         :param use_native_support: Use native support for data transfer if available on the destination
         """
@@ -499,7 +519,6 @@ class DatabaseDataProvider(DataProviders[Table]):
             self.create_table(
                 table,
                 dataframe=dataframe,
-                columns_names_capitalization=columns_names_capitalization,
                 use_native_support=use_native_support,
             )
 
@@ -518,14 +537,13 @@ class DatabaseDataProvider(DataProviders[Table]):
         response = self.run_sql(statement, handler=lambda x: x.fetchall())
         return response  # type: ignore
 
-    def is_native_load_file_available(  # skipcq: PYL-R0201
-        self, source_file: File, target_table: Table  # skipcq: PYL-W0613
+    def is_native_path_available(  # skipcq: PYL-R0201
+        self, source_dataset: File | Table  # skipcq: PYL-W0613
     ) -> bool:
         """
         Check if there is an optimised path for source to destination.
 
-        :param source_file: File from which we need to transfer data
-        :param target_table: Table that needs to be populated with file data
+        :param source_dataset: File | Table from which we need to transfer data
         """
         return False
 
@@ -536,7 +554,6 @@ class DatabaseDataProvider(DataProviders[Table]):
         normalize_config: dict | None = None,
         if_exists: LoadExistStrategy = "replace",
         chunk_size: int = DEFAULT_CHUNK_SIZE,
-        columns_names_capitalization: ColumnCapitalization = "original",
         **kwargs,
     ) -> str:
         """
@@ -549,21 +566,16 @@ class DatabaseDataProvider(DataProviders[Table]):
         :param chunk_size: Specify the number of records in each batch to be written at a time
         :param use_native_support: Use native support for data transfer if available on the destination
         :param normalize_config: pandas json_normalize params config
-        :param columns_names_capitalization: determines whether to convert all columns to lowercase/uppercase
-            in the resulting dataframe
         """
         normalize_config = normalize_config or {}
 
         self.create_schema_and_table_if_needed(
             file=input_file,
             table=output_table,
-            columns_names_capitalization=columns_names_capitalization,
             if_exists=if_exists,
             normalize_config=normalize_config,
         )
-        if self.transfer_mode == TransferMode.NATIVE and self.is_native_load_file_available(
-            source_file=input_file, target_table=output_table
-        ):
+        if self.transfer_mode == TransferMode.NATIVE:
             self.load_file_to_table_natively_with_fallback(
                 source_file=input_file,
                 target_table=output_table,

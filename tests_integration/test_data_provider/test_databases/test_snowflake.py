@@ -13,6 +13,15 @@ from universal_transfer_operator.data_providers.database.snowflake import Snowfl
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Metadata, Table
 from universal_transfer_operator.settings import SNOWFLAKE_SCHEMA
+from universal_transfer_operator.universal_transfer_operator import UniversalTransferOperator
+from universal_transfer_operator.constants import FileType
+from universal_transfer_operator.settings import SNOWFLAKE_STORAGE_INTEGRATION_AMAZON,\
+    SNOWFLAKE_STORAGE_INTEGRATION_GOOGLE
+from utils.test_dag_runner import run_dag
+
+
+SNOWFLAKE_STORAGE_INTEGRATION_AMAZON = SNOWFLAKE_STORAGE_INTEGRATION_AMAZON or "aws_int_python_sdk"
+SNOWFLAKE_STORAGE_INTEGRATION_GOOGLE = SNOWFLAKE_STORAGE_INTEGRATION_GOOGLE or "gcs_int_python_sdk"
 
 DEFAULT_CONN_ID = "snowflake_default"
 CUSTOM_CONN_ID = "snowflake_conn"
@@ -156,3 +165,34 @@ def test_write_method(dataset_table_fixture):
     rows = dp.fetch_all_rows(table=dp.dataset)
     rows.sort(key=lambda x: x[0])
     assert rows == [(1, "First"), (2, "Second"), (3, "Third with unicode पांचाल")]
+
+
+def test_s3_to_snowflake_native_path(sample_dag):
+    """
+    Test the native path of S3 to Snowflake
+    """
+    with sample_dag:
+         UniversalTransferOperator(
+            task_id="s3_to_bigquery",
+            source_dataset=File(
+                path="s3://astro-sdk-test/uto/csv_files/homes2.csv",
+                conn_id="aws_default",
+                filetype=FileType.CSV
+            ),
+            destination_dataset=Table(
+                name="homes_temp",
+                conn_id="snowflake_conn"
+            ),
+            transfer_params={
+                "storage_integration": SNOWFLAKE_STORAGE_INTEGRATION_AMAZON
+            },
+            transfer_mode=TransferMode.NATIVE
+        )
+    run_dag(sample_dag)
+
+
+def test_gcs_to_snowflake_native_path():
+    """
+    Test the native path of gcs to Snowflake
+    """
+    pass
