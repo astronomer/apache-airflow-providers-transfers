@@ -12,7 +12,7 @@ from universal_transfer_operator.datasets.table import Table
 
 @attr.define
 class TransferParameters:
-    if_exists: LoadExistStrategy = "replace"
+    if_exists: LoadExistStrategy = attr.field(default="replace")
 
 
 def check_if_connection_exists(conn_id: str) -> bool:

@@ -63,6 +63,7 @@ class DatabaseDataProvider(DataProviders[Table]):
     ):
         self.dataset = dataset
         self.transfer_params = transfer_params
+        self.if_exists = self._if_exists
         self.transfer_mode = transfer_mode
         self.transfer_mapping = set()
         self.LOAD_DATA_NATIVELY_FROM_SOURCE: dict = {}
@@ -96,6 +97,15 @@ class DatabaseDataProvider(DataProviders[Table]):
     def transport_params(self) -> dict | None:  # skipcq: PYL-R0201
         """Get credentials required by smart open to access files"""
         return None
+
+    @property
+    def _if_exists(self) -> LoadExistStrategy:
+        """Check if_exists is passed by user else default to replace"""
+        try:
+            if_exist = self.transfer_params.if_exists
+        except AttributeError:
+            if_exist = "replace"
+        return if_exist
 
     def run_sql(
         self,
@@ -194,17 +204,16 @@ class DatabaseDataProvider(DataProviders[Table]):
 
         :param source_ref: Stream of data to be loaded into output table or a pandas dataframe.
         """
-        if_exists = self.transfer_params.if_exists
         # `source_ref` can be a dataframe for all the filetypes we can create a dataframe for like -
         # CSV, JSON, NDJSON, and Parquet or SQL Tables. This gives us the option to perform various
         # functions on the data on the fly, like filtering or changing the file format altogether. For other
         # files whose content cannot be converted to dataframe like - zip or image, we get a DataStream object.
         if isinstance(source_ref, DataStream):
             return self.load_file_to_table(
-                input_file=source_ref.actual_file, output_table=self.dataset, if_exists=if_exists
+                input_file=source_ref.actual_file, output_table=self.dataset, if_exists=self.if_exists
             )
         return self.load_dataframe_to_table(
-            input_dataframe=source_ref, output_table=self.dataset, if_exists=if_exists
+            input_dataframe=source_ref, output_table=self.dataset, if_exists=self.if_exists
         )
 
     @property
