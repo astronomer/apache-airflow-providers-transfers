@@ -200,7 +200,7 @@ class DatabaseDataProvider(DataProviders[Table]):
 
     def read(self) -> Iterator[pd.DataFrame]:
         """Convert a Table into a Pandas DataFrame"""
-        if self.transfer_mode.NATIVE:
+        if self.transfer_mode == TransferMode.NATIVE:
             yield DataStream(actual_file=File, remote_obj_buffer=io.BytesIO(), actual_filename="")
         yield self.export_table_to_pandas_dataframe()
 

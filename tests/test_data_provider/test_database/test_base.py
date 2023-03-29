@@ -109,7 +109,7 @@ def test_create_schema_if_needed_replace(
     mock_drop_table.assert_called_once_with(table)
     mock_table_exists.assert_not_called()
     mock_create_table.assert_called_once_with(
-        table, dataframe=df, columns_names_capitalization="original", use_native_support=True
+        table, dataframe=df, use_native_support=True
     )
 
 
@@ -135,5 +135,5 @@ def test_create_schema_if_needed_append(
     mock_drop_table.assert_not_called()
     mock_table_exists.assert_called_once_with(table)
     mock_create_table.assert_called_once_with(
-        table, dataframe=df, columns_names_capitalization="original", use_native_support=True
+        table, dataframe=df, use_native_support=True
     )
