@@ -5,16 +5,15 @@ from pathlib import Path
 import pandas as pd
 import pytest
 import sqlalchemy
+from utils.test_dag_runner import run_dag
 
-from universal_transfer_operator.constants import TransferMode
+from universal_transfer_operator.constants import FileType, TransferMode
 from universal_transfer_operator.data_providers.database.google.bigquery import BigqueryDataProvider
 from universal_transfer_operator.data_providers.filesystem.base import FileStream
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Metadata, Table
 from universal_transfer_operator.settings import BIGQUERY_SCHEMA
 from universal_transfer_operator.universal_transfer_operator import UniversalTransferOperator
-from universal_transfer_operator.constants import FileType
-from utils.test_dag_runner import run_dag
 
 DEFAULT_CONN_ID = "google_cloud_default"
 CUSTOM_CONN_ID = "gcp_conn"
@@ -171,18 +170,19 @@ def test_write_method(dataset_table_fixture):
     rows.sort(key=lambda x: x[0])
     assert rows == [(1, "First"), (2, "Second"), (3, "Third with unicode पांचाल")]
 
+
 @pytest.mark.integration
 def test_gcs_to_snowflake_native_path(sample_dag):
     """
     Test the native path of S3 to Snowflake
     """
     with sample_dag:
-         UniversalTransferOperator(
+        UniversalTransferOperator(
             task_id="gcs_to_bigquery",
             source_dataset=File(
                 path="gs://uto-test/uto/homes_append.csv",
                 conn_id="google_cloud_default",
-                filetype=FileType.CSV
+                filetype=FileType.CSV,
             ),
             destination_dataset=Table(
                 name="uto_gs_to_bigquery_table_native",
@@ -194,6 +194,6 @@ def test_gcs_to_snowflake_native_path(sample_dag):
                 "allow_jagged_rows": True,
                 "skip_leading_rows": "1",
             },
-            transfer_mode=TransferMode.NATIVE
+            transfer_mode=TransferMode.NATIVE,
         )
     run_dag(sample_dag)

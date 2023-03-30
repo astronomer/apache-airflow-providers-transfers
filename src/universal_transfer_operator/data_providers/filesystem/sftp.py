@@ -20,8 +20,6 @@ class SFTPDataProvider(BaseFilesystemProviders):
     DataProviders interactions with GS Dataset.
     """
 
-    location_type = FileLocation.SFTP
-
     def __init__(
         self,
         dataset: File,
@@ -37,6 +35,7 @@ class SFTPDataProvider(BaseFilesystemProviders):
             Location.S3,
             Location.GS,
         }
+        self.location_type = FileLocation.SFTP
 
     @cached_property
     def hook(self) -> SFTPHook:

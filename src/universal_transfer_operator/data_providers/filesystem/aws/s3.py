@@ -24,8 +24,6 @@ class S3DataProvider(BaseFilesystemProviders):
     DataProviders interactions with S3 Dataset.
     """
 
-    location_type = FileLocation.S3
-
     def __init__(
         self,
         dataset: File,
@@ -41,6 +39,7 @@ class S3DataProvider(BaseFilesystemProviders):
             Location.S3,
             Location.GS,
         }
+        self.location_type = FileLocation.S3
 
     @cached_property
     def hook(self) -> S3Hook:

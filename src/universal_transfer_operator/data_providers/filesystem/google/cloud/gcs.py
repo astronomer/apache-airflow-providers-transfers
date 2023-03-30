@@ -9,7 +9,7 @@ from urllib.parse import urlparse, urlunparse
 
 from airflow.providers.google.cloud.hooks.gcs import GCSHook, _parse_gcs_url
 
-from universal_transfer_operator.constants import FileLocation, Location, TransferMode
+from universal_transfer_operator.constants import Location, TransferMode
 from universal_transfer_operator.data_providers.filesystem.base import (
     BaseFilesystemProviders,
     Path,
@@ -23,8 +23,6 @@ class GCSDataProvider(BaseFilesystemProviders):
     """
     DataProviders interactions with GS Dataset.
     """
-
-    location_type = FileLocation.GS
 
     def __init__(
         self,
@@ -41,6 +39,7 @@ class GCSDataProvider(BaseFilesystemProviders):
             Location.S3,
             Location.GS,
         }
+        self.location_type = Location.GS
 
     @cached_property
     def hook(self) -> GCSHook:

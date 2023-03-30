@@ -231,7 +231,7 @@ class BigqueryDataProvider(DatabaseDataProvider):
         """
         Check if native auto detection of schema is available.
         :param file: File used to check the file type of to decide
-            whether there is a native auto detection available for it.
+        whether there is a native auto detection available for it.
         """
         supported_config = self.NATIVE_AUTODETECT_SCHEMA_CONFIG.get(file.location.location_type)
         if supported_config and file.type.name in supported_config["filetype"]:  # type: ignore
@@ -252,16 +252,21 @@ class BigqueryDataProvider(DatabaseDataProvider):
         return supported_config["method"](table=table, file=file)  # type: ignore
 
     # Require skipcq because method overriding we need param target_table
-    def is_native_load_file_available(
-        self, source_file: File, target_table: Table  # skipcq PYL-W0613
+    def is_native_path_available(  # skipcq: PYL-R0201
+        self,
+        source_dataset: File | Table,  # skipcq PYL-W0613
     ) -> bool:
         """
         Check if there is an optimised path for source to destination.
         :param source_file: File from which we need to transfer data
         :param target_table: Table that needs to be populated with file data
         """
-        file_type = NATIVE_PATHS_SUPPORTED_FILE_TYPES.get(source_file.type.name)
-        location_type = self.NATIVE_PATHS.get(source_file.location.location_type)
+        if isinstance(source_dataset, Table):
+            return False
+        file_type = NATIVE_PATHS_SUPPORTED_FILE_TYPES.get(source_dataset.type.name)
+        print(source_dataset.location.__dict__)
+        location_type = self.NATIVE_PATHS.get(source_dataset.location.location_type)
+        print(file_type, location_type)
         return bool(location_type and file_type)
 
     def load_file_to_table_natively(
