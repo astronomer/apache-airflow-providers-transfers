@@ -261,3 +261,75 @@ def test_load_pandas_dataframe_to_table_with_append(dst_dataset_fixture):
     assert rows[1] == (2,)
 
     dst_dp.drop_table(dataset)
+
+
+@pytest.mark.parametrize(
+    "dst_dataset_fixture",
+    [
+        {"name": "SqliteDataProvider"},
+        {
+            "name": "SnowflakeDataProvider",
+        },
+        {
+            "name": "BigqueryDataProvider",
+        },
+    ],
+    indirect=True,
+    ids=lambda db: db["name"],
+)
+def test_write_to_table_with_replace(dst_dataset_fixture):
+    """Write to a SQL table with replace strategy"""
+    dst_dp, dataset = dst_dataset_fixture
+
+    pandas_dataframe = pd.DataFrame(data={"id": [1, 2]})
+    dst_dp.write(pandas_dataframe)
+
+    rows = dst_dp.fetch_all_rows(dataset)
+    assert len(rows) == 2
+    assert rows[0] == (1,)
+    assert rows[1] == (2,)
+
+    pandas_dataframe = pd.DataFrame(data={"id": [3, 4]})
+    dst_dp.write(pandas_dataframe)
+    rows = dst_dp.fetch_all_rows(dataset)
+    assert len(rows) == 2
+    assert rows[0] == (3,)
+    assert rows[1] == (4,)
+
+    dst_dp.drop_table(dataset)
+
+
+@pytest.mark.parametrize(
+    "dst_dataset_fixture",
+    [
+        {"name": "SqliteDataProvider"},
+        {
+            "name": "SnowflakeDataProvider",
+        },
+        {
+            "name": "BigqueryDataProvider",
+        },
+    ],
+    indirect=True,
+    ids=lambda db: db["name"],
+)
+def test_write_to_table_with_append(dst_dataset_fixture):
+    """Write to a SQL table with append strategy"""
+    dst_dp, dataset = dst_dataset_fixture
+
+    pandas_dataframe = pd.DataFrame(data={"id": [1, 2]})
+    dst_dp.write(pandas_dataframe)
+
+    rows = dst_dp.fetch_all_rows(dataset)
+    assert len(rows) == 2
+    assert rows[0] == (1,)
+    assert rows[1] == (2,)
+
+    dst_dp.if_exists = "append"
+    dst_dp.write(pandas_dataframe)
+    rows = dst_dp.fetch_all_rows(dataset)
+    assert len(rows) == 4
+    assert rows[0] == (1,)
+    assert rows[1] == (2,)
+
+    dst_dp.drop_table(dataset)
