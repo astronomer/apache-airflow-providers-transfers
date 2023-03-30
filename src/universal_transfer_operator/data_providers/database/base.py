@@ -249,6 +249,35 @@ class DatabaseDataProvider(DataProviders[Table]):
         )
         return self.get_table_qualified_name(output_table)
 
+    def load_dataframe_to_table(
+        self,
+        input_dataframe: pd.DataFrame,
+        output_table: Table,
+        if_exists: LoadExistStrategy = "replace",
+        chunk_size: int = DEFAULT_CHUNK_SIZE,
+    ) -> str:
+        """
+        Load content of dataframe in output_table.
+        :param input_dataframe: dataframe
+        :param output_table: Table to create
+        :param if_exists: Overwrite file if exists
+        :param chunk_size: Specify the number of records in each batch to be written at a time
+        :param normalize_config: pandas json_normalize params config
+        """
+
+        self.create_schema_and_table_if_needed_from_dataframe(
+            table=output_table,
+            dataframe=input_dataframe,
+            if_exists=if_exists,
+        )
+        self.load_pandas_dataframe_to_table(
+            input_dataframe,
+            output_table,
+            chunk_size=chunk_size,
+            if_exists=if_exists,
+        )
+        return self.get_table_qualified_name(output_table)
+
     @property
     def openlineage_dataset_namespace(self) -> str:
         """
