@@ -101,7 +101,7 @@ Following are the load strategies supported for :ref:`table` transfers:
 If the table you trying to create already exists, you can specify whether you want to replace the table or append the new data by specifying either if_exists='append' or if_exists='replace'.
 
 1. ``if_exists="replace"``
-    By default if ``transfer_params`` if not passed as an argument to :py:mod:`universal_transfer_operator operator <universal_transfer_operator.universal_transfer_operator>`, it sets if_exists='replace' by default.
+    By default if ``transfer_params`` is not passed as an argument to :py:mod:`universal_transfer_operator operator <universal_transfer_operator.universal_transfer_operator>`, it sets if_exists='replace' by default.
 
     .. literalinclude:: ../../example_dags/example_append_and_replace_strategies.py
        :language: python
