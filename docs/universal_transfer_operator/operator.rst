@@ -105,8 +105,8 @@ If the table you trying to create already exists, you can specify whether you wa
 
     .. literalinclude:: ../../example_dags/example_append_and_replace_strategies.py
        :language: python
-       :start-after: [START howto_transfer_data_from_s3_to_snowflake_using_replace]
-       :end-before: [END howto_transfer_data_from_s3_to_snowflake_using_replace]
+       :start-after: [START howto_transfer_data_from_s3_to_sqlite_using_replace]
+       :end-before: [END howto_transfer_data_from_s3_to_sqlite_using_replace]
 
     .. note::
         If you use if_exists='replace', existing table will be dropped and the schema of the new data will be used.
@@ -116,5 +116,5 @@ If the table you trying to create already exists, you can specify whether you wa
 
     .. literalinclude:: ../../example_dags/example_append_and_replace_strategies.py
        :language: python
-       :start-after: [START howto_transfer_data_from_s3_to_snowflake_using_append]
-       :end-before: [END howto_transfer_data_from_s3_to_snowflake_using_append]
+       :start-after: [START howto_transfer_data_from_s3_to_sqlite_using_append]
+       :end-before: [END howto_transfer_data_from_s3_to_sqlite_using_append]
