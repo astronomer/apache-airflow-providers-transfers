@@ -90,7 +90,7 @@ Comparison with traditional transfer Operator
 Load Strategies
 ~~~~~~~~~~~~~~~
 
-Following are the load strategies supported for :ref:`table` transfers:
+Following are the load strategies supported when :ref:`table` is the destination dataset:
 
 .. literalinclude:: ../../src/universal_transfer_operator/constants.py
    :language: python
