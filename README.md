@@ -8,7 +8,7 @@ transfers made easy<br><br>
 
 [![CI](https://github.com/astronomer/apache-airflow-provider-transfers/actions/workflows/ci-uto.yaml/badge.svg)](https://github.com/astronomer/apache-airflow-provider-transfers)
 
-The **Universal Transfer Operator** simplifies how users transfer data from a source to a destination using [Apache Airflow](https://airflow.apache.org/). It offers a consistent agnostic interface, improving the users' experience so they do not need to use explicitly specific providers or operators.
+The `UniversalTransferOperator` simplifies how users transfer data from a source to a destination using [Apache Airflow](https://airflow.apache.org/). It offers a consistent agnostic interface, improving the users' experience so they do not need to use explicitly specific providers or operators.
 
 At the moment, it supports transferring data between [file locations](https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/src/universal_transfer_operator/constants.py#L26-L32) and [databases](https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/src/universal_transfer_operator/constants.py#L72-L74) (in both directions) and cross-database transfers.
 
@@ -30,7 +30,7 @@ Checkout the [example_dags](./example_dags) folder for examples of how the Unive
 
 ![Approach](./docs/images/approach.png)
 
-With Universal Transfer Operator, users can perform data transfers using the following transfer modes:
+With `UniversalTransferOperator`, users can perform data transfers using the following transfer modes:
 
 1. Non-native
 2. Native
@@ -47,8 +47,7 @@ Internally, the steps involved are:
 
 Following is an example of non-native transfers between Google cloud storage and Sqlite:
 
-https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_universal_transfer_operator.py#L37-L41
-
+https://github.com/astronomer/apache-airflow-provider-transfers/blob/a80dc84b7f33bb86ae244f79411b240f4f4c7e22/example_dags/example_universal_transfer_operator.py#L45-L54
 
 ### Improving bottlenecks by using native transfer
 
@@ -65,12 +64,11 @@ Steps:
 
 
 ### Transfer using a third-party tool
-The Universal Transfer Operator can also offer an interface to generic third-party services that transfer data, similar to Fivetran.
+The `UniversalTransferOperator` can also offer an interface to generic third-party services that transfer data, similar to Fivetran.
 
 Here is an example of how to use Fivetran for transfers:
 
-https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_dag_fivetran.py#L52-L58
-
+https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_dag_fivetran.py#L55-L61
 
 
 
@@ -78,11 +76,11 @@ https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/exampl
 
 - Databases supported:
 
-    https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/src/universal_transfer_operator/constants.py#L72-L74
+    https://github.com/astronomer/apache-airflow-provider-transfers/blob/513591afb967694062097d6b36170265883b77e3/src/universal_transfer_operator/constants.py#L72-L74
 
 - File store supported:
 
-    https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/src/universal_transfer_operator/constants.py#L26-L32
+    https://github.com/astronomer/apache-airflow-provider-transfers/blob/513591afb967694062097d6b36170265883b77e3/src/universal_transfer_operator/constants.py#L28-L31
 
 
 ## Documentation
