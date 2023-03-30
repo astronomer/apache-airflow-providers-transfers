@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import io
 from typing import TYPE_CHECKING, Any, Callable, Iterator
 
 import pandas as pd
@@ -27,7 +28,11 @@ from universal_transfer_operator.data_providers.filesystem import resolve_file_p
 from universal_transfer_operator.datasets.dataframe.pandas import PandasDataframe
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Metadata, Table
-from universal_transfer_operator.settings import LOAD_TABLE_AUTODETECT_ROWS_COUNT, SCHEMA
+from universal_transfer_operator.exceptions import DatabaseCustomError
+from universal_transfer_operator.settings import (
+    LOAD_TABLE_AUTODETECT_ROWS_COUNT,
+    SCHEMA,
+)
 from universal_transfer_operator.universal_transfer_operator import TransferIntegrationOptions
 from universal_transfer_operator.utils import get_dataset_connection_type
 
@@ -50,6 +55,7 @@ class DatabaseDataProvider(DataProviders[Table]):
     IGNORE_HANDLER_IN_RUN_RAW_SQL: bool = False
     NATIVE_PATHS: dict[Any, Any] = {}
     DEFAULT_SCHEMA = SCHEMA
+    NATIVE_LOAD_EXCEPTIONS: Any = DatabaseCustomError
 
     def __init__(
         self,
@@ -192,6 +198,8 @@ class DatabaseDataProvider(DataProviders[Table]):
 
     def read(self) -> Iterator[pd.DataFrame]:
         """Convert a Table into a Pandas DataFrame"""
+        if self.transfer_mode == TransferMode.NATIVE:
+            yield DataStream(actual_file=File, remote_obj_buffer=io.BytesIO(), actual_filename="")
         yield self.export_table_to_pandas_dataframe()
 
     def write(self, source_ref: DataStream | pd.DataFrame) -> str:
@@ -211,6 +219,35 @@ class DatabaseDataProvider(DataProviders[Table]):
         return self.load_dataframe_to_table(
             input_dataframe=source_ref, output_table=self.dataset, if_exists=self.if_exists
         )
+
+    def load_dataframe_to_table(
+        self,
+        input_dataframe: pd.DataFrame,
+        output_table: Table,
+        if_exists: LoadExistStrategy = "replace",
+        chunk_size: int = DEFAULT_CHUNK_SIZE,
+    ) -> str:
+        """
+        Load content of dataframe in output_table.
+        :param input_dataframe: dataframe
+        :param output_table: Table to create
+        :param if_exists: Overwrite file if exists
+        :param chunk_size: Specify the number of records in each batch to be written at a time
+        :param normalize_config: pandas json_normalize params config
+        """
+
+        self.create_schema_and_table_if_needed_from_dataframe(
+            table=output_table,
+            dataframe=input_dataframe,
+            if_exists=if_exists,
+        )
+        self.load_pandas_dataframe_to_table(
+            input_dataframe,
+            output_table,
+            chunk_size=chunk_size,
+            if_exists=if_exists,
+        )
+        return self.get_table_qualified_name(output_table)
 
     @property
     def openlineage_dataset_namespace(self) -> str:

@@ -66,6 +66,15 @@ class UniversalTransferOperator(BaseOperator):
             transfer_params=self.transfer_params,
             transfer_mode=self.transfer_mode,
         )
+        native_path_available = destination_dataprovider.is_native_path_available(
+            source_dataset=self.source_dataset
+        )
+        if self.transfer_mode == TransferMode.NATIVE and native_path_available is False:
+            raise ValueError(
+                f"No native path available for {source_dataprovider.dataset} to"
+                f" {destination_dataprovider.dataset}. You can try TransferMode - {TransferMode.NONNATIVE}"
+                f" or {TransferMode.THIRDPARTY}"
+            )
 
         destination_references = []
         for source_data in source_dataprovider.read():

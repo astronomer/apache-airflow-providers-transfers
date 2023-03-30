@@ -44,3 +44,5 @@ BIGQUERY_SCHEMA_LOCATION = conf.get(
 LOAD_TABLE_AUTODETECT_ROWS_COUNT = conf.getint(
     section=SECTION_KEY, key="load_table_autodetect_rows_count", fallback=1000
 )
+
+LOAD_FILE_ENABLE_NATIVE_FALLBACK = conf.get(SECTION_KEY, "load_file_enable_native_fallback", fallback=False)
