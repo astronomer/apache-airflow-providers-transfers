@@ -591,6 +591,7 @@ class DatabaseDataProvider(DataProviders[Table]):
                 if_exists="append",
                 chunk_size=chunk_size,
             )
+        return self.get_table_qualified_name(output_table)
 
     def load_file_to_table_natively_with_fallback(
         self,
