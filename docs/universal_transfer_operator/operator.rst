@@ -112,7 +112,7 @@ If the table you trying to create already exists, you can specify whether you wa
         If you use if_exists='replace', existing table will be dropped and the schema of the new data will be used.
 
 2. ``if_exists="append"``
-    User can set ``if_exists="append"`` passing an argument ``transfer_params=TransferIntegrationOptions(if_exists="append")`` to :py:mod:`universal_transfer_operator operator <universal_transfer_operator.universal_transfer_operator>` as the example below:
+    User can set ``if_exists="append"`` by passing an argument ``transfer_params=TransferIntegrationOptions(if_exists="append")`` to :py:mod:`universal_transfer_operator operator <universal_transfer_operator.universal_transfer_operator>` as the example below:
 
     .. literalinclude:: ../../example_dags/example_append_and_replace_strategies.py
        :language: python
