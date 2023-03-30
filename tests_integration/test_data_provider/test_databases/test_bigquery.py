@@ -201,7 +201,7 @@ def test_s3_to_bigquery_native_path(sample_dag, src_dataset_fixture):
                 "allow_jagged_rows": True,
                 "skip_leading_rows": "1",
             },
-            transfer_mode=TransferMode.NATIVE
+            transfer_mode=TransferMode.NATIVE,
         )
     run_dag(sample_dag)
     file_dataframe = export_to_dataframe(file_dataset)
