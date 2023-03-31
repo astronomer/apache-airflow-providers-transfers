@@ -86,7 +86,7 @@ class BaseFilesystemProviders(DataProviders[File]):
     def read(self) -> Iterator[DataStream]:
         """Read the remote or local file dataset and returns i/o buffers"""
         if self.transfer_mode == TransferMode.NATIVE:
-            return DataStream(actual_file=self.dataset, remote_obj_buffer=io.BytesIO(), actual_filename="")
+            yield DataStream(actual_file=self.dataset, remote_obj_buffer=io.BytesIO(), actual_filename="")
         return self.read_using_smart_open()
 
     def read_using_smart_open(self) -> Iterator[DataStream]:
