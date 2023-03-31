@@ -68,9 +68,7 @@ The `UniversalTransferOperator` can also offer an interface to generic third-par
 
 Here is an example of how to use Fivetran for transfers:
 
-https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_dag_fivetran.py#L55-L61
-
-
+https://github.com/astronomer/apache-airflow-provider-transfers/blob/0c30747ec33592e329de1f66bfbdc1d4ffdae34c/example_dags/example_dag_fivetran.py#L65-L72
 
 ## Supported technologies
 
