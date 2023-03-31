@@ -212,7 +212,7 @@ def test_s3_to_bigquery_native_path(sample_dag, src_dataset_fixture):
 @pytest.mark.parametrize(
     "src_dataset_fixture",
     [{
-        "name": "SnowflakeDataProvider",
+        "name": "BigqueryDataProvider",
         "table": Table(metadata=Metadata(schema=BIGQUERY_SCHEMA)),
     }],
     indirect=True,
