@@ -6,8 +6,10 @@ import pandas as pd
 import pytest
 import sqlalchemy
 from utils.test_dag_runner import run_dag
+from utils.test_utils import export_to_dataframe
 
 from universal_transfer_operator.constants import FileType, TransferMode
+from universal_transfer_operator.data_providers import create_dataprovider
 from universal_transfer_operator.data_providers.database.google.bigquery import BigqueryDataProvider
 from universal_transfer_operator.data_providers.base import DataStream
 from universal_transfer_operator.datasets.file.base import File
@@ -170,30 +172,78 @@ def test_write_method(dataset_table_fixture):
     rows.sort(key=lambda x: x[0])
     assert rows == [(1, "First"), (2, "Second"), (3, "Third with unicode पांचाल")]
 
-
-@pytest.mark.integration
-def test_gcs_to_snowflake_native_path(sample_dag):
+@pytest.mark.parametrize(
+    "src_dataset_fixture",
+    [{
+        "name": "BigqueryDataProvider",
+        "table": Table(metadata=Metadata(schema=BIGQUERY_SCHEMA)),
+    }],
+    indirect=True,
+    ids=lambda dp: dp["name"],
+)
+def test_s3_to_bigquery_native_path(sample_dag, src_dataset_fixture):
     """
-    Test the native path of S3 to Snowflake
+    Test the native path of S3 to Bigquery
     """
+    _, table_dataset = src_dataset_fixture
+    file_dataset = File(
+        path="s3://astro-sdk/data/sample.csv",
+        conn_id="aws_default",
+        filetype=FileType.CSV
+    )
     with sample_dag:
-        UniversalTransferOperator(
-            task_id="gcs_to_bigquery",
-            source_dataset=File(
-                path="gs://uto-test/uto/homes_append.csv",
-                conn_id="google_cloud_default",
-                filetype=FileType.CSV,
-            ),
-            destination_dataset=Table(
-                name="uto_gs_to_bigquery_table_native",
-                conn_id="google_cloud_default",
-                metadata=Metadata(schema="rajath"),
-            ),
+         UniversalTransferOperator(
+            task_id="s3_to_bigquery",
+            source_dataset=file_dataset,
+            destination_dataset=table_dataset,
             transfer_params={
                 "ignore_unknown_values": True,
                 "allow_jagged_rows": True,
                 "skip_leading_rows": "1",
             },
-            transfer_mode=TransferMode.NATIVE,
+            transfer_mode=TransferMode.NATIVE
         )
     run_dag(sample_dag)
+    file_dataframe = export_to_dataframe(file_dataset)
+    table_dataframe = export_to_dataframe(table_dataset)
+    assert file_dataframe.equals(table_dataframe)
+
+
+@pytest.mark.parametrize(
+    "src_dataset_fixture",
+    [{
+        "name": "SnowflakeDataProvider",
+        "table": Table(metadata=Metadata(schema=BIGQUERY_SCHEMA)),
+    }],
+    indirect=True,
+    ids=lambda dp: dp["name"],
+)
+def test_gcs_to_bigquery_native_path(sample_dag, src_dataset_fixture):
+    """
+    Test the native path of GCS to Bigquery
+    """
+    table_dataprovider, table_dataset = src_dataset_fixture
+    file_dataset = File(
+        path="gs://astro-sdk/workspace/sample.csv",
+        conn_id="google_cloud_default",
+        filetype=FileType.CSV
+    )
+    file_dataprovider = create_dataprovider(
+        dataset=file_dataset
+    )
+    with sample_dag:
+         UniversalTransferOperator(
+            task_id="gcp_to_bigquery",
+            source_dataset=file_dataset,
+            destination_dataset=table_dataset,
+            transfer_params={
+                "ignore_unknown_values": True,
+                "allow_jagged_rows": True,
+                "skip_leading_rows": "1",
+            },
+            transfer_mode=TransferMode.NATIVE
+        )
+    run_dag(sample_dag)
+    file_dataframe = export_to_dataframe(file_dataprovider)
+    table_dataframe = export_to_dataframe(table_dataprovider)
+    assert file_dataframe.equals(table_dataframe)

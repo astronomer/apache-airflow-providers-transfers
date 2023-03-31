@@ -1,12 +1,10 @@
 import io
 import os
 import pathlib
-from urllib.parse import urlparse, urlunparse
 
 import pandas as pd
 import pytest
-import smart_open
-from pyarrow.lib import ArrowInvalid
+from utils.test_utils import create_unique_str, export_to_dataframe
 from utils.test_utils import create_unique_str
 
 from universal_transfer_operator.data_providers.base import DataStream
