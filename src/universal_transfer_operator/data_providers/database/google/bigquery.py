@@ -264,9 +264,7 @@ class BigqueryDataProvider(DatabaseDataProvider):
         if isinstance(source_dataset, Table):
             return False
         file_type = NATIVE_PATHS_SUPPORTED_FILE_TYPES.get(source_dataset.type.name)
-        print(source_dataset.location.__dict__)
         location_type = self.NATIVE_PATHS.get(source_dataset.location.location_type)
-        print(file_type, location_type)
         return bool(location_type and file_type)
 
     def load_file_to_table_natively(
