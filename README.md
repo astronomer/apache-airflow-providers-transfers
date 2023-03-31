@@ -47,7 +47,7 @@ Internally, the steps involved are:
 
 Following is an example of non-native transfers between Google cloud storage and Sqlite:
 
-https://github.com/astronomer/apache-airflow-provider-transfers/blob/a80dc84b7f33bb86ae244f79411b240f4f4c7e22/example_dags/example_universal_transfer_operator.py#L45-L54
+https://github.com/astronomer/apache-airflow-provider-transfers/blob/a80dc84b7f33bb86ae244f79411b240f4f4c7e22/example_dags/example_universal_transfer_operator.py#L68-L74
 
 ### Improving bottlenecks by using native transfer
 
