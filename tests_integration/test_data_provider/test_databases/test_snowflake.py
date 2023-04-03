@@ -181,25 +181,28 @@ def test_s3_to_snowflake_native_path(sample_dag, src_dataset_fixture):
     """
     Test the native path of S3 to Snowflake
     """
-    _, table_dataset = src_dataset_fixture
+    table_dataprovider, table_dataset = src_dataset_fixture
     file_dataset = File(
-        path="s3://astro-sdk/data/sample.csv",
+        path="s3://astro-sdk/sample.csv",
         conn_id="aws_default",
         filetype=FileType.CSV
     )
+    file_dataprovider = create_dataprovider(file_dataset)
     with sample_dag:
          UniversalTransferOperator(
             task_id="s3_to_bigquery",
             source_dataset=file_dataset,
             destination_dataset=table_dataset,
             transfer_params={
-                "storage_integration": SNOWFLAKE_STORAGE_INTEGRATION_AMAZON
+                'file_options': {
+                    'SKIP_HEADER': 1
+                }
             },
             transfer_mode=TransferMode.NATIVE
         )
     run_dag(sample_dag)
-    file_dataframe = export_to_dataframe(file_dataset)
-    table_dataframe = export_to_dataframe(table_dataset)
+    file_dataframe = export_to_dataframe(file_dataprovider)
+    table_dataframe = export_to_dataframe(table_dataprovider)
     assert file_dataframe.equals(table_dataframe)
 
 

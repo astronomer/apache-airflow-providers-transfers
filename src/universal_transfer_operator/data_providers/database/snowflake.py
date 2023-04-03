@@ -450,7 +450,7 @@ class SnowflakeDataProvider(DatabaseDataProvider):
 
         storage_integration = native_support_kwargs.get("storage_integration", None)
         if storage_integration is None:
-            storage_integration = self.transfer_params["storage_integration"]
+            storage_integration = self.transfer_params.get("storage_integration", None)
 
         stage = self.create_stage(file=source_file, storage_integration=storage_integration)
 
