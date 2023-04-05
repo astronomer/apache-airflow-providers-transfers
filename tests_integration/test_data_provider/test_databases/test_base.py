@@ -1,3 +1,4 @@
+import io
 import os
 import pathlib
 from urllib.parse import urlparse, urlunparse
@@ -8,6 +9,7 @@ import smart_open
 from pyarrow.lib import ArrowInvalid
 from utils.test_utils import create_unique_str
 
+from universal_transfer_operator.data_providers.base import DataStream
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Table
 
@@ -259,5 +261,176 @@ def test_load_pandas_dataframe_to_table_with_append(dst_dataset_fixture):
     assert len(rows) == 4
     assert rows[0] == (1,)
     assert rows[1] == (2,)
+
+    dst_dp.drop_table(dataset)
+
+
+@pytest.mark.parametrize(
+    "dst_dataset_fixture",
+    [
+        {"name": "SqliteDataProvider"},
+        {
+            "name": "SnowflakeDataProvider",
+        },
+        {
+            "name": "BigqueryDataProvider",
+        },
+    ],
+    indirect=True,
+    ids=lambda db: db["name"],
+)
+def test_write_dataframe_to_table_with_replace(dst_dataset_fixture):
+    """Write dataframe to a SQL table with replace strategy"""
+    dst_dp, dataset = dst_dataset_fixture
+
+    pandas_dataframe = pd.DataFrame(data={"id": [1, 2]})
+    dst_dp.write(pandas_dataframe)
+
+    rows = dst_dp.fetch_all_rows(dataset)
+    assert len(rows) == 2
+    assert rows[0] == (1,)
+    assert rows[1] == (2,)
+
+    pandas_dataframe = pd.DataFrame(data={"id": [3, 4]})
+    dst_dp.write(pandas_dataframe)
+    rows = dst_dp.fetch_all_rows(dataset)
+    assert len(rows) == 2
+    assert rows[0] == (3,)
+    assert rows[1] == (4,)
+
+    dst_dp.drop_table(dataset)
+
+
+@pytest.mark.parametrize(
+    "dst_dataset_fixture",
+    [
+        {"name": "SqliteDataProvider"},
+        {
+            "name": "SnowflakeDataProvider",
+        },
+        {
+            "name": "BigqueryDataProvider",
+        },
+    ],
+    indirect=True,
+    ids=lambda db: db["name"],
+)
+def test_write_dataframe_to_table_with_append(dst_dataset_fixture):
+    """Write dataframe to a SQL table with append strategy"""
+    dst_dp, dataset = dst_dataset_fixture
+
+    pandas_dataframe = pd.DataFrame(data={"id": [1, 2]})
+    dst_dp.write(pandas_dataframe)
+
+    rows = dst_dp.fetch_all_rows(dataset)
+    assert len(rows) == 2
+    assert rows[0] == (1,)
+    assert rows[1] == (2,)
+
+    dst_dp.if_exists = "append"
+    dst_dp.write(pandas_dataframe)
+    rows = dst_dp.fetch_all_rows(dataset)
+    assert len(rows) == 4
+    assert rows[0] == (1,)
+    assert rows[1] == (2,)
+
+    dst_dp.drop_table(dataset)
+
+
+@pytest.mark.parametrize(
+    "dst_dataset_fixture",
+    [
+        {"name": "SqliteDataProvider"},
+        {
+            "name": "SnowflakeDataProvider",
+        },
+        {
+            "name": "BigqueryDataProvider",
+        },
+    ],
+    indirect=True,
+    ids=lambda db: db["name"],
+)
+def test_write_file_datastream_to_table_with_replace(dst_dataset_fixture):
+    """Write file datastream to a SQL table with replace strategy"""
+    dst_dp, dataset = dst_dataset_fixture
+
+    filepath = f"{str(CWD)}/../../data/sample.csv"
+    remote_obj_buffer = io.StringIO()
+    with smart_open.open(filepath, mode="r", transport_params=None) as stream:
+        remote_obj_buffer.write(stream.read())
+        remote_obj_buffer.seek(0)
+
+        data_stream = DataStream(
+            remote_obj_buffer=remote_obj_buffer,
+            actual_filename="sample.csv",
+            actual_file=File(path=f"{str(CWD)}/../../data/sample.csv"),
+        )
+
+        dst_dp.write(data_stream)
+
+        rows = dst_dp.fetch_all_rows(dataset)
+        assert len(rows) == 3
+        assert rows[0] == (1, "First")
+        assert rows[1] == (2, "Second")
+        assert rows[2] == (3, "Third with unicode पांचाल")
+
+        dst_dp.write(data_stream)
+
+        rows = dst_dp.fetch_all_rows(dataset)
+        assert len(rows) == 3
+        assert rows[0] == (1, "First")
+        assert rows[1] == (2, "Second")
+        assert rows[2] == (3, "Third with unicode पांचाल")
+
+    dst_dp.drop_table(dataset)
+
+
+@pytest.mark.parametrize(
+    "dst_dataset_fixture",
+    [
+        {"name": "SqliteDataProvider"},
+        {
+            "name": "SnowflakeDataProvider",
+        },
+        {
+            "name": "BigqueryDataProvider",
+        },
+    ],
+    indirect=True,
+    ids=lambda db: db["name"],
+)
+def test_write_file_datastream_to_table_with_append(dst_dataset_fixture):
+    """Write file datastream to a SQL table with append strategy"""
+    dst_dp, dataset = dst_dataset_fixture
+
+    filepath = f"{str(CWD)}/../../data/sample.csv"
+    remote_obj_buffer = io.StringIO()
+    with smart_open.open(filepath, mode="r", transport_params=None) as stream:
+        remote_obj_buffer.write(stream.read())
+        remote_obj_buffer.seek(0)
+
+        data_stream = DataStream(
+            remote_obj_buffer=remote_obj_buffer,
+            actual_filename="sample.csv",
+            actual_file=File(path=f"{str(CWD)}/../../data/sample.csv"),
+        )
+
+        dst_dp.write(data_stream)
+
+        rows = dst_dp.fetch_all_rows(dataset)
+        assert len(rows) == 3
+        assert rows[0] == (1, "First")
+        assert rows[1] == (2, "Second")
+        assert rows[2] == (3, "Third with unicode पांचाल")
+
+        dst_dp.if_exists = "append"
+        dst_dp.write(data_stream)
+
+        rows = dst_dp.fetch_all_rows(dataset)
+        assert len(rows) == 6
+        assert rows[3] == (1, "First")
+        assert rows[4] == (2, "Second")
+        assert rows[5] == (3, "Third with unicode पांचाल")
 
     dst_dp.drop_table(dataset)

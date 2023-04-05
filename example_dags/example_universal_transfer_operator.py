@@ -80,7 +80,7 @@ with DAG(
         source_dataset=File(
             path="s3://astro-sdk-test/example_uto/csv_files/", conn_id="aws_default", filetype=FileType.CSV
         ),
-        destination_dataset=Table(name="uto_s3_table_to_snowflake", conn_id="snowflake_conn"),
+        destination_dataset=Table(name="uto_s3_table_to_snowflake_table", conn_id="snowflake_conn"),
     )
     # [END transfer_non_native_s3_to_snowflake]
 
