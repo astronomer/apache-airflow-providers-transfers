@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import importlib
 from typing import Type, cast
 
@@ -20,7 +22,7 @@ def get_transfer_integration(transfer_params: TransferIntegrationOptions) -> Tra
     return get_ingestor_class(conn_id=conn_id)(transfer_params)
 
 
-def get_ingestor_class(conn_id: str) -> Type[TransferIntegration]:
+def get_ingestor_class(conn_id: str) -> type[TransferIntegration]:
     """
     Given a transfer_params return the associated TransferIntegrations class.
 
@@ -36,7 +38,7 @@ def get_ingestor_class(conn_id: str) -> Type[TransferIntegration]:
     return cast(Type[TransferIntegration], getattr(module, class_name))
 
 
-def get_ingestor_option_class(conn_id: str) -> Type[TransferIntegrationOptions]:
+def get_ingestor_option_class(conn_id: str) -> type[TransferIntegrationOptions]:
     """
     Get options class for fivetran
     """
