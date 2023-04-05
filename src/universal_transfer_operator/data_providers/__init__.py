@@ -10,7 +10,7 @@ from universal_transfer_operator.data_providers.base import DataProviders
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Table
 from universal_transfer_operator.integrations.base import TransferIntegrationOptions
-from universal_transfer_operator.utils import TransferParameters, get_class_name
+from universal_transfer_operator.utils import get_class_name
 
 DATASET_CONN_ID_TO_DATAPROVIDER_MAPPING = {
     ("s3", File): "universal_transfer_operator.data_providers.filesystem.aws.s3",
@@ -28,12 +28,12 @@ DATASET_CONN_ID_TO_DATAPROVIDER_MAPPING = {
 
 def create_dataprovider(
     dataset: Table | File,
-    transfer_params: TransferParameters | None = None,
+    transfer_params: TransferIntegrationOptions | None = None,
     transfer_mode: TransferMode = TransferMode.NONNATIVE,
 ) -> DataProviders:
     class_ref = get_dataprovider_class(dataset=dataset)
     if transfer_params is None:
-        transfer_params = TransferParameters()
+        transfer_params = TransferIntegrationOptions()
     data_provider: DataProviders = class_ref(
         dataset=dataset,
         transfer_params=transfer_params,

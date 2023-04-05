@@ -36,10 +36,7 @@ class SnowflakeDataProvider(DatabaseDataProvider):
         self,
         dataset: Table,
         transfer_mode,
-        transfer_params: TransferIntegrationOptions = attr.field(
-            factory=TransferIntegrationOptions,
-            converter=lambda val: TransferIntegrationOptions(**val) if isinstance(val, dict) else val,
-        ),
+        transfer_params: TransferIntegrationOptions,
     ):
         self.dataset = dataset
         self.transfer_params = transfer_params

@@ -7,7 +7,6 @@ from tempfile import NamedTemporaryFile
 from typing import Any, Iterator
 from urllib.parse import urlparse, urlunparse
 
-import attr
 from airflow.providers.google.cloud.hooks.gcs import GCSHook, _parse_gcs_url
 
 from universal_transfer_operator.constants import Location, TransferMode
@@ -28,10 +27,7 @@ class GCSDataProvider(BaseFilesystemProviders):
     def __init__(
         self,
         dataset: File,
-        transfer_params: TransferIntegrationOptions = attr.field(
-            factory=TransferIntegrationOptions,
-            converter=lambda val: TransferIntegrationOptions(**val) if isinstance(val, dict) else val,
-        ),
+        transfer_params: TransferIntegrationOptions,
         transfer_mode: TransferMode = TransferMode.NONNATIVE,
     ):
         super().__init__(
@@ -80,7 +76,7 @@ class GCSDataProvider(BaseFilesystemProviders):
         paths = [urlunparse((url.scheme, url.netloc, keys, "", "", "")) for keys in prefixes]
         return paths
 
-    def check_if_exists(self, path: str | None = None) -> bool:
+    def check_if_exists(self, path: str | None = None) -> Any:
         """Return true if the dataset exists"""
         path = self.dataset.path if path is None else path
         url = urlparse(path)
@@ -164,7 +160,7 @@ class GCSDataProvider(BaseFilesystemProviders):
         return self.dataset.extra.get("delimiter", None)
 
     @property
-    def bucket_name(self) -> str:
+    def bucket_name(self) -> Any:
         bucket_name, _ = _parse_gcs_url(gsurl=self.dataset.path)
         return bucket_name
 
@@ -177,7 +173,7 @@ class GCSDataProvider(BaseFilesystemProviders):
         return self.dataset.extra.get("gzip", False)
 
     @property
-    def blob_name(self) -> str:
+    def blob_name(self) -> Any:
         _, blob = _parse_gcs_url(gsurl=self.dataset.path)
         return blob
 

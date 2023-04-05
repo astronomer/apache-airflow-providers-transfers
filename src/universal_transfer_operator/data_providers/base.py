@@ -12,7 +12,8 @@ from airflow.hooks.base import BaseHook
 from universal_transfer_operator.constants import Location
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Table
-from universal_transfer_operator.utils import TransferParameters, get_dataset_connection_type
+from universal_transfer_operator.integrations.base import TransferIntegrationOptions
+from universal_transfer_operator.utils import get_dataset_connection_type
 
 DatasetType = TypeVar("DatasetType", File, Table)
 
@@ -37,10 +38,7 @@ class DataProviders(ABC, Generic[DatasetType]):
         self,
         dataset: DatasetType,
         transfer_mode,
-        transfer_params: TransferParameters = attr.field(
-            factory=TransferParameters,
-            converter=lambda val: TransferParameters(**val) if isinstance(val, dict) else val,
-        ),
+        transfer_params: TransferIntegrationOptions,
     ):
         self.dataset: DatasetType = dataset
         self.transfer_params = transfer_params

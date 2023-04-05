@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import socket
 
-import attr
 from airflow.providers.sqlite.hooks.sqlite import SqliteHook
 from sqlalchemy import MetaData as SqlaMetaData, create_engine
 from sqlalchemy.engine.base import Engine
@@ -20,10 +19,7 @@ class SqliteDataProvider(DatabaseDataProvider):
         self,
         dataset: Table,
         transfer_mode,
-        transfer_params: TransferIntegrationOptions = attr.field(
-            factory=TransferIntegrationOptions,
-            converter=lambda val: TransferIntegrationOptions(**val) if isinstance(val, dict) else val,
-        ),
+        transfer_params: TransferIntegrationOptions,
     ):
         self.dataset = dataset
         self.transfer_params = transfer_params

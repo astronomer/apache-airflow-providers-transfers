@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import attr
 import pandas as pd
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 from google.api_core.exceptions import (
@@ -30,10 +29,7 @@ class BigqueryDataProvider(DatabaseDataProvider):
         self,
         dataset: Table,
         transfer_mode,
-        transfer_params: TransferIntegrationOptions = attr.field(
-            factory=TransferIntegrationOptions,
-            converter=lambda val: TransferIntegrationOptions(**val) if isinstance(val, dict) else val,
-        ),
+        transfer_params: TransferIntegrationOptions,
     ):
         self.dataset = dataset
         self.transfer_params = transfer_params
