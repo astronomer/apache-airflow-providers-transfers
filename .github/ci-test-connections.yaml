@@ -77,6 +77,5 @@ connections:
     port: 2222
   - conn_id: fivetran_default
     conn_type: fivetran
-    extra:
-      login: $FIVETRAN_KEY
-      password: $FIVETRAN_SECRET
+    login: $FIVETRAN_KEY
+    password: $FIVETRAN_SECRET
