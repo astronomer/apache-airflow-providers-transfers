@@ -78,5 +78,5 @@ connections:
   - conn_id: fivetran_default
     conn_type: fivetran
     extra:
-      key: $FIVETRAN_KEY
-      secret: $FIVETRAN_SECRET
+      login: $FIVETRAN_KEY
+      password: $FIVETRAN_SECRET
