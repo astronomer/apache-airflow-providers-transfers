@@ -2,12 +2,11 @@ from __future__ import annotations
 
 from typing import Any
 
-import attr
 from airflow.models import BaseOperator
 from airflow.utils.context import Context
 
 from universal_transfer_operator.constants import TransferMode
-from universal_transfer_operator.data_providers import create_dataprovider
+from universal_transfer_operator.data_providers import create_dataprovider, get_options_class
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Table
 from universal_transfer_operator.integrations import get_transfer_integration
@@ -33,18 +32,20 @@ class UniversalTransferOperator(BaseOperator):
         *,
         source_dataset: Table | File,
         destination_dataset: Table | File,
-        transfer_params: TransferIntegrationOptions = attr.field(
-            factory=TransferIntegrationOptions,
-            converter=lambda val: TransferIntegrationOptions(**val) if isinstance(val, dict) else val,
-        ),
+        transfer_params: TransferIntegrationOptions | dict | None = None,
         transfer_mode: TransferMode = TransferMode.NONNATIVE,
         **kwargs,
     ) -> None:
+        transfer_params = transfer_params or {}
         self.source_dataset = source_dataset
         self.destination_dataset = destination_dataset
         self.transfer_mode = transfer_mode
         # TODO: revisit names of transfer_mode
-        self.transfer_params = transfer_params
+        self.transfer_params: TransferIntegrationOptions = (
+            get_options_class(dataset=destination_dataset)(**transfer_params)
+            if isinstance(transfer_params, dict)
+            else transfer_params
+        )
         super().__init__(**kwargs)
 
     def execute(self, context: Context) -> Any:  # skipcq: PYL-W0613

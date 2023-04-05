@@ -29,7 +29,7 @@ def check_if_connection_exists(conn_id: str) -> bool:
     return True
 
 
-def get_dataset_connection_type(dataset: Table | File) -> str:
+def get_dataset_connection_type(dataset: Table | File):
     """
     Given dataset fetch the connection type based on airflow connection
     """
