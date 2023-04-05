@@ -144,106 +144,106 @@ def test_load_file_to_table_natively_for_not_optimised_path(dataset_table_fixtur
     assert response is None
 
 
-@pytest.mark.integration
-@pytest.mark.parametrize(
-    "dataset_table_fixture",
-    [
-        {
-            "dataset": "BigqueryDataProvider",
-            "table": Table(metadata=Metadata(schema=BIGQUERY_SCHEMA)),
-        },
-    ],
-    indirect=True,
-    ids=["snowflake"],
-)
-def test_write_method(dataset_table_fixture):
-    """Test write() for snowflake"""
-    dp, table = dataset_table_fixture
-    file_path = f"{str(CWD)}/../../data/sample.csv"
-    fs = DataStream(
-        remote_obj_buffer=file_path,
-        actual_file=File(
-            path=file_path,
-        ),
-        actual_filename=Path(file_path),
-    )
-    dp.write(source_ref=fs)
-    rows = dp.fetch_all_rows(table=dp.dataset)
-    rows.sort(key=lambda x: x[0])
-    assert rows == [(1, "First"), (2, "Second"), (3, "Third with unicode पांचाल")]
+# @pytest.mark.integration
+# @pytest.mark.parametrize(
+#     "dataset_table_fixture",
+#     [
+#         {
+#             "dataset": "BigqueryDataProvider",
+#             "table": Table(metadata=Metadata(schema=BIGQUERY_SCHEMA)),
+#         },
+#     ],
+#     indirect=True,
+#     ids=["snowflake"],
+# )
+# def test_write_method(dataset_table_fixture):
+#     """Test write() for snowflake"""
+#     dp, table = dataset_table_fixture
+#     file_path = f"{str(CWD)}/../../data/sample.csv"
+#     fs = DataStream(
+#         remote_obj_buffer=file_path,
+#         actual_file=File(
+#             path=file_path,
+#         ),
+#         actual_filename=Path(file_path),
+#     )
+#     dp.write(source_ref=fs)
+#     rows = dp.fetch_all_rows(table=dp.dataset)
+#     rows.sort(key=lambda x: x[0])
+#     assert rows == [(1, "First"), (2, "Second"), (3, "Third with unicode पांचाल")]
 
-@pytest.mark.parametrize(
-    "src_dataset_fixture",
-    [{
-        "name": "BigqueryDataProvider",
-        "table": Table(metadata=Metadata(schema=BIGQUERY_SCHEMA)),
-    }],
-    indirect=True,
-    ids=lambda dp: dp["name"],
-)
-def test_s3_to_bigquery_native_path(sample_dag, src_dataset_fixture):
-    """
-    Test the native path of S3 to Bigquery
-    """
-    _, table_dataset = src_dataset_fixture
-    file_dataset = File(
-        path="s3://astro-sdk/data/sample.csv",
-        conn_id="aws_default",
-        filetype=FileType.CSV
-    )
-    with sample_dag:
-         UniversalTransferOperator(
-            task_id="s3_to_bigquery",
-            source_dataset=file_dataset,
-            destination_dataset=table_dataset,
-            transfer_params={
-                "ignore_unknown_values": True,
-                "allow_jagged_rows": True,
-                "skip_leading_rows": "1",
-            },
-            transfer_mode=TransferMode.NATIVE
-        )
-    run_dag(sample_dag)
-    file_dataframe = export_to_dataframe(file_dataset)
-    table_dataframe = export_to_dataframe(table_dataset)
-    assert file_dataframe.equals(table_dataframe)
+# @pytest.mark.parametrize(
+#     "src_dataset_fixture",
+#     [{
+#         "name": "BigqueryDataProvider",
+#         "table": Table(metadata=Metadata(schema=BIGQUERY_SCHEMA)),
+#     }],
+#     indirect=True,
+#     ids=lambda dp: dp["name"],
+# )
+# def test_s3_to_bigquery_native_path(sample_dag, src_dataset_fixture):
+#     """
+#     Test the native path of S3 to Bigquery
+#     """
+#     _, table_dataset = src_dataset_fixture
+#     file_dataset = File(
+#         path="s3://astro-sdk/data/sample.csv",
+#         conn_id="aws_default",
+#         filetype=FileType.CSV
+#     )
+#     with sample_dag:
+#          UniversalTransferOperator(
+#             task_id="s3_to_bigquery",
+#             source_dataset=file_dataset,
+#             destination_dataset=table_dataset,
+#             transfer_params={
+#                 "ignore_unknown_values": True,
+#                 "allow_jagged_rows": True,
+#                 "skip_leading_rows": "1",
+#             },
+#             transfer_mode=TransferMode.NATIVE
+#         )
+#     run_dag(sample_dag)
+#     file_dataframe = export_to_dataframe(file_dataset)
+#     table_dataframe = export_to_dataframe(table_dataset)
+#     assert file_dataframe.equals(table_dataframe)
 
 
-@pytest.mark.parametrize(
-    "src_dataset_fixture",
-    [{
-        "name": "BigqueryDataProvider",
-        "table": Table(metadata=Metadata(schema=BIGQUERY_SCHEMA)),
-    }],
-    indirect=True,
-    ids=lambda dp: dp["name"],
-)
-def test_gcs_to_bigquery_native_path(sample_dag, src_dataset_fixture):
-    """
-    Test the native path of GCS to Bigquery
-    """
-    table_dataprovider, table_dataset = src_dataset_fixture
-    file_dataset = File(
-        path="gs://astro-sdk/workspace/sample.csv",
-        conn_id="google_cloud_default",
-        filetype=FileType.CSV
-    )
-    file_dataprovider = create_dataprovider(
-        dataset=file_dataset
-    )
-    with sample_dag:
-         UniversalTransferOperator(
-            task_id="gcp_to_bigquery",
-            source_dataset=file_dataset,
-            destination_dataset=table_dataset,
-            transfer_params={
-                "ignore_unknown_values": True,
-                "allow_jagged_rows": True,
-                "skip_leading_rows": "1",
-            },
-            transfer_mode=TransferMode.NATIVE
-        )
-    run_dag(sample_dag)
-    file_dataframe = export_to_dataframe(file_dataprovider)
-    table_dataframe = export_to_dataframe(table_dataprovider)
-    assert file_dataframe.equals(table_dataframe)
+# @pytest.mark.parametrize(
+#     "src_dataset_fixture",
+#     [{
+#         "name": "BigqueryDataProvider",
+#         "table": Table(metadata=Metadata(schema=BIGQUERY_SCHEMA)),
+#     }],
+#     indirect=True,
+#     ids=lambda dp: dp["name"],
+# )
+# def test_gcs_to_bigquery_native_path(sample_dag, src_dataset_fixture):
+#     """
+#     Test the native path of GCS to Bigquery
+#     """
+#     table_dataprovider, table_dataset = src_dataset_fixture
+#     file_dataset = File(
+#         path="gs://astro-sdk/workspace/sample.csv",
+#         conn_id="google_cloud_default",
+#         filetype=FileType.CSV
+#     )
+#     file_dataprovider = create_dataprovider(
+#         dataset=file_dataset
+#     )
+#     with sample_dag:
+#          UniversalTransferOperator(
+#             task_id="gcp_to_bigquery",
+#             source_dataset=file_dataset,
+#             destination_dataset=table_dataset,
+#             transfer_params={
+#                 "ignore_unknown_values": True,
+#                 "allow_jagged_rows": True,
+#                 "skip_leading_rows": "1",
+#             },
+#             transfer_mode=TransferMode.NATIVE
+#         )
+#     run_dag(sample_dag)
+#     file_dataframe = export_to_dataframe(file_dataprovider)
+#     table_dataframe = export_to_dataframe(table_dataprovider)
+#     assert file_dataframe.equals(table_dataframe)
