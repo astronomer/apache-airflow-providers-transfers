@@ -15,9 +15,10 @@ from universal_transfer_operator.constants import FileType, Location, TransferMo
 from universal_transfer_operator.data_providers.base import DataProviders, DataStream
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.file.types import create_file_type
+from universal_transfer_operator.exceptions import DatabaseCustomError
 from universal_transfer_operator.universal_transfer_operator import TransferIntegrationOptions
 from universal_transfer_operator.utils import get_dataset_connection_type
-from universal_transfer_operator.exceptions import DatabaseCustomError
+
 
 @attr.define
 class TempFile:
@@ -85,8 +86,9 @@ class BaseFilesystemProviders(DataProviders[File]):
     def read(self) -> Iterator[DataStream]:
         """Read the remote or local file dataset and returns i/o buffers"""
         if self.transfer_mode == TransferMode.NATIVE:
-            return [DataStream(actual_file=self.dataset, remote_obj_buffer=io.BytesIO(), actual_filename="")]
-        return self.read_using_smart_open()
+            yield DataStream(actual_file=self.dataset, remote_obj_buffer=io.BytesIO(), actual_filename=Path(""))
+        else:
+            return self.read_using_smart_open()
 
     def read_using_smart_open(self) -> Iterator[DataStream]:
         """Read the file dataset using smart open returns i/o buffer"""

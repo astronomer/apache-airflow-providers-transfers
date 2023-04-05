@@ -18,7 +18,6 @@ from snowflake.connector.errors import (
 
 from universal_transfer_operator.constants import (
     DEFAULT_CHUNK_SIZE,
-    ColumnCapitalization,
     FileLocation,
     FileType,
     LoadExistStrategy,
@@ -397,7 +396,8 @@ class SnowflakeDataProvider(DatabaseDataProvider):
         return f"{self.openlineage_dataset_namespace}{self.openlineage_dataset_name}"
 
     def is_native_path_available(
-        self, source_dataset: File | Table,  # skipcq PYL-W0613, PYL-R0201
+        self,
+        source_dataset: File | Table,  # skipcq PYL-W0613, PYL-R0201
     ) -> bool:
         """
         Check if there is an optimised path for source to destination.

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import io
 from typing import TYPE_CHECKING, Any, Callable, Iterator
 
-import io
 import pandas as pd
 import sqlalchemy
 
@@ -19,7 +19,6 @@ from sqlalchemy.sql.schema import Table as SqlaTable
 
 from universal_transfer_operator.constants import (
     DEFAULT_CHUNK_SIZE,
-    ColumnCapitalization,
     LoadExistStrategy,
     Location,
     TransferMode,
@@ -201,8 +200,9 @@ class DatabaseDataProvider(DataProviders[Table]):
     def read(self) -> Iterator[pd.DataFrame]:
         """Convert a Table into a Pandas DataFrame"""
         if self.transfer_mode == TransferMode.NATIVE:
-            yield DataStream(actual_file=File, remote_obj_buffer=io.BytesIO(), actual_filename="")
-        yield self.export_table_to_pandas_dataframe()
+            raise ValueError("No native path for `database` to destination")
+        else:
+            yield self.export_table_to_pandas_dataframe()
 
     def write(self, source_ref: DataStream | pd.DataFrame) -> str:
         """
@@ -223,11 +223,11 @@ class DatabaseDataProvider(DataProviders[Table]):
         )
 
     def load_dataframe_to_table(
-            self,
-            input_dataframe: pd.DataFrame,
-            output_table: Table,
-            if_exists: LoadExistStrategy = "replace",
-            chunk_size: int = DEFAULT_CHUNK_SIZE,
+        self,
+        input_dataframe: pd.DataFrame,
+        output_table: Table,
+        if_exists: LoadExistStrategy = "replace",
+        chunk_size: int = DEFAULT_CHUNK_SIZE,
     ) -> str:
         """
         Load content of dataframe in output_table.

@@ -9,21 +9,22 @@ from urllib.parse import urlparse, urlunparse
 
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 
-from universal_transfer_operator.constants import Location, TransferMode, FileLocation
+from universal_transfer_operator.constants import FileLocation, Location, TransferMode
 from universal_transfer_operator.data_providers.filesystem.base import (
     BaseFilesystemProviders,
     Path,
     TempFile,
 )
 from universal_transfer_operator.datasets.file.base import File
-from universal_transfer_operator.integrations.base import TransferIntegrationOptions
 from universal_transfer_operator.exceptions import DatabaseCustomError
+from universal_transfer_operator.integrations.base import TransferIntegrationOptions
 
 
 class S3DataProvider(BaseFilesystemProviders):
     """
     DataProviders interactions with S3 Dataset.
     """
+
     location_type = FileLocation.S3
 
     def __init__(

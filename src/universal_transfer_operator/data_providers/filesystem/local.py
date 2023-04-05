@@ -10,9 +10,9 @@ import pandas as pd
 import smart_open
 from airflow.hooks.base import BaseHook
 
+from universal_transfer_operator.constants import FileLocation
 from universal_transfer_operator.data_providers.base import DataStream
 from universal_transfer_operator.data_providers.filesystem.base import BaseFilesystemProviders
-from universal_transfer_operator.constants import FileLocation
 
 
 class LocalDataProvider(BaseFilesystemProviders):

@@ -1,12 +1,12 @@
 import random
 import string
+from urllib.parse import urlparse, urlunparse
 
 import pandas as pd
-from pandas.testing import assert_frame_equal
-
 import smart_open
+from pandas.testing import assert_frame_equal
 from pyarrow.lib import ArrowInvalid
-from urllib.parse import urlparse, urlunparse
+
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Table
 

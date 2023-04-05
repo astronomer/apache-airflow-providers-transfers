@@ -107,7 +107,8 @@ class DataProviders(ABC, Generic[DatasetType]):
         raise NotImplementedError
 
     def is_native_path_available(  # skipcq: PYL-R0201
-        self, source_dataset: File | Table,  # skipcq: PYL-W0613
+        self,
+        source_dataset: File | Table,  # skipcq: PYL-W0613
     ) -> bool:
         """
         Check if there is an optimised path for source to destination.

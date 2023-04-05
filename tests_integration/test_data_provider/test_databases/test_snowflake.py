@@ -6,21 +6,21 @@ import pandas as pd
 import pytest
 import sqlalchemy
 from sqlalchemy.exc import ProgrammingError
+from utils.test_dag_runner import run_dag
+from utils.test_utils import export_to_dataframe
 
-from universal_transfer_operator.constants import TransferMode
+from universal_transfer_operator.constants import FileType, TransferMode
 from universal_transfer_operator.data_providers import create_dataprovider
 from universal_transfer_operator.data_providers.base import DataStream
 from universal_transfer_operator.data_providers.database.snowflake import SnowflakeDataProvider
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Metadata, Table
-from universal_transfer_operator.settings import SNOWFLAKE_SCHEMA
+from universal_transfer_operator.settings import (
+    SNOWFLAKE_SCHEMA,
+    SNOWFLAKE_STORAGE_INTEGRATION_AMAZON,
+    SNOWFLAKE_STORAGE_INTEGRATION_GOOGLE,
+)
 from universal_transfer_operator.universal_transfer_operator import UniversalTransferOperator
-from universal_transfer_operator.constants import FileType
-from universal_transfer_operator.settings import SNOWFLAKE_STORAGE_INTEGRATION_AMAZON,\
-    SNOWFLAKE_STORAGE_INTEGRATION_GOOGLE
-from utils.test_dag_runner import run_dag
-from utils.test_utils import export_to_dataframe
-
 
 SNOWFLAKE_STORAGE_INTEGRATION_AMAZON = SNOWFLAKE_STORAGE_INTEGRATION_AMAZON or "aws_int_python_sdk"
 SNOWFLAKE_STORAGE_INTEGRATION_GOOGLE = SNOWFLAKE_STORAGE_INTEGRATION_GOOGLE or "gcs_int_python_sdk"
@@ -171,9 +171,11 @@ def test_write_method(dataset_table_fixture):
 
 @pytest.mark.parametrize(
     "src_dataset_fixture",
-    [{
-        "name": "SnowflakeDataProvider",
-    }],
+    [
+        {
+            "name": "SnowflakeDataProvider",
+        }
+    ],
     indirect=True,
     ids=lambda dp: dp["name"],
 )
@@ -182,23 +184,18 @@ def test_s3_to_snowflake_native_path(sample_dag, src_dataset_fixture):
     Test the native path of S3 to Snowflake
     """
     table_dataprovider, table_dataset = src_dataset_fixture
-    file_dataset = File(
-        path="s3://astro-sdk/sample.csv",
-        conn_id="aws_default",
-        filetype=FileType.CSV
-    )
+    file_dataset = File(path="s3://astro-sdk/sample.csv", conn_id="aws_default", filetype=FileType.CSV)
     file_dataprovider = create_dataprovider(file_dataset)
     with sample_dag:
-         UniversalTransferOperator(
+        UniversalTransferOperator(
             task_id="s3_to_bigquery",
             source_dataset=file_dataset,
             destination_dataset=table_dataset,
             transfer_params={
-                'file_options': {
-                    'SKIP_HEADER': 1
-                }
+                "file_options": {"SKIP_HEADER": 1},
+                "storage_integration": SNOWFLAKE_STORAGE_INTEGRATION_AMAZON,
             },
-            transfer_mode=TransferMode.NATIVE
+            transfer_mode=TransferMode.NATIVE,
         )
     run_dag(sample_dag)
     file_dataframe = export_to_dataframe(file_dataprovider)
@@ -208,9 +205,11 @@ def test_s3_to_snowflake_native_path(sample_dag, src_dataset_fixture):
 
 @pytest.mark.parametrize(
     "src_dataset_fixture",
-    [{
-        "name": "SnowflakeDataProvider",
-    }],
+    [
+        {
+            "name": "SnowflakeDataProvider",
+        }
+    ],
     indirect=True,
     ids=lambda dp: dp["name"],
 )
@@ -220,15 +219,11 @@ def test_gcs_to_snowflake_native_path(sample_dag, src_dataset_fixture):
     """
     table_dataprovider, table_dataset = src_dataset_fixture
     file_dataset = File(
-        path="gs://astro-sdk/workspace/sample.csv",
-        conn_id="google_cloud_default",
-        filetype=FileType.CSV
+        path="gs://astro-sdk/workspace/sample.csv", conn_id="google_cloud_default", filetype=FileType.CSV
     )
-    file_dataprovider = create_dataprovider(
-        dataset=file_dataset
-    )
+    file_dataprovider = create_dataprovider(dataset=file_dataset)
     with sample_dag:
-         UniversalTransferOperator(
+        UniversalTransferOperator(
             task_id="gcp_to_bigquery",
             source_dataset=file_dataset,
             destination_dataset=table_dataset,
@@ -237,7 +232,7 @@ def test_gcs_to_snowflake_native_path(sample_dag, src_dataset_fixture):
                 "copy_options": {"ON_ERROR": "CONTINUE"},
                 "file_options": {"TYPE": "CSV", "TRIM_SPACE": True},
             },
-            transfer_mode=TransferMode.NATIVE
+            transfer_mode=TransferMode.NATIVE,
         )
     run_dag(sample_dag)
     file_dataframe = export_to_dataframe(file_dataprovider)
