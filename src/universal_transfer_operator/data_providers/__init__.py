@@ -55,7 +55,7 @@ def get_dataprovider_class(dataset: Table | File) -> type[DataProviders]:
     return cast(Type[DataProviders], getattr(module, class_name))
 
 
-def get_options_class(dataset: Table | File) -> type[TransferIntegrationOptions]:
+def get_dataprovider_options_class(dataset: Table | File) -> type[TransferIntegrationOptions]:
     """
     Get options class based on the dataset
     """

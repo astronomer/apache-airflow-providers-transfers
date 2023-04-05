@@ -6,10 +6,14 @@ from airflow.models import BaseOperator
 from airflow.utils.context import Context
 
 from universal_transfer_operator.constants import TransferMode
-from universal_transfer_operator.data_providers import create_dataprovider, get_options_class
+from universal_transfer_operator.data_providers import create_dataprovider, get_dataprovider_options_class
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Table
-from universal_transfer_operator.integrations import get_transfer_integration
+from universal_transfer_operator.integrations import (
+    get_conn_id,
+    get_ingestor_option_class,
+    get_transfer_integration,
+)
 from universal_transfer_operator.integrations.base import TransferIntegrationOptions
 
 
@@ -42,7 +46,9 @@ class UniversalTransferOperator(BaseOperator):
         self.transfer_mode = transfer_mode
         # TODO: revisit names of transfer_mode
         self.transfer_params: TransferIntegrationOptions = (
-            get_options_class(dataset=destination_dataset)(**transfer_params)
+            self._get_options_class(dataset=destination_dataset, transfer_params=transfer_params)(
+                **transfer_params
+            )
             if isinstance(transfer_params, dict)
             else transfer_params
         )
@@ -69,3 +75,15 @@ class UniversalTransferOperator(BaseOperator):
         for source_data in source_dataprovider.read():
             destination_references.append(destination_dataprovider.write(source_data))
         return destination_references
+
+    def _get_options_class(
+        self, transfer_params: TransferIntegrationOptions | dict, dataset: Table | File
+    ) -> type[TransferIntegrationOptions]:
+        """
+        Get option class based on transfer type
+        """
+        if self.transfer_mode == TransferMode.THIRDPARTY:
+            conn_id = get_conn_id(transfer_params=transfer_params)
+            return get_ingestor_option_class(conn_id=conn_id)
+        else:
+            return get_dataprovider_options_class(dataset=dataset)

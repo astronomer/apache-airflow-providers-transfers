@@ -1,7 +1,7 @@
 import pytest
 
 from universal_transfer_operator.constants import TransferMode
-from universal_transfer_operator.data_providers import create_dataprovider, get_options_class
+from universal_transfer_operator.data_providers import create_dataprovider, get_dataprovider_options_class
 from universal_transfer_operator.data_providers.base import DataProviders, TransferParameters
 from universal_transfer_operator.data_providers.database.snowflake import (
     SnowflakeDataProvider,
@@ -48,7 +48,7 @@ def test_create_dataprovider(datasets):
 )
 def test_get_option_class(datasets):
     """Test that the correct options class is created for a dataset"""
-    option_class = get_options_class(dataset=datasets["dataset"])
+    option_class = get_dataprovider_options_class(dataset=datasets["dataset"])
     assert isinstance(option_class, type(datasets["expected"]))
 
 
