@@ -19,6 +19,7 @@ def test_option_class_loading_for_dict_to_fivetran_options_class():
         transfer_mode=TransferMode.THIRDPARTY,
         transfer_params=transfer_param,
     )
+    uto._populate_transfer_params()
     assert isinstance(uto.transfer_params, FiveTranOptions)
 
 
@@ -35,4 +36,5 @@ def test_option_class_loading_for_dict_to_snowflake_options_class():
         transfer_mode=TransferMode.NATIVE,
         transfer_params={},
     )
+    uto._populate_transfer_params()
     assert isinstance(uto.transfer_params, SnowflakeOptions)

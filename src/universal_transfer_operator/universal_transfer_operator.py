@@ -49,13 +49,7 @@ class UniversalTransferOperator(BaseOperator):
         super().__init__(**kwargs)
 
     def execute(self, context: Context) -> Any:  # skipcq: PYL-W0613
-        self.transfer_params: TransferIntegrationOptions = (
-            self._get_options_class(dataset=self.destination_dataset, transfer_params=self._transfer_params)(
-                **self._transfer_params
-            )
-            if isinstance(self._transfer_params, dict)
-            else self._transfer_params
-        )
+        self._populate_transfer_params()
 
         if self.transfer_mode == TransferMode.THIRDPARTY:
             transfer_integration = get_transfer_integration(self.transfer_params)
@@ -77,6 +71,18 @@ class UniversalTransferOperator(BaseOperator):
         for source_data in source_dataprovider.read():
             destination_references.append(destination_dataprovider.write(source_data))
         return destination_references
+
+    def _populate_transfer_params(self):
+        """
+        Populate option class in transfer_params
+        """
+        self.transfer_params: TransferIntegrationOptions = (
+            self._get_options_class(dataset=self.destination_dataset, transfer_params=self._transfer_params)(
+                **self._transfer_params
+            )
+            if isinstance(self._transfer_params, dict)
+            else self._transfer_params
+        )
 
     def _get_options_class(
         self, transfer_params: TransferIntegrationOptions | dict, dataset: Table | File
