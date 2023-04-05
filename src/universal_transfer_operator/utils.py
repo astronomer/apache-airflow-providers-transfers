@@ -5,13 +5,14 @@ from typing import Any
 import attr
 from airflow.hooks.base import BaseHook
 
+from universal_transfer_operator.constants import LoadExistStrategy
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Table
 
 
 @attr.define
 class TransferParameters:
-    if_exists: str = "replace"
+    if_exists: LoadExistStrategy = attr.field(default="replace")
 
 
 def check_if_connection_exists(conn_id: str) -> bool:
@@ -29,7 +30,7 @@ def check_if_connection_exists(conn_id: str) -> bool:
     return True
 
 
-def get_dataset_connection_type(dataset: Table | File):
+def get_dataset_connection_type(dataset: Table | File) -> Any:
     """
     Given dataset fetch the connection type based on airflow connection
     """
