@@ -1,6 +1,7 @@
 import pytest
 
 from universal_transfer_operator.integrations import (
+    get_conn_id,
     get_ingestor_option_class,
     get_transfer_integration,
 )
@@ -73,5 +74,6 @@ def test_create_dataprovider(transfer):
 )
 def test_get_ingestor_option_class(transfer):
     """Test that the correct ingestor class is created for a transfer params"""
-    ingestor_option_class = get_ingestor_option_class(transfer_params=transfer["params"])
+    conn_id = get_conn_id(transfer_params=transfer["params"])
+    ingestor_option_class = get_ingestor_option_class(conn_id=conn_id)
     assert isinstance(ingestor_option_class, type(transfer["expected"]))
