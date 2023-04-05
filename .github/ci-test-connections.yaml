@@ -75,3 +75,7 @@ connections:
     login: $SFTP_USERNAME
     password: $SFTP_PASSWORD
     port: 2222
+  - conn_id: fivetran_default
+    conn_type: fivetran
+    login: $FIVETRAN_KEY
+    password: $FIVETRAN_SECRET
