@@ -2,7 +2,7 @@
 coverage.xml
 **/.coverage*
 **/.python-version
-universal_transfer_operator/test-connections.yaml
+test-connections.yaml
 .idea
 .env
 airflow_settings.yaml
