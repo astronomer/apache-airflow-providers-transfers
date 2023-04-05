@@ -42,6 +42,9 @@ env:
   SFTP_HOSTNAME: ${{ secrets.SFTP_HOSTNAME }}
   SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
   SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+  FIVETRAN_KEY: ${{ secrets.FIVETRAN_KEY }}
+  FIVETRAN_SECRET: ${{ secrets.FIVETRAN_SECRET }}
+
 
 jobs:
   Type-Check:
