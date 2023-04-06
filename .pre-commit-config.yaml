@@ -81,6 +81,7 @@ repos:
         name: mypy-uto
         additional_dependencies: [ types-PyYAML, types-requests, types-attrs, attrs ]
         files: "^src/"
+        args: ['--follow-imports=normal']
 
   -   repo: https://github.com/asottile/pyupgrade
       rev: v3.3.1
