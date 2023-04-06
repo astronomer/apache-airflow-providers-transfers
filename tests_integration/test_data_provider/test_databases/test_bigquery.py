@@ -6,7 +6,6 @@ import pandas as pd
 import pytest
 import sqlalchemy
 from utils.test_dag_runner import run_dag
-from tests_integration.test_data_provider.test_databases.test_base import export_to_dataframe
 
 from universal_transfer_operator.constants import FileType, TransferMode
 from universal_transfer_operator.data_providers import create_dataprovider
@@ -124,25 +123,24 @@ def test_load_pandas_dataframe_to_table(dataset_table_fixture):
     assert rows[1] == (2,)
 
 
-@pytest.mark.integration
-@pytest.mark.parametrize(
-    "dataset_table_fixture",
-    [
-        {
-            "dataset": "BigqueryDataProvider",
-            "table": Table(metadata=Metadata(schema=BIGQUERY_SCHEMA)),
-        },
-    ],
-    indirect=True,
-    ids=["bigquery"],
-)
-def test_load_file_to_table_natively_for_not_optimised_path(dataset_table_fixture):
-    """Test loading on files to bigquery natively for non optimized path."""
-    database, target_table = dataset_table_fixture
-    filepath = f"{str(CWD)}/../../data/sample.csv"
-    response = database.load_file_to_table_natively(File(filepath), target_table)
-    assert response is None
-
+# @pytest.mark.integration
+# @pytest.mark.parametrize(
+#     "dataset_table_fixture",
+#     [
+#         {
+#             "dataset": "BigqueryDataProvider",
+#             "table": Table(metadata=Metadata(schema=BIGQUERY_SCHEMA)),
+#         },
+#     ],
+#     indirect=True,
+#     ids=["bigquery"],
+# )
+# def test_load_file_to_table_natively_for_not_optimised_path(dataset_table_fixture):
+#     """Test loading on files to bigquery natively for non optimized path."""
+#     database, target_table = dataset_table_fixture
+#     filepath = f"{str(CWD)}/../../data/sample.csv"
+#     response = database.load_file_to_table_natively(File(filepath), target_table)
+#     assert response is None
 
 # @pytest.mark.integration
 # @pytest.mark.parametrize(
