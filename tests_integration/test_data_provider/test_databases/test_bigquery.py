@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 import sqlalchemy
 from utils.test_dag_runner import run_dag
-from utils.test_utils import export_to_dataframe
+from tests_integration.test_data_provider.test_databases.test_base import export_to_dataframe
 
 from universal_transfer_operator.constants import FileType, TransferMode
 from universal_transfer_operator.data_providers import create_dataprovider
