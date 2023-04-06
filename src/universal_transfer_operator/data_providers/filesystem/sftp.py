@@ -23,7 +23,7 @@ class SFTPDataProvider(BaseFilesystemProviders):
     def __init__(
         self,
         dataset: File,
-        transfer_params: TransferIntegrationOptions,
+        transfer_params: TransferIntegrationOptions = TransferIntegrationOptions(),
         transfer_mode: TransferMode = TransferMode.NONNATIVE,
     ):
         super().__init__(

@@ -36,7 +36,7 @@ class SnowflakeDataProvider(DatabaseDataProvider):
         self,
         dataset: Table,
         transfer_mode,
-        transfer_params: TransferIntegrationOptions,
+        transfer_params: TransferIntegrationOptions = TransferIntegrationOptions(),
     ):
         self.dataset = dataset
         self.transfer_params = transfer_params

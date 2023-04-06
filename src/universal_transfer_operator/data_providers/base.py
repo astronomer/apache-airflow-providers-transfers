@@ -38,7 +38,7 @@ class DataProviders(ABC, Generic[DatasetType]):
         self,
         dataset: DatasetType,
         transfer_mode,
-        transfer_params: TransferIntegrationOptions,
+        transfer_params: TransferIntegrationOptions = TransferIntegrationOptions(),
     ):
         self.dataset: DatasetType = dataset
         self.transfer_params = transfer_params
