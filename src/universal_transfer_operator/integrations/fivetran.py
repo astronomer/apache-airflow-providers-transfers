@@ -139,6 +139,8 @@ class FiveTranOptions(TransferIntegrationOptions):
 class FivetranIntegration(TransferIntegration):
     """Fivetran integration to transfer datasets using Fivetran APIs."""
 
+    OPTIONS_CLASS = FiveTranOptions
+
     api_user_agent = "airflow_provider_fivetran/1.1.3"
     api_protocol = "https"
     api_host = "api.fivetran.com"

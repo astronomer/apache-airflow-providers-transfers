@@ -2,15 +2,18 @@ from __future__ import annotations
 
 from typing import Any
 
-import attr
 from airflow.models import BaseOperator
 from airflow.utils.context import Context
 
 from universal_transfer_operator.constants import TransferMode
-from universal_transfer_operator.data_providers import create_dataprovider
+from universal_transfer_operator.data_providers import create_dataprovider, get_dataprovider_options_class
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Table
-from universal_transfer_operator.integrations import get_transfer_integration
+from universal_transfer_operator.integrations import (
+    get_conn_id,
+    get_ingestor_option_class,
+    get_transfer_integration,
+)
 from universal_transfer_operator.integrations.base import TransferIntegrationOptions
 
 
@@ -33,21 +36,21 @@ class UniversalTransferOperator(BaseOperator):
         *,
         source_dataset: Table | File,
         destination_dataset: Table | File,
-        transfer_params: TransferIntegrationOptions = attr.field(
-            factory=TransferIntegrationOptions,
-            converter=lambda val: TransferIntegrationOptions(**val) if isinstance(val, dict) else val,
-        ),
+        transfer_params: TransferIntegrationOptions | dict | None = None,
         transfer_mode: TransferMode = TransferMode.NONNATIVE,
         **kwargs,
     ) -> None:
+        transfer_params = transfer_params or {}
         self.source_dataset = source_dataset
         self.destination_dataset = destination_dataset
         self.transfer_mode = transfer_mode
+        self._transfer_params = transfer_params
         # TODO: revisit names of transfer_mode
-        self.transfer_params = transfer_params
         super().__init__(**kwargs)
 
     def execute(self, context: Context) -> Any:  # skipcq: PYL-W0613
+        self._populate_transfer_params()
+
         if self.transfer_mode == TransferMode.THIRDPARTY:
             transfer_integration = get_transfer_integration(self.transfer_params)
             return transfer_integration.transfer_job(self.source_dataset, self.destination_dataset)
@@ -68,3 +71,27 @@ class UniversalTransferOperator(BaseOperator):
         for source_data in source_dataprovider.read():
             destination_references.append(destination_dataprovider.write(source_data))
         return destination_references
+
+    def _populate_transfer_params(self):
+        """
+        Populate option class in transfer_params
+        """
+        self.transfer_params: TransferIntegrationOptions = (
+            self._get_options_class(dataset=self.destination_dataset, transfer_params=self._transfer_params)(
+                **self._transfer_params
+            )
+            if isinstance(self._transfer_params, dict)
+            else self._transfer_params
+        )
+
+    def _get_options_class(
+        self, transfer_params: TransferIntegrationOptions | dict, dataset: Table | File
+    ) -> type[TransferIntegrationOptions]:
+        """
+        Get option class based on transfer type
+        """
+        if self.transfer_mode == TransferMode.THIRDPARTY:
+            conn_id = get_conn_id(transfer_params=transfer_params)
+            return get_ingestor_option_class(conn_id=conn_id)
+        else:
+            return get_dataprovider_options_class(dataset=dataset)

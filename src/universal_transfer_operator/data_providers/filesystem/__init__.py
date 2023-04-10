@@ -6,14 +6,14 @@ from universal_transfer_operator.constants import FileType, TransferMode
 from universal_transfer_operator.data_providers import create_dataprovider
 from universal_transfer_operator.data_providers.filesystem.base import BaseFilesystemProviders
 from universal_transfer_operator.datasets.file.base import File
-from universal_transfer_operator.utils import TransferParameters
+from universal_transfer_operator.universal_transfer_operator import TransferIntegrationOptions
 
 
 def resolve_file_path_pattern(
     file: File,
     filetype: FileType | None = None,
     normalize_config: dict | None = None,
-    transfer_params: TransferParameters | None = None,
+    transfer_params: TransferIntegrationOptions | None = None,
     transfer_mode: TransferMode = TransferMode.NONNATIVE,
 ) -> list[File]:
     """get file objects by resolving path_pattern from local/object stores
@@ -28,7 +28,7 @@ def resolve_file_path_pattern(
     :param transfer_mode: Use transfer_mode TransferMode; native, non-native or thirdparty.
     """
     if transfer_params is None:
-        transfer_params = TransferParameters()
+        transfer_params = TransferIntegrationOptions()
 
     location = cast(
         BaseFilesystemProviders,
