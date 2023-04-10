@@ -10,7 +10,6 @@ if TYPE_CHECKING:  # pragma: no cover
 
 import warnings
 
-import attr
 from airflow.hooks.dbapi import DbApiHook
 from pandas.io.sql import SQLDatabase
 from sqlalchemy.sql import ClauseElement
@@ -56,10 +55,7 @@ class DatabaseDataProvider(DataProviders[Table]):
         self,
         dataset: Table,
         transfer_mode: TransferMode,
-        transfer_params: TransferIntegrationOptions = attr.field(
-            factory=TransferIntegrationOptions,
-            converter=lambda val: TransferIntegrationOptions(**val) if isinstance(val, dict) else val,
-        ),
+        transfer_params: TransferIntegrationOptions = TransferIntegrationOptions(),
     ):
         self.dataset = dataset
         self.transfer_params = transfer_params

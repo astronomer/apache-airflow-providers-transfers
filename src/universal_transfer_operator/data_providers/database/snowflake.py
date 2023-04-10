@@ -15,19 +15,28 @@ from universal_transfer_operator.settings import LOAD_TABLE_AUTODETECT_ROWS_COUN
 from universal_transfer_operator.universal_transfer_operator import TransferIntegrationOptions
 
 
+@attr.define
+class SnowflakeOptions(TransferIntegrationOptions):
+    """
+    Snowflake load option for naive transfer.
+    """
+
+    file_options: dict = attr.field(factory=dict)
+    copy_options: dict = attr.field(factory=dict)
+    storage_integration: str | None = attr.field(default=None)
+
+
 class SnowflakeDataProvider(DatabaseDataProvider):
     """SnowflakeDataProvider represent all the DataProviders interactions with Snowflake Databases."""
 
     DEFAULT_SCHEMA = SNOWFLAKE_SCHEMA
+    OPTIONS_CLASS = SnowflakeOptions
 
     def __init__(
         self,
         dataset: Table,
         transfer_mode,
-        transfer_params: TransferIntegrationOptions = attr.field(
-            factory=TransferIntegrationOptions,
-            converter=lambda val: TransferIntegrationOptions(**val) if isinstance(val, dict) else val,
-        ),
+        transfer_params: TransferIntegrationOptions = TransferIntegrationOptions(),
     ):
         self.dataset = dataset
         self.transfer_params = transfer_params
