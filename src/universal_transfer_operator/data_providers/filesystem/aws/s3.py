@@ -7,7 +7,6 @@ from tempfile import NamedTemporaryFile
 from typing import Any, Iterator
 from urllib.parse import urlparse, urlunparse
 
-import attr
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 
 from universal_transfer_operator.constants import Location, TransferMode
@@ -28,10 +27,7 @@ class S3DataProvider(BaseFilesystemProviders):
     def __init__(
         self,
         dataset: File,
-        transfer_params: TransferIntegrationOptions = attr.field(
-            factory=TransferIntegrationOptions,
-            converter=lambda val: TransferIntegrationOptions(**val) if isinstance(val, dict) else val,
-        ),
+        transfer_params: TransferIntegrationOptions = TransferIntegrationOptions(),
         transfer_mode: TransferMode = TransferMode.NONNATIVE,
     ):
         super().__init__(
@@ -81,7 +77,7 @@ class S3DataProvider(BaseFilesystemProviders):
         paths = [urlunparse((url.scheme, url.netloc, keys, "", "", "")) for keys in prefixes]
         return paths
 
-    def check_if_exists(self, path: str | None = None) -> bool:
+    def check_if_exists(self, path: str | None = None) -> Any:
         """Return true if the dataset exists"""
         path = self.dataset.path if path is None else path
         return self.hook.check_for_key(key=path)
@@ -148,12 +144,12 @@ class S3DataProvider(BaseFilesystemProviders):
         return self.dataset.extra.get("s3_extra_args", {})
 
     @property
-    def bucket_name(self) -> str:
+    def bucket_name(self) -> Any:
         bucket_name, _ = self.hook.parse_s3_url(self.dataset.path)
         return bucket_name
 
     @property
-    def s3_key(self) -> str:
+    def s3_key(self) -> Any:
         _, key = self.hook.parse_s3_url(self.dataset.path)
         return key
 

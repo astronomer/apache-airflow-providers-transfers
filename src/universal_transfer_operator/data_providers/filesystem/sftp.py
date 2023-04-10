@@ -4,7 +4,6 @@ import os
 from functools import cached_property
 from urllib.parse import ParseResult, urlparse, urlunparse
 
-import attr
 import pandas as pd
 import smart_open
 from airflow.providers.sftp.hooks.sftp import SFTPHook
@@ -24,10 +23,7 @@ class SFTPDataProvider(BaseFilesystemProviders):
     def __init__(
         self,
         dataset: File,
-        transfer_params: TransferIntegrationOptions = attr.field(
-            factory=TransferIntegrationOptions,
-            converter=lambda val: TransferIntegrationOptions(**val) if isinstance(val, dict) else val,
-        ),
+        transfer_params: TransferIntegrationOptions = TransferIntegrationOptions(),
         transfer_mode: TransferMode = TransferMode.NONNATIVE,
     ):
         super().__init__(

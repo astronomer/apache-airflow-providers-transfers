@@ -1,15 +1,19 @@
 import pytest
 
 from universal_transfer_operator.constants import TransferMode
-from universal_transfer_operator.data_providers import create_dataprovider
+from universal_transfer_operator.data_providers import create_dataprovider, get_dataprovider_options_class
 from universal_transfer_operator.data_providers.base import DataProviders
-from universal_transfer_operator.data_providers.database.snowflake import SnowflakeDataProvider
+from universal_transfer_operator.data_providers.database.snowflake import (
+    SnowflakeDataProvider,
+    SnowflakeOptions,
+)
 from universal_transfer_operator.data_providers.database.sqlite import SqliteDataProvider
 from universal_transfer_operator.data_providers.filesystem.aws.s3 import S3DataProvider
 from universal_transfer_operator.data_providers.filesystem.google.cloud.gcs import GCSDataProvider
 from universal_transfer_operator.data_providers.filesystem.sftp import SFTPDataProvider
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Table
+from universal_transfer_operator.integrations.base import TransferIntegrationOptions
 
 
 @pytest.mark.parametrize(
@@ -27,6 +31,32 @@ def test_create_dataprovider(datasets):
     """Test that the correct data-provider is created for a dataset"""
     data_provider = create_dataprovider(dataset=datasets["dataset"])
     assert isinstance(data_provider, datasets["expected"])
+
+
+@pytest.mark.parametrize(
+    "datasets",
+    [
+        {
+            "dataset": File("s3://astro-sdk-test/uto/", conn_id="aws_default"),
+            "expected": TransferIntegrationOptions,
+        },
+        {
+            "dataset": File("gs://uto-test/uto/", conn_id="google_cloud_default"),
+            "expected": TransferIntegrationOptions,
+        },
+        {
+            "dataset": File("sftp://upload/sample.csv", conn_id="sftp_default"),
+            "expected": TransferIntegrationOptions,
+        },
+        {"dataset": Table("some_table", conn_id="sqlite_default"), "expected": TransferIntegrationOptions},
+        {"dataset": Table("some_table", conn_id="snowflake_conn"), "expected": SnowflakeOptions},
+    ],
+    ids=lambda d: d["dataset"].conn_id,
+)
+def test_get_option_class(datasets):
+    """Test that the correct options class is created for a dataset"""
+    option_class = get_dataprovider_options_class(dataset=datasets["dataset"])
+    assert isinstance(option_class, type(datasets["expected"]))
 
 
 def test_raising_of_NotImplementedError():
