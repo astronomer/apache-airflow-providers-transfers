@@ -80,8 +80,7 @@ repos:
       - id: mypy
         name: mypy-uto
         additional_dependencies: [ types-PyYAML, types-requests, types-attrs, attrs ]
-        files: "src/universal_transfer_operator"
-        args: ['--follow-imports=normal', '--no-implicit-optional', '--pretty', '--strict-equality', '--show-error-codes', '--show-error-context', '--warn-redundant-casts', '--warn-return-any', '--warn-unused-configs', '--ignore-missing-imports']
+        files: "^src/"
 
   -   repo: https://github.com/asottile/pyupgrade
       rev: v3.3.1
