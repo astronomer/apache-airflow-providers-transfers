@@ -157,6 +157,7 @@ class SnowflakeOptions(TransferIntegrationOptions):
     file_options: dict = attr.field(factory=dict)
     copy_options: dict = attr.field(factory=dict)
     storage_integration: str | None = attr.field(default=None)
+    validation_mode: str | None = attr.field(default=None)
 
 
 class SnowflakeDataProvider(DatabaseDataProvider):
@@ -169,10 +170,10 @@ class SnowflakeDataProvider(DatabaseDataProvider):
         self,
         dataset: Table,
         transfer_mode,
-        transfer_params: TransferIntegrationOptions = TransferIntegrationOptions(),
+        transfer_params: SnowflakeOptions = SnowflakeOptions(),
     ):
         self.dataset = dataset
-        self.transfer_params = transfer_params
+        self.transfer_params: SnowflakeOptions = transfer_params
         self.transfer_mode = transfer_mode
         self.transfer_mapping = set()
         self.LOAD_DATA_NATIVELY_FROM_SOURCE: dict = {}
@@ -450,7 +451,7 @@ class SnowflakeDataProvider(DatabaseDataProvider):
 
         storage_integration = native_support_kwargs.get("storage_integration", None)
         if storage_integration is None:
-            storage_integration = self.transfer_params.get("storage_integration", None)
+            storage_integration = self.transfer_params.storage_integration
 
         stage = self.create_stage(file=source_file, storage_integration=storage_integration)
 
@@ -474,7 +475,7 @@ class SnowflakeDataProvider(DatabaseDataProvider):
         )
         if storage_integration is not None:
             return f"storage_integration = {storage_integration};"
-        return file.location.get_snowflake_stage_auth_sub_statement()
+        return file.location.get_snowflake_stage_auth_sub_statement()  # type: ignore
 
     def create_stage(
         self,
@@ -512,8 +513,8 @@ class SnowflakeDataProvider(DatabaseDataProvider):
 
         file_format = ASTRO_SDK_TO_SNOWFLAKE_FILE_FORMAT_MAP[file.type.name]
         copy_options = []
-        copy_options.extend([f"{k}={v}" for k, v in self.transfer_params.get("copy_options", {}).items()])
-        file_options = [f"{k}={v}" for k, v in self.transfer_params.get("file_options", {}).items()]
+        copy_options.extend([f"{k}={v}" for k, v in self.transfer_params.copy_options.items()])
+        file_options = [f"{k}={v}" for k, v in self.transfer_params.file_options.items()]
         file_options.extend([f"TYPE={file_format}", "TRIM_SPACE=TRUE"])
         file_options_str = ", ".join(file_options)
         copy_options_str = ", ".join(copy_options)
@@ -558,13 +559,13 @@ class SnowflakeDataProvider(DatabaseDataProvider):
     ) -> None:
         """Validate COPY INTO command to tests the files for errors but does not load them."""
         if self.transfer_params:
-            if self.transfer_params.get("validation_mode") is None:
+            if self.transfer_params.validation_mode is None:
                 return
             table_name = self.get_table_qualified_name(target_table)
             file_path = os.path.basename(source_file.path) or ""
             sql_statement = (
                 f"COPY INTO {table_name} FROM "
-                f"@{stage.qualified_name}/{file_path} VALIDATION_MODE='{self.load_options.validation_mode}'"
+                f"@{stage.qualified_name}/{file_path} VALIDATION_MODE='{self.transfer_params.validation_mode}'"
             )
             try:
                 self.hook.run(sql_statement, handler=lambda cur: cur.fetchall())

@@ -29,7 +29,6 @@ from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Metadata, Table
 from universal_transfer_operator.exceptions import DatabaseCustomError
 from universal_transfer_operator.settings import (
-    LOAD_FILE_ENABLE_NATIVE_FALLBACK,
     LOAD_TABLE_AUTODETECT_ROWS_COUNT,
     SCHEMA,
 )
@@ -610,9 +609,6 @@ class DatabaseDataProvider(DataProviders[Table]):
         :param chunk_size: Specify the number of records in each batch to be written at a time
         :param normalize_config: pandas json_normalize params config
         """
-        enable_native_fallback = self.transfer_params.get(
-            "enable_native_fallback", LOAD_FILE_ENABLE_NATIVE_FALLBACK
-        )
         try:
             logging.info("Loading file(s) with Native Support...")
             self.load_file_to_table_natively(
@@ -621,22 +617,11 @@ class DatabaseDataProvider(DataProviders[Table]):
                 if_exists=if_exists,
                 **kwargs,
             )
-        except self.NATIVE_LOAD_EXCEPTIONS as load_exception:  # skipcq: PYL-W0703
+        except self.NATIVE_LOAD_EXCEPTIONS:  # skipcq: PYL-W0703
             logging.warning(
                 "Loading file(s) failed with Native Support.",
                 exc_info=True,
             )
-            if enable_native_fallback:
-                logging.warning("Falling back to Pandas-based load...")
-                self.load_file_to_table_using_pandas(
-                    input_file=source_file,
-                    output_table=target_table,
-                    normalize_config=normalize_config,
-                    if_exists=if_exists,
-                    chunk_size=chunk_size,
-                )
-            else:
-                raise load_exception
 
     def load_file_to_table_natively(
         self,

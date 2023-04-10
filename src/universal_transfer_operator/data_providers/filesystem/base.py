@@ -15,7 +15,6 @@ from universal_transfer_operator.constants import FileType, Location, TransferMo
 from universal_transfer_operator.data_providers.base import DataProviders, DataStream
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.file.types import create_file_type
-from universal_transfer_operator.exceptions import DatabaseCustomError
 from universal_transfer_operator.universal_transfer_operator import TransferIntegrationOptions
 from universal_transfer_operator.utils import get_dataset_connection_type
 
@@ -229,7 +228,7 @@ class BaseFilesystemProviders(DataProviders[File]):
         pass
 
     def get_snowflake_stage_auth_sub_statement(self) -> str:  # skipcq: PYL-R0201
-        raise DatabaseCustomError("In order to create a stage, `storage_integration` is required.")
+        raise NotImplementedError("In order to create a stage, `storage_integration` is required.")
 
     @property
     def snowflake_stage_path(self) -> str:
