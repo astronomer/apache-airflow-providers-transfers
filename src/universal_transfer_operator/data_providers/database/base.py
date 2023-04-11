@@ -533,16 +533,6 @@ class DatabaseDataProvider(DataProviders[Table]):
         response = self.run_sql(statement, handler=lambda x: x.fetchall())
         return response  # type: ignore
 
-    def is_native_path_available(  # skipcq: PYL-R0201
-        self, source_dataset: File | Table  # skipcq: PYL-W0613
-    ) -> bool:
-        """
-        Check if there is an optimised path for source to destination.
-
-        :param source_dataset: File | Table from which we need to transfer data
-        """
-        return False
-
     def load_file_to_table(
         self,
         input_file: File,
