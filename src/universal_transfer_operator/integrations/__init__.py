@@ -9,7 +9,9 @@ from universal_transfer_operator.constants import IngestorSupported
 from universal_transfer_operator.integrations.base import TransferIntegration, TransferIntegrationOptions
 from universal_transfer_operator.utils import get_class_name
 
-CUSTOM_INGESTION_TYPE_TO_MODULE_PATH = {"fivetran": "universal_transfer_operator.integrations.fivetran"}
+CUSTOM_INGESTION_TYPE_TO_MODULE_PATH = {
+    "fivetran": "universal_transfer_operator.integrations.fivetran.fivetran"
+}
 
 
 def get_transfer_integration(transfer_params: TransferIntegrationOptions) -> TransferIntegration:

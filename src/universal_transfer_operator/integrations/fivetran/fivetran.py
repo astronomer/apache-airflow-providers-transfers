@@ -1,15 +1,17 @@
 from __future__ import annotations
 
+import json
 import logging
 from functools import cached_property
 from typing import Any
 
 import attr
+from airflow.exceptions import AirflowException
 from attr import field
-from fivetran_provider.hooks.fivetran import FivetranHook
 
 from universal_transfer_operator.datasets.base import Dataset
 from universal_transfer_operator.integrations.base import TransferIntegration, TransferIntegrationOptions
+from universal_transfer_operator.integrations.hooks.fivetran import FivetranHook
 
 
 @attr.define
@@ -67,13 +69,12 @@ class Connector:
     :param connector_id: The unique identifier for the connector within the Fivetran system
     :param service: services as per https://fivetran.com/docs/rest-api/destinations/config
     :param config: Configuration as per destination specified at https://fivetran.com/docs/rest-api/connectors/config
-    :param paused: Specifies whether the connector is paused. Defaults to True.
+    :param paused: Specifies whether the connector is paused. Defaults to False.
     :param pause_after_trial: Specifies whether the connector should be paused after the free trial period has ended.
-     Defaults to True.
+     Defaults to False.
     :param sync_frequency: The connector sync frequency in minutes Enum: "5" "15" "30" "60" "120" "180" "360" "480"
-     "720" "1440". Default to "5"
-    :param daily_sync_time: Defines the sync start time when the sync frequency is already set or being set by
-     the current request to 1440.
+     "720" "1440".
+    :param daily_sync_time: Defines the sync start time when the sync frequency is already set
     :param schedule_type: Define the schedule type
     :param connect_card_config: Connector card configuration
     :param trust_certificates: Specifies whether we should trust the certificate automatically. The default value is
@@ -86,15 +87,15 @@ class Connector:
     connector_id: str | None
     service: str
     config: dict
-    connect_card_config: dict
-    paused: bool = True
-    pause_after_trial: bool = True
-    sync_frequency: str = "5"
-    daily_sync_time: str = "00:00"
-    schedule_type: str = ""
+    paused: bool = False
+    pause_after_trial: bool = False
+    sync_frequency: str | None = None
+    daily_sync_time: str | None = None
+    schedule_type: str | None = None
     trust_certificates: bool = False
     trust_fingerprints: bool = False
     run_setup_tests: bool = True
+    connect_card_config: dict | None = None
 
     def to_dict(self) -> dict:
         """
@@ -201,22 +202,24 @@ class FivetranIntegration(TransferIntegration):
             # create group if not group_id is not passed.
             group_id = self.create_group(fivetran_hook=fivetran_hook)
 
+        logging.info(f"Group created with group_id: {group_id}")
         destination_id = (
             self.transfer_params.destination.destination_id
             if self.transfer_params.destination and self.transfer_params.destination.destination_id
             else None
         )
+
+        # TODO: Add logic to check for destination if already exists
         if not destination_id or not self.check_destination_details(
             fivetran_hook=fivetran_hook, destination_id=destination_id
         ):
             # Check for destination based on destination_id else create destination
-            self.create_destination(fivetran_hook=fivetran_hook, group_id=group_id)
+            destination = self.create_destination(fivetran_hook=fivetran_hook, group_id=group_id)
 
+        logging.info(f"Destination created with destination details: {destination}")
+        # TODO: Add logic to create auth for connector
         # Create connector if it doesn't exist
         connector_id = self.create_connector(fivetran_hook=fivetran_hook, group_id=group_id)
-
-        # Run connector setup test
-        self.run_connector_setup_tests(fivetran_hook=fivetran_hook, connector_id=connector_id)
 
         # Sync connector data
         fivetran_hook.prep_connector(
@@ -231,7 +234,7 @@ class FivetranIntegration(TransferIntegration):
         :param fivetran_hook: Fivetran hook
         """
         connector_id = self.transfer_params.connector_id
-        if connector_id is None:
+        if connector_id == "":
             logging.warning("No value specified for connector_id")
             return False
         # Explicitly casting is required since the `fivetran_hook.check_connector` doesn't specify the return type
@@ -261,7 +264,7 @@ class FivetranIntegration(TransferIntegration):
 
     def create_group(self, fivetran_hook: FivetranHook) -> str:
         """
-        Creates the group based on group name passed
+        Creates the group based on group name passed. If name already exists return group name.
 
         :param fivetran_hook: Fivetran hook
         """
@@ -271,12 +274,41 @@ class FivetranIntegration(TransferIntegration):
             raise ValueError("Group is none. Pass a valid group")
         group = Group(**group_dict.to_dict())
         payload = {"name": group.name}
-        api_response = fivetran_hook._do_api_call(("POST", endpoint), json=payload)  # skipcq: PYL-W0212
-        if api_response["code"] == "Success":
-            logging.info(api_response)
-        else:
-            raise ValueError(api_response)
-        return str(api_response["data"]["id"])
+        try:
+            api_response = fivetran_hook._do_api_call(
+                ("POST", endpoint), json=json.dumps(payload)
+            )  # skipcq: PYL-W0212
+            if api_response["code"] == "Success":
+                logging.info(api_response)
+            else:
+                raise ValueError(api_response)
+            return str(api_response["data"]["id"])
+        except AirflowException as airflow_exec:
+            logging.warning(airflow_exec)
+        return self.fetch_group_id_from_name(fivetran_hook)
+
+    def fetch_group_id_from_name(self, fivetran_hook: FivetranHook) -> str:
+        """
+        Fetches group name from group id in fivetran
+
+        :param fivetran_hook: Fivetran hook
+        """
+        endpoint = self.api_path_groups
+        resp = fivetran_hook._do_api_call(("GET", endpoint))
+        response = resp["data"]
+        group_dict = self.transfer_params.group
+        if group_dict is None:
+            raise ValueError("Group is none. Pass a valid group")
+        group = Group(**group_dict.to_dict())
+        if not response.get("items", None):
+            raise AirflowException("Group name not found.")
+
+        for item in response["items"]:
+            if item["name"] == group.name:
+                group_id: str = item["id"]
+                logging.debug(f"Group name found with id: {group_id}")
+                return group_id
+        raise AirflowException("Group name not found.")
 
     def check_destination_details(self, fivetran_hook: FivetranHook, destination_id: str | None) -> bool:
         """
@@ -319,10 +351,22 @@ class FivetranIntegration(TransferIntegration):
             "config": destination.config,
             "run_setup_tests": destination.run_setup_tests,
         }
-        api_response = fivetran_hook._do_api_call(("POST", endpoint), json=payload)  # skipcq: PYL-W0212
+        api_response = fivetran_hook._do_api_call(
+            ("POST", endpoint), json=json.dumps(payload)
+        )  # skipcq: PYL-W0212
         if api_response["code"] == "Success":
             logging.info(api_response)
-            # TODO: parse all setup tests status for passed status
+            setup_status = api_response["data"]["setup_status"]
+            if setup_status == "connected":
+                logging.info(f"Destination is created with details: {api_response}")
+            else:
+                api_response_data = api_response["data"]
+                logging.error(
+                    f"Error occurred in creating the destination with following details {api_response_data}"
+                )
+                raise ValueError(
+                    f"Error occurred in creating the destination with following details {api_response_data}"
+                )
         else:
             raise ValueError(api_response)
         return dict(api_response)
@@ -351,37 +395,24 @@ class FivetranIntegration(TransferIntegration):
             "sync_frequency": connector.sync_frequency,
             "daily_sync_time": connector.daily_sync_time,
             "schedule_type": connector.schedule_type,
-            "connect_card_config": connector.connect_card_config,
             "config": connector.config,
         }
-        api_response = fivetran_hook._do_api_call(("POST", endpoint), json=payload)  # skipcq: PYL-W0212
+        api_response = fivetran_hook._do_api_call(
+            ("POST", endpoint), json=json.dumps(payload)
+        )  # skipcq: PYL-W0212
         if api_response["code"] == "Success":
             logging.info(api_response)
-            # TODO: parse all setup tests status for passed status
+            setup_state = api_response["data"]["status"]
+            if setup_state["setup_state"] == "connected":
+                logging.info(f"Connector is created with details: {api_response}")
+            else:
+                api_response_data = api_response["data"]
+                logging.error(
+                    f"Error occurred in creating the connector with following details {api_response_data}"
+                )
+                raise ValueError(
+                    f"Error occurred in creating the connector with following details {api_response_data}"
+                )
         else:
             raise ValueError(api_response)
         return str(api_response["data"]["id"])
-
-    def run_connector_setup_tests(self, fivetran_hook: FivetranHook, connector_id: str):
-        """
-        Runs the setup tests for an existing connector within your Fivetran account.
-
-        :param fivetran_hook: Fivetran hook
-        :param connector_id: The unique identifier for the connector within the Fivetran system
-        """
-        endpoint = self.api_path_connectors + connector_id + "/test"
-        connector_dict = self.transfer_params.connector
-        if connector_dict is None:
-            raise ValueError("connector is none. Pass a valid connector")
-
-        connector = Connector(**connector_dict.to_dict())
-        payload = {
-            "trust_certificates": connector.trust_certificates,
-            "trust_fingerprints": connector.trust_fingerprints,
-        }
-        api_response = fivetran_hook._do_api_call(("POST", endpoint), json=payload)  # skipcq: PYL-W0212
-        if api_response["code"] == "Success":
-            logging.info(api_response)
-            # TODO: parse all setup tests status for passed status
-        else:
-            raise ValueError(api_response)
