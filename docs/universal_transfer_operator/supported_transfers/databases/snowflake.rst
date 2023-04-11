@@ -58,6 +58,14 @@ Examples
                :start-after: [START fivetran_transfer_without_setup]
                :end-before: [END fivetran_transfer_without_setup]
 
+    - :ref:`native`
+        Following is an example of transfer between S3 to Snowflake natively
+
+            .. literalinclude:: ../../../../tests_integration/test_data_provider/test_databases/test_snowflake.py
+               :language: python
+               :start-after: [START transfer_from_s3_to_snowflake_natively]
+               :end-before: [END transfer_from_s3_to_snowflake_natively]
+
 2. GCS to Snowflake transfers
     - :ref:`non_native`
         Following is an example of non-native transfers between GCS to Snowflake using non-native transfer:
@@ -66,6 +74,14 @@ Examples
                :language: python
                :start-after: [START transfer_non_native_gs_to_snowflake]
                :end-before: [END transfer_non_native_gs_to_snowflake]
+
+    - :ref:`native`
+        Following is an example of transfer between GCS to Snowflake natively
+
+            .. literalinclude:: ../../../../tests_integration/test_data_provider/test_databases/test_snowflake.py
+               :language: python
+               :start-after: [START transfer_from_gcs_to_snowflake_natively]
+               :end-before: [END transfer_from_gcs_to_snowflake_natively]
 
 2. Bigquery to Snowflake transfers
     - :ref:`non_native`

@@ -187,6 +187,9 @@ def test_s3_to_snowflake_native_path(sample_dag, src_dataset_fixture):
     file_dataset = File(path="s3://astro-sdk/sample.csv", conn_id="aws_default", filetype=FileType.CSV)
     file_dataprovider = create_dataprovider(file_dataset)
     with sample_dag:
+        # [START transfer_from_s3_to_snowflake_natively]
+        # file_dataset = File(path="s3://astro-sdk/sample.csv", conn_id="aws_default", filetype=FileType.CSV)
+        # table_dataset = Table(conn_id="snowflake_conn")
         UniversalTransferOperator(
             task_id="s3_to_bigquery",
             source_dataset=file_dataset,
@@ -197,6 +200,7 @@ def test_s3_to_snowflake_native_path(sample_dag, src_dataset_fixture):
             },
             transfer_mode=TransferMode.NATIVE,
         )
+        # [END transfer_from_s3_to_snowflake_natively]
     run_dag(sample_dag)
     file_dataframe = export_to_dataframe(file_dataprovider)
     table_dataframe = export_to_dataframe(table_dataprovider)
@@ -223,6 +227,11 @@ def test_gcs_to_snowflake_native_path(sample_dag, src_dataset_fixture):
     )
     file_dataprovider = create_dataprovider(dataset=file_dataset)
     with sample_dag:
+        # [START transfer_from_gcs_to_snowflake_natively]
+        # file_dataset = File(
+        #     path="gs://astro-sdk/workspace/sample.csv", conn_id="google_cloud_default", filetype=FileType.CSV
+        # )
+        # table_dataset = Table(conn_id="snowflake_conn")
         UniversalTransferOperator(
             task_id="gcp_to_bigquery",
             source_dataset=file_dataset,
@@ -234,6 +243,7 @@ def test_gcs_to_snowflake_native_path(sample_dag, src_dataset_fixture):
             },
             transfer_mode=TransferMode.NATIVE,
         )
+        # [END transfer_from_gcs_to_snowflake_natively]
     run_dag(sample_dag)
     file_dataframe = export_to_dataframe(file_dataprovider)
     table_dataframe = export_to_dataframe(table_dataprovider)
