@@ -248,3 +248,28 @@ def test_gcs_to_snowflake_native_path(sample_dag, src_dataset_fixture):
     file_dataframe = export_to_dataframe(file_dataprovider)
     table_dataframe = export_to_dataframe(table_dataprovider)
     assert file_dataframe.equals(table_dataframe)
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    "src_dataset_fixture",
+    [
+        {
+            "name": "SnowflakeDataProvider",
+        }
+    ],
+    indirect=True,
+    ids=["snowflake"],
+)
+def test_create_table_using_schema_autodetection(src_dataset_fixture):
+    """Test create_table_using_schema_autodetection"""
+    dp, dataset_object = src_dataset_fixture
+    filepath = str(pathlib.Path(CWD.parent, "../data/sample.csv"))
+    dp.create_table_using_schema_autodetection(table=dataset_object, file=File(filepath))
+
+    statement = f"DESCRIBE TABLE {dp.get_table_qualified_name(dataset_object)}"
+    cols = dp.run_sql(statement, handler=lambda x: x.fetchall())
+    assert cols[0][0] == "ID"
+    assert str(cols[0][1]).startswith("NUMBER")
+    assert cols[1][0] == "NAME"
+    assert str(cols[1][1]).startswith("VARCHAR")
