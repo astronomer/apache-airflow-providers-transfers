@@ -66,6 +66,8 @@ Examples
                :start-after: [START transfer_from_s3_to_snowflake_natively]
                :end-before: [END transfer_from_s3_to_snowflake_natively]
 
+        For a complete list of what can be passed in ``transfer_params`` check this `copy-into-table options <https://docs.snowflake.com/en/sql-reference/sql/copy-into-table.html>`_, you would also need setup/permissions to make this work, check this `s3 document <https://docs.snowflake.com/en/user-guide/data-load-s3.html>`_ for setup.
+
 2. GCS to Snowflake transfers
     - :ref:`non_native`
         Following is an example of non-native transfers between GCS to Snowflake using non-native transfer:
@@ -82,6 +84,8 @@ Examples
                :language: python
                :start-after: [START transfer_from_gcs_to_snowflake_natively]
                :end-before: [END transfer_from_gcs_to_snowflake_natively]
+
+        For a complete list of what can be passed in ``transfer_params`` check this `copy-into-table options <https://docs.snowflake.com/en/sql-reference/sql/copy-into-table.html>`_, you would also need setup/permissions to make this work, check this `gcs document <https://docs.snowflake.com/en/user-guide/data-load-gcs-config.html>`_ for setup.
 
 2. Bigquery to Snowflake transfers
     - :ref:`non_native`
