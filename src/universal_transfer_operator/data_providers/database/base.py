@@ -27,7 +27,6 @@ from universal_transfer_operator.data_providers.filesystem import resolve_file_p
 from universal_transfer_operator.datasets.dataframe.pandas import PandasDataframe
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Metadata, Table
-from universal_transfer_operator.exceptions import DatabaseCustomError
 from universal_transfer_operator.settings import (
     LOAD_TABLE_AUTODETECT_ROWS_COUNT,
     SCHEMA,
@@ -54,7 +53,6 @@ class DatabaseDataProvider(DataProviders[Table]):
     IGNORE_HANDLER_IN_RUN_RAW_SQL: bool = False
     NATIVE_PATHS: dict[Any, Any] = {}
     DEFAULT_SCHEMA = SCHEMA
-    NATIVE_LOAD_EXCEPTIONS: Any = DatabaseCustomError
 
     def __init__(
         self,
@@ -574,14 +572,15 @@ class DatabaseDataProvider(DataProviders[Table]):
             normalize_config=normalize_config,
         )
         if self.transfer_mode == TransferMode.NATIVE:
-            self.load_file_to_table_natively_with_fallback(
+            logging.info("Loading file(s) with Native Support...")
+            self.load_file_to_table_natively(
                 source_file=input_file,
                 target_table=output_table,
                 if_exists="append",
-                normalize_config=normalize_config,
-                chunk_size=chunk_size,
+                **kwargs,
             )
         else:
+            logging.info("Loading file(s) with Non Native Support...")
             self.load_file_to_table_using_pandas(
                 input_file=input_file,
                 output_table=output_table,
@@ -590,38 +589,6 @@ class DatabaseDataProvider(DataProviders[Table]):
                 chunk_size=chunk_size,
             )
         return self.get_table_qualified_name(output_table)
-
-    def load_file_to_table_natively_with_fallback(
-        self,
-        source_file: File,
-        target_table: Table,
-        if_exists: LoadExistStrategy = "replace",
-        normalize_config: dict | None = None,
-        chunk_size: int = DEFAULT_CHUNK_SIZE,
-        **kwargs,
-    ):
-        """
-        Load content of a file in output_table.
-
-        :param source_file: File path and conn_id for object stores
-        :param target_table: Table to create
-        :param if_exists: Overwrite file if exists
-        :param chunk_size: Specify the number of records in each batch to be written at a time
-        :param normalize_config: pandas json_normalize params config
-        """
-        try:
-            logging.info("Loading file(s) with Native Support...")
-            self.load_file_to_table_natively(
-                source_file=source_file,
-                target_table=target_table,
-                if_exists=if_exists,
-                **kwargs,
-            )
-        except self.NATIVE_LOAD_EXCEPTIONS:  # skipcq: PYL-W0703
-            logging.warning(
-                "Loading file(s) failed with Native Support.",
-                exc_info=True,
-            )
 
     def load_file_to_table_natively(
         self,
