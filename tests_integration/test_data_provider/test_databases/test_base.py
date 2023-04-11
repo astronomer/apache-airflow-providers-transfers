@@ -4,6 +4,7 @@ import pathlib
 
 import pandas as pd
 import pytest
+import smart_open
 from utils.test_utils import create_unique_str, export_to_dataframe
 
 from universal_transfer_operator.data_providers.base import DataStream
