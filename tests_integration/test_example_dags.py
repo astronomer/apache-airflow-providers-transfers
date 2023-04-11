@@ -60,9 +60,6 @@ def get_dag_bag() -> DagBag:
     airflow_ignore_file = example_dags_dir / ".airflowignore"
 
     with open(airflow_ignore_file, "a+") as file:
-        # Note - excluding fivetran dags till we add the `fivetran_default` in the CI connections.
-        # Ticket - https://github.com/astronomer/astro-sdk/issues/1843
-        file.writelines("example_dag_fivetran.py\n")
         for min_version, files in MIN_VER_DAG_FILE_VER.items():
             if Version(airflow.__version__) < min_version:
                 print(f"Adding {files} to .airflowignore")
