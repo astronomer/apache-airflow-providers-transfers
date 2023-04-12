@@ -4,12 +4,6 @@ import string
 import pandas as pd
 from pandas.testing import assert_frame_equal
 
-import smart_open
-from pyarrow.lib import ArrowInvalid
-from urllib.parse import urlparse, urlunparse
-from universal_transfer_operator.datasets.file.base import File
-from universal_transfer_operator.datasets.table import Table
-
 
 def create_unique_str(length: int = 50) -> str:
     """
