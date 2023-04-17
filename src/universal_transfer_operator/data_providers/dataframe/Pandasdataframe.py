@@ -62,6 +62,12 @@ class PandasdataframeDataProvider(DataframeProvider):
 
     version: ClassVar[int] = 1
 
+    def equal(self, other: PandasdataframeDataProvider):
+        """Check equality of two PandasdataframeDataProvider"""
+        if isinstance(other, PandasdataframeDataProvider):
+            return self.dataset.equal(other.dataset)
+        return False
+
     def serialize(self):
         # Store in the metadata DB if Dataframe < 100 kb
         df_size = self.memory_usage(deep=True).sum()
@@ -85,10 +91,12 @@ class PandasdataframeDataProvider(DataframeProvider):
             file = File.from_json(data)
             if file.is_dataframe:
                 logger.info("Retrieving file from %s using %s conn_id ", file.path, file.conn_id)
-                return PandasdataframeDataProvider(file.export_to_dataframe())
+                return file.export_to_dataframe()
             return file
         return PandasdataframeDataProvider.from_pandas_df(pd.read_json(data["data"]))
 
     @classmethod
-    def from_pandas_df(cls, df: pd.DataFrame) -> PandasdataframeDataProvider:
+    def from_pandas_df(cls, df: pd.DataFrame) -> pd.DataFrame | PandasdataframeDataProvider:
+        if not settings.NEED_CUSTOM_SERIALIZATION:
+            return df
         return cls(df)
