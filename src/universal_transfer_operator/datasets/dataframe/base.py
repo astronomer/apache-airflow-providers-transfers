@@ -18,7 +18,7 @@ class Dataframe(Dataset):
 
     name: str = field(default="")
     dataframe: Any = field(default=None)
-    uri: str = field(default=None)
+    uri: str = field(init=None)  # type: ignore
 
     # TODO: define the name and namespace for dataframe
 
