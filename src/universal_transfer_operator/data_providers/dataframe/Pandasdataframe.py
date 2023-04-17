@@ -62,7 +62,7 @@ class PandasdataframeDataProvider(DataframeProvider):
 
     version: ClassVar[int] = 1
 
-    def equal(self, other: PandasdataframeDataProvider):
+    def equals(self, other: PandasdataframeDataProvider):
         """Check equality of two PandasdataframeDataProvider"""
         if isinstance(other, PandasdataframeDataProvider):
             return self.dataset.equal(other.dataset)
