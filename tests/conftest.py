@@ -288,7 +288,8 @@ def dataset_fixture(request):
     dataset_object = set_missing_values(dataset_object=dataset_object, dp_name=dp_name)
 
     dp = create_dataprovider(dataset=dataset_object, transfer_mode=transfer_mode)
-    dp.populate_metadata()
+    if isinstance(dp, DatabaseDataProvider):
+        dp.populate_metadata()
 
     load_data_in_datasets(
         dataset_object=dataset_object, dp=dp, dp_name=dp_name, local_file_path=local_file_path

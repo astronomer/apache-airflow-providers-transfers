@@ -49,6 +49,8 @@ def convert_dataframe_to_file(df: pd.DataFrame) -> File:
 
 
 class PandasdataframeDataProvider(DataframeProvider):
+    version: ClassVar[int] = 1
+
     def read(self) -> Iterator[pd.DataFrame]:
         """Read from dataframe dataset and write to local reference locations or dataframes"""
         yield self.dataset
@@ -60,12 +62,12 @@ class PandasdataframeDataProvider(DataframeProvider):
         elif isinstance(source_ref, DataStream):
             return source_ref.actual_file.type.export_to_dataframe(stream=source_ref.remote_obj_buffer)
 
-    version: ClassVar[int] = 1
-
     def equals(self, other: PandasdataframeDataProvider):
         """Check equality of two PandasdataframeDataProvider"""
         if isinstance(other, PandasdataframeDataProvider):
-            return self.dataset.equal(other.dataset)
+            return self.dataset.equals(other.dataset)
+        if isinstance(other, pd.DataFrame):
+            return self.dataset.equals(other)
         return False
 
     def serialize(self):
