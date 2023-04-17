@@ -5,10 +5,6 @@ import io
 import pandas as pd
 
 from universal_transfer_operator.constants import FileType as FileTypeConstants
-from universal_transfer_operator.datasets.dataframe.pandas import (
-    PandasDataframe,
-    convert_columns_names_capitalization,
-)
 from universal_transfer_operator.datasets.file.types.base import FileTypes
 
 
@@ -30,10 +26,11 @@ class ParquetFileTypes(FileTypes):
         byte_io_buffer = self._convert_remote_file_to_byte_stream(stream)
 
         df = pd.read_parquet(byte_io_buffer, **kwargs_copy)
-        df = convert_columns_names_capitalization(
-            df=df, columns_names_capitalization=columns_names_capitalization
+        from universal_transfer_operator.data_providers.dataframe.Pandasdataframe import (
+            PandasdataframeDataProvider,
         )
-        return PandasDataframe.from_pandas_df(df)
+
+        return PandasdataframeDataProvider.from_pandas_df(df)
 
     @staticmethod
     def _convert_remote_file_to_byte_stream(stream) -> io.IOBase:

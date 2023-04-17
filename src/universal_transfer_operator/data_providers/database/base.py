@@ -24,7 +24,6 @@ from universal_transfer_operator.constants import (
 )
 from universal_transfer_operator.data_providers.base import DataProviders, DataStream
 from universal_transfer_operator.data_providers.filesystem import resolve_file_path_pattern
-from universal_transfer_operator.datasets.dataframe.pandas import PandasDataframe
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Metadata, Table
 from universal_transfer_operator.settings import LOAD_TABLE_AUTODETECT_ROWS_COUNT, SCHEMA
@@ -61,11 +60,9 @@ class DatabaseDataProvider(DataProviders[Table]):
         self.transfer_params = transfer_params
         self.if_exists = self._if_exists
         self.transfer_mode = transfer_mode
-        self.transfer_mapping = set()
+        self.transfer_mapping: set[Location] = set()
         self.LOAD_DATA_NATIVELY_FROM_SOURCE: dict = {}
-        super().__init__(
-            dataset=self.dataset, transfer_mode=self.transfer_mode, transfer_params=self.transfer_params
-        )
+        super().__init__(dataset=self.dataset)
 
     def __repr__(self):
         return f'{self.__class__.__name__}(conn_id="{self.dataset.conn_id})'
@@ -734,4 +731,8 @@ class DatabaseDataProvider(DataProviders[Table]):
 
         sqla_table = self.get_sqla_table(self.dataset)
         df = pd.read_sql(sql=sqla_table.select(), con=self.sqlalchemy_engine)
-        return PandasDataframe.from_pandas_df(df)
+        from universal_transfer_operator.data_providers.dataframe.Pandasdataframe import (
+            PandasdataframeDataProvider,
+        )
+
+        return PandasdataframeDataProvider.from_pandas_df(df)
