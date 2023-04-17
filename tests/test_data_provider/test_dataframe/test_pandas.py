@@ -46,4 +46,4 @@ def test_write_with_io_bytesio():
     dp = PandasdataframeDataProvider(Dataframe(name="test"))
     ds = get_datastream_object(path=DATA_DIR + "sample.csv", mode="r")
     returned_df = dp.write(ds)
-    assert returned_df.equals(df)
+    assert returned_df.dataset.equals(df)

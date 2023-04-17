@@ -85,12 +85,10 @@ class PandasdataframeDataProvider(DataframeProvider):
             file = File.from_json(data)
             if file.is_dataframe:
                 logger.info("Retrieving file from %s using %s conn_id ", file.path, file.conn_id)
-                return file.export_to_dataframe()
+                return PandasdataframeDataProvider(file.export_to_dataframe())
             return file
         return PandasdataframeDataProvider.from_pandas_df(pd.read_json(data["data"]))
 
     @classmethod
-    def from_pandas_df(cls, df: pd.DataFrame) -> pd.DataFrame:
-        if not settings.NEED_CUSTOM_SERIALIZATION:
-            return df
+    def from_pandas_df(cls, df: pd.DataFrame) -> PandasdataframeDataProvider:
         return cls(df)
