@@ -5,10 +5,8 @@ from airflow import DAG
 
 from universal_transfer_operator.constants import TransferMode
 from universal_transfer_operator.datasets.file.base import File
-from universal_transfer_operator.datasets.table import Metadata, Table
-from universal_transfer_operator.integrations.fivetran.connector import FivetranConnector
-from universal_transfer_operator.integrations.fivetran.destination import FivetranDestination
-from universal_transfer_operator.integrations.fivetran.fivetran import FiveTranOptions, Group
+from universal_transfer_operator.datasets.table import Table
+from universal_transfer_operator.integrations.fivetran.fivetran import FiveTranOptions
 from universal_transfer_operator.universal_transfer_operator import UniversalTransferOperator
 
 s3_bucket = os.getenv("S3_BUCKET", "s3://astro-sdk-test")
@@ -36,25 +34,25 @@ with DAG(
     # [END fivetran_transfer_with_setup]
 
     # [START fivetran_transfer_without_setup]
-    transfer_fivetran_without_connector_id = UniversalTransferOperator(
-        task_id="transfer_fivetran_without_connector_id",
-        source_dataset=File(path=f"{s3_bucket}/", conn_id="aws_default", extra={"prefix": "fivetran_test"}),
-        destination_dataset=Table(
-            name="fivetran_test",
-            conn_id="snowflake_conn",
-            metadata=Metadata(database=snowflake_database, schema=snowflake_schema),
-        ),
-        transfer_mode=TransferMode.THIRDPARTY,
-        transfer_params=FiveTranOptions(
-            conn_id="fivetran_default",
-            group=Group(name="test_group_fivetran_snowflake"),
-            connector=FivetranConnector(service="s3", config=connector_config, connector_id=None),
-            destination=FivetranDestination(
-                service="snowflake",
-                time_zone_offset="-5",
-                region="US",
-                config={},
-            ),
-        ),
-    )
+    # transfer_fivetran_without_connector_id = UniversalTransferOperator(
+    #     task_id="transfer_fivetran_without_connector_id",
+    #     source_dataset=File(path=f"{s3_bucket}/", conn_id="aws_default", extra={"prefix": "fivetran_test"}),
+    #     destination_dataset=Table(
+    #         name="fivetran_test",
+    #         conn_id="snowflake_conn",
+    #         metadata=Metadata(database=snowflake_database, schema=snowflake_schema),
+    #     ),
+    #     transfer_mode=TransferMode.THIRDPARTY,
+    #     transfer_params=FiveTranOptions(
+    #         conn_id="fivetran_default",
+    #         group=Group(name="test_group_fivetran_snowflake"),
+    #         connector=FivetranConnector(service="s3", config=connector_config, connector_id=None),
+    #         destination=FivetranDestination(
+    #             service="snowflake",
+    #             time_zone_offset="-5",
+    #             region="US",
+    #             config={},
+    #         ),
+    #     ),
+    # )
     # [END fivetran_transfer_without_setup]
