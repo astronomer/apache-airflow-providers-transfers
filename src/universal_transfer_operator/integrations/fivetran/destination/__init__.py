@@ -31,7 +31,7 @@ def get_fivetran_destination(
     :param region: Data processing location. This is where Fivetran will operate and run computation on data.
     :param run_setup_tests: Specifies whether setup tests should be run automatically.
     """
-    destination_conn_id = destination_dataset.conn_id
+    destination_conn_id = destination_dataset.conn_id  # type: ignore
 
     if destination_conn_id is None:
         raise ValueError("Connection id for destination_dataset is not specified.")

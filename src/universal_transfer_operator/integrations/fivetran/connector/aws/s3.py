@@ -105,19 +105,19 @@ class S3Connector(FivetranConnector):
         :param destination_dataset: Destination dataset
         :param group_id: Group id in fivetran system
         """
-        conn = BaseHook().get_connection(source_dataset.conn_id)
+        conn = BaseHook().get_connection(source_dataset.conn_id)  # type: ignore
 
         access_key = conn.login
         secret_key = conn.password
 
         if not access_key:
-            raise ConnectionError(f"AWS_ACCESS_KEY_ID is not configured for {source_dataset.conn_id}")
+            raise ConnectionError(f"AWS_ACCESS_KEY_ID is not configured for {source_dataset.conn_id}")  # type: ignore
 
         if not secret_key:
-            raise ConnectionError(f"AWS_SECRET_ACCESS_KEY is not configured for {source_dataset.conn_id}")
+            raise ConnectionError(f"AWS_SECRET_ACCESS_KEY is not configured {source_dataset.conn_id}")  # type: ignore
 
         s3_hook = self.hook(
-            conn_id=source_dataset,
+            conn_id=source_dataset.conn_id,  # type: ignore
             verify=self.verify(source_dataset),
             transfer_config_args=self.transfer_config_args(source_dataset),
             s3_extra_args=self.s3_extra_args(source_dataset),
@@ -132,7 +132,7 @@ class S3Connector(FivetranConnector):
         # Create IAM Role. Read more at: Read more at: https://fivetran.com/docs/files/amazon-s3/setup-guide
         iam_role = self.create_role(
             role_name=self.generate_unique_fivetran_name(),
-            fivetran_aws_vpc_account_id=FIVETRAN_AWS_VPC_ACCOUNT_ID,
+            fivetran_aws_vpc_account_id=str(FIVETRAN_AWS_VPC_ACCOUNT_ID),
             group_id=group_id,
             access_key=access_key,
             secret_key=secret_key,
@@ -147,8 +147,8 @@ class S3Connector(FivetranConnector):
         )
 
         connection_details = {
-            "schema": destination_dataset.metadata.schema,
-            "table": destination_dataset.name,
+            "schema": destination_dataset.metadata.schema,  # type: ignore
+            "table": destination_dataset.name,  # type: ignore
             "external_id": group_id,
             "is_public": self.config.get("is_public"),
             "role_arn": iam_role["Role"]["Arn"],
@@ -163,15 +163,15 @@ class S3Connector(FivetranConnector):
 
     @staticmethod
     def verify(dataset: Dataset) -> Any:
-        return dataset.extra.get("verify")
+        return dataset.extra.get("verify") if dataset else None
 
     @staticmethod
     def transfer_config_args(dataset: Dataset) -> Any:
-        return dataset.extra.get("transfer_config_args", {})
+        return dataset.extra.get("transfer_config_args", {}) if dataset else None
 
     @staticmethod
     def s3_extra_args(dataset: Dataset) -> Any:
-        return dataset.extra.get("s3_extra_args", {})
+        return dataset.extra.get("s3_extra_args", {}) if dataset else None
 
     @staticmethod
     def bucket_name(s3_hook: S3Hook, dataset: Dataset) -> Any:
@@ -185,11 +185,11 @@ class S3Connector(FivetranConnector):
 
     @staticmethod
     def prefix(dataset: Dataset) -> Any:
-        return dataset.extra.get("prefix", None)
+        return dataset.extra.get("prefix", None) if dataset else None
 
     @staticmethod
     def delimiter(dataset: Dataset) -> Any:
-        return dataset.extra.get("delimiter", None)
+        return dataset.extra.get("delimiter", None) if dataset else None
 
     @staticmethod
     def generate_unique_fivetran_name() -> str:

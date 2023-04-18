@@ -291,7 +291,7 @@ class FivetranIntegration(TransferIntegration):
         destination = get_fivetran_destination(
             destination_dataset=destination_dataset, **destination_dict.to_dict()
         )
-        config = destination.create_config(conn_id=destination_dataset.conn_id)
+        config = destination.create_config(conn_id=destination_dataset.conn_id)  # type: ignore
         payload = {
             "group_id": group_id,
             "service": destination.service,

@@ -14,17 +14,11 @@ from requests import exceptions as requests_exceptions
 class FivetranHook(BaseHook):
     """
     Fivetran API interaction hook.
-    :param fivetran_conn_id: `Conn ID` of the Connection to be used to
-        configure this hook.
-    :type fivetran_conn_id: str
-    :param timeout_seconds: The amount of time in seconds the requests library
-        will wait before timing out.
-    :type timeout_seconds: int
-    :param retry_limit: The number of times to retry the connection in case of
-        service outages.
-    :type retry_limit: int
+
+    :param fivetran_conn_id: `Conn ID` of the Connection to be used to configure this hook.
+    :param timeout_seconds: The amount of time in seconds the requests library will wait before timing out.
+    :param retry_limit: The number of times to retry the connection in case of service outages.
     :param retry_delay: The number of seconds to wait between retries.
-    :type retry_delay: float
     """
 
     conn_name_attr = "fivetran_conn_id"
@@ -57,8 +51,7 @@ class FivetranHook(BaseHook):
     @staticmethod
     def _get_airflow_version() -> Any:
         """
-        Fetch and return the current Airflow version
-        from aws provider
+        Fetch and return the current Airflow version from aws provider
         https://github.com/apache/airflow/blob/main/airflow/providers/amazon/aws/hooks/base_aws.py#L486
         """
         try:
@@ -91,14 +84,9 @@ class FivetranHook(BaseHook):
     def _do_api_call(self, endpoint_info, json=None):
         """
         Utility function to perform an API call with retries
+
         :param endpoint_info: Tuple of method and endpoint
-        :type endpoint_info: tuple[string, string]
         :param json: Parameters for this API call.
-        :type json: dict
-        :return: If the api call returns a OK status code,
-            this function returns the response in JSON. Otherwise,
-            we throw an AirflowException.
-        :rtype: dict
         """
         method, endpoint = endpoint_info
         if self.fivetran_conn is None:
@@ -166,11 +154,8 @@ class FivetranHook(BaseHook):
     def get_connector(self, connector_id) -> Any:
         """
         Fetches the detail of a connector.
-        :param connector_id: Fivetran connector_id, found in connector settings
-            page in the Fivetran user interface.
-        :type connector_id: str
-        :return: connector details
-        :rtype: Dict
+
+        :param connector_id: Fivetran connector_id, found in connector settings page in the Fivetran user interface.
         """
         if connector_id == "":
             raise ValueError("No value specified for connector_id")
@@ -181,11 +166,8 @@ class FivetranHook(BaseHook):
     def get_connector_schemas(self, connector_id) -> Any:
         """
         Fetches schema information of the connector.
-        :param connector_id: Fivetran connector_id, found in connector settings
-            page in the Fivetran user interface.
-        :type connector_id: str
-        :return: schema details
-        :rtype: Dict
+
+        :param connector_id: Fivetran connector_id, found in connector settings page in the Fivetran user interface.
         """
         if connector_id == "":
             raise ValueError("No value specified for connector_id")
@@ -195,17 +177,11 @@ class FivetranHook(BaseHook):
 
     def get_metadata(self, connector_id, metadata) -> Any:
         """
-        Fetches metadata for a given metadata string and connector.
+        Fetches metadata for a given metadata string and connector. The Fivetran metadata API is currently in beta and
+        available to all Fivetran users on the enterprise plan and above.
 
-        The Fivetran metadata API is currently in beta and available to
-        all Fivetran users on the enterprise plan and above.
-        :param connector_id: Fivetran connector_id, found in connector settings
-            page in the Fivetran user interface.
-        :type connector_id: str
+        :param connector_id: Fivetran connector_id, found in connector settings page in the Fivetran user interface.
         :param metadata: The string to return the type of metadata from the API
-        :type metadata: str
-        :return: table or column metadata details
-        :rtype: Dict
         """
         metadata_values = ("tables", "columns")
         if connector_id == "":
@@ -219,10 +195,8 @@ class FivetranHook(BaseHook):
     def get_destinations(self, group_id) -> Any:
         """
         Fetches destination information for the given group.
+
         :param group_id: The Fivetran group ID, returned by a connector API call.
-        :type group_id: str
-        :return: destination details
-        :rtype: Dict
         """
         if group_id == "":
             raise ValueError("No value specified for group_id")
@@ -233,10 +207,8 @@ class FivetranHook(BaseHook):
     def get_groups(self, group_id) -> Any:
         """
         Fetches destination information for the given group.
+
         :param group_id: The Fivetran group ID, returned by a connector API call.
-        :type group_id: str
-        :return: group details
-        :rtype: Dict
         """
         if group_id == "":
             raise ValueError("No value specified for connector_id")
@@ -246,11 +218,9 @@ class FivetranHook(BaseHook):
 
     def check_connector(self, connector_id):
         """
-        Ensures connector configuration has been completed successfully and is in
-            a functional state.
-        :param connector_id: Fivetran connector_id, found in connector settings
-            page in the Fivetran user interface.
-        :type connector_id: str
+        Ensures connector configuration has been completed successfully and is in a functional state.
+
+        :param connector_id: Fivetran connector_id, found in connector settings page in the Fivetran user interface.
         """
         connector_details = self.get_connector(connector_id)
         service_name = connector_details["service"]
@@ -269,24 +239,18 @@ class FivetranHook(BaseHook):
     def set_schedule_type(self, connector_id, schedule_type):
         """
         Set connector sync mode to switch sync control between API and UI.
-        :param connector_id: Fivetran connector_id, found in connector settings
-            page in the Fivetran user interface.
-        :type connector_id: str
-        :param schedule_type: "manual" (schedule controlled via Airlow) or "auto" (schedule controlled via Fivetran)
-        :type schedule_type: str
+
+        :param connector_id: Fivetran connector_id, found in connector settings page in the Fivetran user interface.
         """
         endpoint = self.api_path_connectors + connector_id
         return self._do_api_call(("PATCH", endpoint), json.dumps({"schedule_type": schedule_type}))
 
     def prep_connector(self, connector_id, schedule_type):
         """
-        Prepare the connector to run in Airflow by checking that it exists and is a good state,
-            then update connector sync schedule type if changed.
-        :param connector_id: Fivetran connector_id, found in connector settings
-            page in the Fivetran user interface.
-        :type connector_id: str
-        :param schedule_type: Fivetran connector schedule type
-        :type schedule_type: str
+        Prepare the connector to run in Airflow by checking that it exists and is a good state, then update connector
+        sync schedule type if changed.
+
+        :param connector_id: Fivetran connector_id, found in connector settings page in the Fivetran user interface.
         """
         self.check_connector(connector_id)
         if schedule_type not in {"manual", "auto"}:
@@ -296,13 +260,6 @@ class FivetranHook(BaseHook):
         return True
 
     def start_fivetran_sync(self, connector_id):
-        """
-        :param connector_id: Fivetran connector_id, found in connector settings
-            page in the Fivetran user interface.
-        :type connector_id: str
-        :return: Timestamp of previously completed sync
-        :rtype: str
-        """
         connector_details = self.get_connector(connector_id)
         succeeded_at = connector_details["succeeded_at"]
         failed_at = connector_details["failed_at"]
@@ -321,15 +278,10 @@ class FivetranHook(BaseHook):
 
     def get_last_sync(self, connector_id, xcom=""):
         """
-        Get the last time Fivetran connector completed a sync.
-            Used with FivetranSensor to monitor sync completion status.
-        :param connector_id: Fivetran connector_id, found in connector settings
-            page in the Fivetran user interface.
-        :type connector_id: str
+        Get the last time Fivetran connector completed a sync. Used with FivetranSensor to monitor sync completion.
+
+        :param connector_id: Fivetran connector_id, found in connector settings page in the Fivetran user interface.
         :param xcom: Timestamp as string pull from FivetranOperator via XCOM
-        :type xcom: str
-        :return: Timestamp of last completed sync
-        :rtype: Pendulum.DateTime
         """
         if xcom:
             last_sync = self._parse_timestamp(xcom)
@@ -343,12 +295,9 @@ class FivetranHook(BaseHook):
     def get_sync_status(self, connector_id, previous_completed_at):
         """
         For sensor, return True if connector's 'succeeded_at' field has updated.
-        :param connector_id: Fivetran connector_id, found in connector settings
-            page in the Fivetran user interface.
-        :type connector_id: str
-        :param previous_completed_at: The last time the connector ran, collected on Sensor
-            initialization.
-        :type previous_completed_at: pendulum.datetime.DateTime
+
+        :param connector_id: Fivetran connector_id, found in connector settings page in the Fivetran user interface.
+        :param previous_completed_at: The last time the connector ran, collected on Sensor initialization.
         """
         # @todo Need logic here to tell if the sync is not running at all and not
         # likely to run in the near future.
@@ -381,11 +330,9 @@ class FivetranHook(BaseHook):
 
     def _parse_timestamp(self, api_time):
         """
-        Returns either the pendulum-parsed actual timestamp or
-            a very out-of-date timestamp if not set
+        Returns either the pendulum-parsed actual timestamp or a very out-of-date timestamp if not set
+
         :param api_time: timestamp format as returned by the Fivetran API.
-        :type api_time: str
-        :rtype: Pendulum.DateTime
         """
         return pendulum.parse(api_time) if api_time is not None else pendulum.from_timestamp(-1)
 
