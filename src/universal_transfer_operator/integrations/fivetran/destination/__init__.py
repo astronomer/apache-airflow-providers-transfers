@@ -14,10 +14,10 @@ CUSTOM_FIVETRAN_DESTINATION_TYPE_TO_MODULE_PATH = {
 def get_fivetran_destination(
     destination_dataset: Dataset,
     service: str,
-    config: dict,
+    config: dict = {},
     destination_id: str | None = None,
     time_zone_offset: str | None = "-5",
-    region: str | None = "GCP_US_EAST4",
+    region: str | None = "US",
     run_setup_tests: bool | None = True,
 ) -> FivetranDestination:
     """

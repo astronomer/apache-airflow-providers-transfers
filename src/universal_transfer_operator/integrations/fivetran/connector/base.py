@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from universal_transfer_operator.integrations.fivetran.connector import Dataset
 
+airflow_connection_type_to_fivetran_connector_service_mapping = {"s3": "s3", "aws": "s3"}
+
 
 class FivetranConnector:
     """
@@ -27,9 +29,7 @@ class FivetranConnector:
 
     def __init__(
         self,
-        connector_id: str | None,
-        service: str,
-        config: dict,
+        config: dict = {},
         paused: bool = False,
         pause_after_trial: bool = False,
         sync_frequency: str | None = None,
@@ -39,6 +39,8 @@ class FivetranConnector:
         trust_fingerprints: bool = False,
         run_setup_tests: bool = True,
         connect_card_config: dict | None = None,
+        connector_id: str | None = None,
+        service: str = "",
     ):
         self.connector_id = connector_id
         self.service = service

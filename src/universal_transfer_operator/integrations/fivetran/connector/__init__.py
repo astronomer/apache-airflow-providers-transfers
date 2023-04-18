@@ -16,7 +16,7 @@ def get_fivetran_connector(
     source_dataset: Dataset,
     connector_id: str | None,
     service: str,
-    config: dict,
+    config: dict = {},
     paused: bool = False,
     pause_after_trial: bool = False,
     sync_frequency: str | None = None,

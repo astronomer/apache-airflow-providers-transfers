@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+airflow_connection_type_to_fivetran_destination_mapping = {"snowflake": "snowflake"}
+
 
 class FivetranDestination:
     """
@@ -15,12 +17,12 @@ class FivetranDestination:
 
     def __init__(
         self,
-        service: str,
-        config: dict,
+        config: dict = {},
         destination_id: str | None = None,
         time_zone_offset: str | None = "-5",
         region: str | None = "GCP_US_EAST4",
         run_setup_tests: bool | None = True,
+        service: str = "",
     ):
         self.service = service
         self.config = config
