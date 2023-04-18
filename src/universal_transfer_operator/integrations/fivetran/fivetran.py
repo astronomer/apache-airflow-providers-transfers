@@ -254,7 +254,7 @@ class FivetranIntegration(TransferIntegration):
         """
         if (
             connector_setup_state == "connected"
-            and destination_schema.split(".")[1] == destination_dataset.name
+            and destination_schema.split(".")[1] == destination_dataset.name  # type: ignore
         ):
             return True
         return False
