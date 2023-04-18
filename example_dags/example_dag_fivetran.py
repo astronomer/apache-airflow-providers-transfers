@@ -40,8 +40,8 @@ with DAG(
         task_id="transfer_fivetran_without_connector_id",
         source_dataset=File(path=f"{s3_bucket}/", conn_id="aws_default", extra={"prefix": "fivetran_test"}),
         destination_dataset=Table(
-            name="fivetran_ankit_test",
-            conn_id="snowflake_fivetran_conn",
+            name="fivetran_test",
+            conn_id="snowflake_conn",
             metadata=Metadata(database=snowflake_database, schema=snowflake_schema),
         ),
         transfer_mode=TransferMode.THIRDPARTY,
