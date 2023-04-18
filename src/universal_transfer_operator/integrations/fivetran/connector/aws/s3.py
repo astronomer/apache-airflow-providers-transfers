@@ -163,33 +163,33 @@ class S3Connector(FivetranConnector):
 
     @staticmethod
     def verify(dataset: Dataset) -> Any:
-        return dataset.extra.get("verify") if dataset else None
+        return dataset.extra.get("verify")  # type: ignore
 
     @staticmethod
     def transfer_config_args(dataset: Dataset) -> Any:
-        return dataset.extra.get("transfer_config_args", {}) if dataset else None
+        return dataset.extra.get("transfer_config_args", {})  # type: ignore
 
     @staticmethod
     def s3_extra_args(dataset: Dataset) -> Any:
-        return dataset.extra.get("s3_extra_args", {}) if dataset else None
+        return dataset.extra.get("s3_extra_args", {})  # type: ignore
 
     @staticmethod
     def bucket_name(s3_hook: S3Hook, dataset: Dataset) -> Any:
-        bucket_name, _ = s3_hook.parse_s3_url(dataset.path)
+        bucket_name, _ = s3_hook.parse_s3_url(dataset.path)  # type: ignore
         return bucket_name
 
     @staticmethod
     def s3_key(s3_hook: S3Hook, dataset: Dataset) -> Any:
-        _, key = s3_hook.parse_s3_url(dataset.path)
+        _, key = s3_hook.parse_s3_url(dataset.path)  # type: ignore
         return key
 
     @staticmethod
     def prefix(dataset: Dataset) -> Any:
-        return dataset.extra.get("prefix", None) if dataset else None
+        return dataset.extra.get("prefix", None)  # type: ignore
 
     @staticmethod
     def delimiter(dataset: Dataset) -> Any:
-        return dataset.extra.get("delimiter", None) if dataset else None
+        return dataset.extra.get("delimiter", None)  # type: ignore
 
     @staticmethod
     def generate_unique_fivetran_name() -> str:

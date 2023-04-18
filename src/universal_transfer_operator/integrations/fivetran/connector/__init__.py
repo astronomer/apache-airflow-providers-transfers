@@ -47,7 +47,7 @@ def get_fivetran_connector(
      is FALSE.
     :param run_setup_tests: Specifies whether the setup tests should be run automatically. The default value is TRUE.
     """
-    source_conn_id = source_dataset.conn_id
+    source_conn_id = source_dataset.conn_id  # type: ignore
 
     if source_conn_id is None:
         raise ValueError("Connection id for source_dataset is not specified.")

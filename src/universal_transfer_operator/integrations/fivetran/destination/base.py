@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 airflow_connection_type_to_fivetran_destination_mapping = {"snowflake": "snowflake"}
 
 
@@ -39,7 +41,7 @@ class FivetranDestination:
 
     def create_config(
         self, conn_id: str, database_overridden: str | None = None, schema_overridden: str | None = None
-    ) -> dict:
+    ) -> Any:
         """
         Creates config based on connection details and config
 

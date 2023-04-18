@@ -252,7 +252,7 @@ class FivetranIntegration(TransferIntegration):
         :param connector_setup_state: connector setup state
         :param destination_dataset: Destination Dataset
         """
-        destination_schema_name = f"{destination_dataset.metadata.schema}.{destination_dataset.name}"
+        destination_schema_name = f"{destination_dataset.metadata.schema}.{destination_dataset.name}"  # type: ignore
         if connector_setup_state == "connected" and destination_schema == destination_schema_name:
             return True
         return False
