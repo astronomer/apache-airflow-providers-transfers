@@ -25,7 +25,7 @@ with DAG(
     transfer_fivetran_with_connector_id = UniversalTransferOperator(
         task_id="transfer_fivetran_with_connector_id",
         source_dataset=File(path=f"{s3_bucket}/uto/", conn_id="aws_default"),
-        destination_dataset=Table(name="fivetran_ankit_test", conn_id="snowflake_default"),
+        destination_dataset=Table(name="fivetran_ankit_test", conn_id="snowflake_fivetran_conn"),
         transfer_mode=TransferMode.THIRDPARTY,
         transfer_params=FiveTranOptions(conn_id="fivetran_default", connector_id="wrap_warehouse"),
     )
@@ -37,7 +37,7 @@ with DAG(
         source_dataset=File(path=f"{s3_bucket}/", conn_id="aws_default", extra={"prefix": "fivetran_test"}),
         destination_dataset=Table(
             name="fivetran_ankit_test",
-            conn_id="snowflake_conn",
+            conn_id="snowflake_fivetran_conn",
             metadata=Metadata(database=snowflake_database, schema=snowflake_schema),
         ),
         transfer_mode=TransferMode.THIRDPARTY,
