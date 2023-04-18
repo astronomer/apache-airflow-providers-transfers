@@ -27,7 +27,7 @@ with DAG(
         source_dataset=File(path=f"{s3_bucket}/uto/", conn_id="aws_default"),
         destination_dataset=Table(name="fivetran_ankit_test", conn_id="snowflake_default"),
         transfer_mode=TransferMode.THIRDPARTY,
-        transfer_params=FiveTranOptions(conn_id="fivetran_default", connector_id="rumour_pathos"),
+        transfer_params=FiveTranOptions(conn_id="fivetran_default", connector_id="wrap_warehouse"),
     )
     # [END fivetran_transfer_with_setup]
 
@@ -43,7 +43,7 @@ with DAG(
         transfer_mode=TransferMode.THIRDPARTY,
         transfer_params={
             "conn_id": "fivetran_default",
-            "group_name": "test_snowflake_s3",
+            "group_name": "test_github_ci_transfer_fivetran_without_connector_id_snowflake",
             "connector": {
                 "config": {
                     "is_public": "false",
