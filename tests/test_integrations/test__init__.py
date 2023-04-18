@@ -5,9 +5,9 @@ from universal_transfer_operator.integrations import (
     get_ingestor_option_class,
     get_transfer_integration,
 )
-from universal_transfer_operator.integrations.fivetran import (
-    Connector,
-    Destination,
+from universal_transfer_operator.integrations.fivetran.connector.base import FivetranConnector
+from universal_transfer_operator.integrations.fivetran.destination.base import FivetranDestination
+from universal_transfer_operator.integrations.fivetran.fivetran import (
     FivetranIntegration,
     FiveTranOptions,
     Group,
@@ -22,13 +22,13 @@ from universal_transfer_operator.integrations.fivetran import (
                 conn_id="fivetran_default",
                 connector_id="filing_muppet",
                 group=Group(name="test_group"),
-                connector=Connector(
+                connector=FivetranConnector(
                     service="s3",
                     config={},
                     connector_id=None,
                     connect_card_config={"connector_val": "test_connector"},
                 ),
-                destination=Destination(
+                destination=FivetranDestination(
                     service="snowflake",
                     time_zone_offset="-5",
                     region="GCP_US_EAST4",
@@ -54,13 +54,13 @@ def test_create_dataprovider(transfer):
                 conn_id="fivetran_default",
                 connector_id="filing_muppet",
                 group=Group(name="test_group"),
-                connector=Connector(
+                connector=FivetranConnector(
                     service="s3",
                     config={},
                     connector_id=None,
                     connect_card_config={"connector_val": "test_connector"},
                 ),
-                destination=Destination(
+                destination=FivetranDestination(
                     service="snowflake",
                     time_zone_offset="-5",
                     region="GCP_US_EAST4",

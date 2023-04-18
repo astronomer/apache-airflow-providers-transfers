@@ -2,7 +2,7 @@ from universal_transfer_operator.constants import FileType, TransferMode
 from universal_transfer_operator.data_providers.database.snowflake import SnowflakeOptions
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Table
-from universal_transfer_operator.integrations.fivetran import FiveTranOptions
+from universal_transfer_operator.integrations.fivetran.fivetran import FiveTranOptions
 from universal_transfer_operator.universal_transfer_operator import UniversalTransferOperator
 
 
