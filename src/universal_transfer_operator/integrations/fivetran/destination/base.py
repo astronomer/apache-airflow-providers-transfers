@@ -52,7 +52,7 @@ class FivetranDestination:
         mapped_connection_details = self.map_airflow_connection_to_fivetran(
             conn_id=conn_id, database_overridden=database_overridden, schema_overridden=schema_overridden
         )
-        return self.config | mapped_connection_details
+        return self.config | mapped_connection_details  # type: ignore
 
     def map_airflow_connection_to_fivetran(
         self,

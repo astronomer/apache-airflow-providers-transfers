@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from universal_transfer_operator.integrations.fivetran.connector import Dataset
 
 airflow_connection_type_to_fivetran_connector_service_mapping = {"s3": "s3", "aws": "s3"}
@@ -66,7 +68,7 @@ class FivetranConnector:
         source_dataset: Dataset,
         destination_dataset: Dataset,
         group_id: str,
-    ) -> dict:
+    ) -> Any:
         """
         Creates config based on connection details and config
 
@@ -77,7 +79,7 @@ class FivetranConnector:
         mapped_connection_details = self.map_airflow_connection_to_fivetran(
             source_dataset=source_dataset, destination_dataset=destination_dataset, group_id=group_id
         )
-        return self.config | mapped_connection_details
+        return self.config | mapped_connection_details  # type: ignore
 
     def map_airflow_connection_to_fivetran(
         self, source_dataset: Dataset, destination_dataset: Dataset, group_id: str

@@ -62,7 +62,7 @@ class SnowflakeDestination(FivetranDestination):
             for key, value in extras.items():
                 extras[key] = f"extra__snowflake__{value}"
         account = self.get_snowflake_account(
-            snowflake_dejson.get(extras["account"]), snowflake_dejson.get(extras["region"])
+            snowflake_dejson.get(extras["account"]), snowflake_dejson.get(extras["region"])  # type: ignore
         )
 
         connection_details = {
