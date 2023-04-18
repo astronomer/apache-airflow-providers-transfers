@@ -223,7 +223,6 @@ class FivetranIntegration(TransferIntegration):
         api_response = self.hook._do_api_call(("GET", endpoint))
         if api_response["code"] == "Success":
             list_of_connectors = api_response["data"]["items"]
-            print(f"connector details: {list_of_connectors}")
             for individual_connectors in list_of_connectors:
                 if self.check_connector_schema_match(
                     destination_schema=individual_connectors["schema"],
@@ -253,11 +252,10 @@ class FivetranIntegration(TransferIntegration):
         :param connector_setup_state: connector setup state
         :param destination_dataset: Destination Dataset
         """
-        destination_schema_name = f"{destination_dataset.metadata.schema}.{destination_dataset.name}"  # type: ignore
-        print(f"destination_schema_name: {destination_schema_name}")
-        print(f"connector_setup_state: {connector_setup_state}")
-        print(f"destination_schema: {destination_schema}")
-        if connector_setup_state == "connected" and destination_schema == destination_schema_name:
+        if (
+            connector_setup_state == "connected"
+            and destination_schema.split(".")[1] == destination_dataset.name
+        ):
             return True
         return False
 
@@ -419,7 +417,6 @@ class FivetranIntegration(TransferIntegration):
             "config": config,
             "run_setup_tests": destination.run_setup_tests,
         }
-        print(f"destination details payload: {payload}")
         api_response = self.hook._do_api_call(
             ("POST", endpoint), json=json.dumps(payload)
         )  # skipcq: PYL-W0212
