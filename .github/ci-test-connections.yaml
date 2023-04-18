@@ -84,7 +84,7 @@ connections:
     host: https://gp21411.us-east-1.snowflakecomputing.com
     port: 443
     login: $SNOWFLAKE_FIVETRAN_ACCOUNT_NAME
-    password: SNOWFLAKE_FIVETRAN_PASSWORD
+    password: $SNOWFLAKE_FIVETRAN_PASSWORD
     schema: S3_TEST
     extra:
       account: "gp21411"

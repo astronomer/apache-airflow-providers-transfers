@@ -254,6 +254,9 @@ class FivetranIntegration(TransferIntegration):
         :param destination_dataset: Destination Dataset
         """
         destination_schema_name = f"{destination_dataset.metadata.schema}.{destination_dataset.name}"  # type: ignore
+        print(f"destination_schema_name: {destination_schema_name}")
+        print(f"connector_setup_state: {connector_setup_state}")
+        print(f"destination_schema: {destination_schema}")
         if connector_setup_state == "connected" and destination_schema == destination_schema_name:
             return True
         return False
