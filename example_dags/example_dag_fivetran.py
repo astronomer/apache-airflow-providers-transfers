@@ -9,7 +9,7 @@ from universal_transfer_operator.datasets.table import Metadata, Table
 from universal_transfer_operator.integrations.fivetran.fivetran import FiveTranOptions
 from universal_transfer_operator.universal_transfer_operator import UniversalTransferOperator
 
-s3_bucket = os.getenv("S3_BUCKET", "s3://astro-sdk-test")
+s3_bucket = os.getenv("S3_BUCKET", "s3://astro-sdk")
 gcs_bucket = os.getenv("GCS_BUCKET", "gs://uto-test")
 snowflake_database = os.getenv("SNOWFLAKE_DATABASE", "dummy-database")
 snowflake_schema = os.getenv("SNOWFLAKE_SCHEMA", "s3_test")
@@ -25,7 +25,7 @@ with DAG(
     transfer_fivetran_with_connector_id = UniversalTransferOperator(
         task_id="transfer_fivetran_with_connector_id",
         source_dataset=File(path=f"{s3_bucket}/uto/", conn_id="aws_default"),
-        destination_dataset=Table(name="fivetran_ankit_test", conn_id="snowflake_fivetran_conn"),
+        destination_dataset=Table(name="fivetran_test", conn_id="snowflake_fivetran_conn"),
         transfer_mode=TransferMode.THIRDPARTY,
         transfer_params=FiveTranOptions(conn_id="fivetran_default", connector_id="wrap_warehouse"),
     )
@@ -36,7 +36,7 @@ with DAG(
         task_id="transfer_fivetran_without_connector_id",
         source_dataset=File(path=f"{s3_bucket}/", conn_id="aws_default", extra={"prefix": "fivetran_test"}),
         destination_dataset=Table(
-            name="fivetran_ankit_test",
+            name="fivetran_test",
             conn_id="snowflake_fivetran_conn",
             metadata=Metadata(database=snowflake_database, schema=snowflake_schema),
         ),

@@ -241,6 +241,7 @@ class FivetranHook(BaseHook):
         Set connector sync mode to switch sync control between API and UI.
 
         :param connector_id: Fivetran connector_id, found in connector settings page in the Fivetran user interface.
+        :param schedule_type: Fivetran schedule type
         """
         endpoint = self.api_path_connectors + connector_id
         return self._do_api_call(("PATCH", endpoint), json.dumps({"schedule_type": schedule_type}))
@@ -251,6 +252,7 @@ class FivetranHook(BaseHook):
         sync schedule type if changed.
 
         :param connector_id: Fivetran connector_id, found in connector settings page in the Fivetran user interface.
+        :param schedule_type: Fivetran schedule type
         """
         self.check_connector(connector_id)
         if schedule_type not in {"manual", "auto"}:
