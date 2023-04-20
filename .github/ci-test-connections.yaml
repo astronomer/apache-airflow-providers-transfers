@@ -81,14 +81,14 @@ connections:
     password: $FIVETRAN_SECRET
   - conn_id: snowflake_fivetran_conn
     conn_type: snowflake
-    host: https://gp21411.us-east-1.snowflakecomputing.com
+    host: $SNOWFLAKE_FIVETRAN_HOST
     port: 443
     login: $SNOWFLAKE_FIVETRAN_ACCOUNT_NAME
     password: $SNOWFLAKE_FIVETRAN_PASSWORD
     schema: S3_TEST
     extra:
-      account: "gp21411"
-      region: "us-east-1"
-      role: "PROVIDERSUSER"
-      warehouse: ROBOTS
-      database: PROVIDERS_FIVETRAN_DEV
+      account: $SNOWFLAKE_FIVETRAN_ACCOUNT
+      region: $SNOWFLAKE_FIVETRAN_REGION
+      role: $SNOWFLAKE_FIVETRAN_ROLE
+      warehouse: SNOWFLAKE_FIVETRAN_WAREHOUSE
+      database: $SNOWFLAKE_FIVETRAN_DATABASE
