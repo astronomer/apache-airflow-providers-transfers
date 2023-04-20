@@ -227,6 +227,7 @@ class DatabaseDataProvider(DataProviders[Table]):
     ) -> str:
         """
         Load content of dataframe in output_table.
+        
         :param input_dataframe: dataframe
         :param output_table: Table to create
         :param if_exists: Overwrite file if exists
