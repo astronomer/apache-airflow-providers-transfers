@@ -653,3 +653,129 @@ class TestFivetranIntegration:
                     source_dataset=File(path="s3://dummy-bucket/dummy-file", conn_id="dummy_conn"),
                     destination_dataset=Table(name="dummy_name", conn_id="dummy_conn"),
                 )
+
+    @mock.patch(
+        "universal_transfer_operator.integrations.fivetran.fivetran.FivetranIntegration.check_for_connector_id"
+    )
+    @mock.patch(
+        "universal_transfer_operator.integrations.fivetran.fivetran.FivetranIntegration.transfer_using_connector_id"
+    )
+    def test_transfer_job_when_connector_id_is_passed(
+        self, mock_transfer_using_connector_id, mock_check_for_connector_id
+    ):
+        """
+        Test to check loading data from source dataset to the destination using ingestion config when connector_id
+        is passed.
+        """
+        mock_check_for_connector_id.return_value = True
+        mock_transfer_using_connector_id.return_value = "success"
+        fivetran_options = FiveTranOptions(
+            connector_id="dummy_connector_id",
+            group=Group(name="dummy_name"),
+            destination=FivetranDestination(config=""),
+        )
+        fivetran_integrations = FivetranIntegration(transfer_params=fivetran_options)
+        assert (
+            fivetran_integrations.transfer_job(
+                source_dataset=File(path="s3://dummy-bucket/dummy-file", conn_id="dummy_conn"),
+                destination_dataset=Table(name="dummy_name", conn_id="dummy_conn"),
+            )
+            == "success"
+        )
+
+    @mock.patch(
+        "universal_transfer_operator.integrations.fivetran.fivetran.FivetranIntegration.check_for_connector_id"
+    )
+    @mock.patch(
+        "universal_transfer_operator.integrations.fivetran.fivetran.FivetranIntegration.create_group_if_needed"
+    )
+    @mock.patch(
+        "universal_transfer_operator.integrations.fivetran.fivetran.FivetranIntegration.fetch_connector_id_from_destination"
+    )
+    @mock.patch(
+        "universal_transfer_operator.integrations.fivetran.fivetran.FivetranIntegration.transfer_using_connector_id"
+    )
+    def test_transfer_job_when_connector_id_is_not_passed_with_previous_dag_run_setup(
+        self,
+        mock_transfer_using_connector_id,
+        mock_fetch_connector_id_from_destination,
+        mock_create_group_if_needed,
+        mock_check_for_connector_id,
+    ):
+        """
+        Test to check loading data from source dataset to the destination using ingestion config when setup is part of
+        previous DAG run
+        """
+        mock_check_for_connector_id.return_value = False
+        mock_create_group_if_needed.return_value = "dummy_group"
+        mock_fetch_connector_id_from_destination.return_value = "dummy_connector_id"
+        mock_transfer_using_connector_id.return_value = "success"
+
+        fivetran_options = FiveTranOptions(
+            connector_id="dummy_connector_id",
+            group=Group(name="dummy_name"),
+        )
+        fivetran_integrations = FivetranIntegration(transfer_params=fivetran_options)
+        assert (
+            fivetran_integrations.transfer_job(
+                source_dataset=File(path="s3://dummy-bucket/dummy-file", conn_id="dummy_conn"),
+                destination_dataset=Table(name="dummy_name", conn_id="dummy_conn"),
+            )
+            == "success"
+        )
+
+    @mock.patch(
+        "universal_transfer_operator.integrations.fivetran.fivetran.FivetranIntegration.check_for_connector_id"
+    )
+    @mock.patch(
+        "universal_transfer_operator.integrations.fivetran.fivetran.FivetranIntegration.create_group_if_needed"
+    )
+    @mock.patch(
+        "universal_transfer_operator.integrations.fivetran.fivetran.FivetranIntegration.fetch_connector_id_from_destination"
+    )
+    @mock.patch(
+        "universal_transfer_operator.integrations.fivetran.fivetran.FivetranIntegration.transfer_using_connector_id"
+    )
+    @mock.patch(
+        "universal_transfer_operator.integrations.fivetran.fivetran.FivetranIntegration.check_destination_details"
+    )
+    @mock.patch(
+        "universal_transfer_operator.integrations.fivetran.fivetran.FivetranIntegration.create_destination"
+    )
+    @mock.patch(
+        "universal_transfer_operator.integrations.fivetran.fivetran.FivetranIntegration.create_connector"
+    )
+    def test_transfer_job_when_connector_id_is_not_passed(
+        self,
+        mock_create_connector,
+        mock_create_destination,
+        mock_check_destination_details,
+        mock_transfer_using_connector_id,
+        mock_fetch_connector_id_from_destination,
+        mock_create_group_if_needed,
+        mock_check_for_connector_id,
+    ):
+        """
+        Test to check loading data from source dataset to the destination using ingestion config when setup is not
+        done on Fivetran.
+        """
+        mock_check_for_connector_id.return_value = False
+        mock_create_group_if_needed.return_value = "dummy_group"
+        mock_fetch_connector_id_from_destination.return_value = None
+        mock_transfer_using_connector_id.return_value = "success"
+        mock_check_destination_details.return_value = False
+        mock_create_destination.return_value = {}
+        mock_create_connector.return_value = "dummy_connector_id"
+
+        fivetran_options = FiveTranOptions(
+            connector_id="dummy_connector_id",
+            group=Group(name="dummy_name"),
+        )
+        fivetran_integrations = FivetranIntegration(transfer_params=fivetran_options)
+        assert (
+            fivetran_integrations.transfer_job(
+                source_dataset=File(path="s3://dummy-bucket/dummy-file", conn_id="dummy_conn"),
+                destination_dataset=Table(name="dummy_name", conn_id="dummy_conn"),
+            )
+            == "success"
+        )
