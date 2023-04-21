@@ -83,7 +83,7 @@ class S3Connector(FivetranConnector):
         """
         return vars(self)
 
-    def hook(self, conn_id: str, verify: Any, transfer_config_args: Any, s3_extra_args: Any) -> S3Hook:
+    def _hook(self, conn_id: str, verify: Any, transfer_config_args: Any, s3_extra_args: Any) -> S3Hook:
         """Return an instance of the database-specific Airflow hook."""
         return S3Hook(
             aws_conn_id=conn_id,
@@ -116,22 +116,22 @@ class S3Connector(FivetranConnector):
         if not secret_key:
             raise ConnectionError(f"AWS_SECRET_ACCESS_KEY is not configured {source_dataset.conn_id}")  # type: ignore
 
-        s3_hook = self.hook(
+        s3_hook = self._hook(
             conn_id=source_dataset.conn_id,  # type: ignore
-            verify=self.verify(source_dataset),
-            transfer_config_args=self.transfer_config_args(source_dataset),
-            s3_extra_args=self.s3_extra_args(source_dataset),
+            verify=self._verify(source_dataset),
+            transfer_config_args=self._transfer_config_args(source_dataset),
+            s3_extra_args=self._s3_extra_args(source_dataset),
         )
 
-        bucket_name = self.bucket_name(s3_hook=s3_hook, dataset=source_dataset)
+        bucket_name = self._bucket_name(s3_hook=s3_hook, dataset=source_dataset)
         # Create IAM policy. Read more at: Read more at: https://fivetran.com/docs/files/amazon-s3/setup-guide
-        iam_policy = self.create_aws_policy(
+        iam_policy = self._create_aws_policy(
             bucket_name=bucket_name, access_key=access_key, secret_key=secret_key
         )
 
         # Create IAM Role. Read more at: Read more at: https://fivetran.com/docs/files/amazon-s3/setup-guide
-        iam_role = self.create_role(
-            role_name=self.generate_unique_fivetran_name(),
+        iam_role = self._create_role(
+            role_name=self._generate_unique_fivetran_name(),
             fivetran_aws_vpc_account_id=str(FIVETRAN_AWS_VPC_ACCOUNT_ID),
             group_id=group_id,
             access_key=access_key,
@@ -139,7 +139,7 @@ class S3Connector(FivetranConnector):
         )
 
         # Attach IAM policy to role. Read more at: Read more at: https://fivetran.com/docs/files/amazon-s3/setup-guide
-        self.attach_to_role(
+        self._attach_to_role(
             role_name=iam_role["Role"]["RoleName"],
             policy_arn=iam_policy["Policy"]["Arn"],
             access_key=access_key,
@@ -153,7 +153,7 @@ class S3Connector(FivetranConnector):
             "is_public": self.config.get("is_public"),
             "role_arn": iam_role["Role"]["Arn"],
             "bucket": bucket_name,
-            "prefix": self.prefix(dataset=source_dataset),
+            "prefix": self._prefix(dataset=source_dataset),
             "file_type": self.config.get("file_type"),
             "compression": self.config.get("compression"),
             "on_error": self.config.get("on_error"),
@@ -162,43 +162,43 @@ class S3Connector(FivetranConnector):
         return connection_details
 
     @staticmethod
-    def verify(dataset: Dataset) -> Any:
+    def _verify(dataset: Dataset) -> Any:
         return dataset.extra.get("verify")  # type: ignore
 
     @staticmethod
-    def transfer_config_args(dataset: Dataset) -> Any:
+    def _transfer_config_args(dataset: Dataset) -> Any:
         return dataset.extra.get("transfer_config_args", {})  # type: ignore
 
     @staticmethod
-    def s3_extra_args(dataset: Dataset) -> Any:
+    def _s3_extra_args(dataset: Dataset) -> Any:
         return dataset.extra.get("s3_extra_args", {})  # type: ignore
 
     @staticmethod
-    def bucket_name(s3_hook: S3Hook, dataset: Dataset) -> Any:
+    def _bucket_name(s3_hook: S3Hook, dataset: Dataset) -> Any:
         bucket_name, _ = s3_hook.parse_s3_url(dataset.path)  # type: ignore
         return bucket_name
 
     @staticmethod
-    def s3_key(s3_hook: S3Hook, dataset: Dataset) -> Any:
+    def _s3_key(s3_hook: S3Hook, dataset: Dataset) -> Any:
         _, key = s3_hook.parse_s3_url(dataset.path)  # type: ignore
         return key
 
     @staticmethod
-    def prefix(dataset: Dataset) -> Any:
+    def _prefix(dataset: Dataset) -> Any:
         return dataset.extra.get("prefix", None)  # type: ignore
 
     @staticmethod
-    def delimiter(dataset: Dataset) -> Any:
+    def _delimiter(dataset: Dataset) -> Any:
         return dataset.extra.get("delimiter", None)  # type: ignore
 
     @staticmethod
-    def generate_unique_fivetran_name() -> str:
+    def _generate_unique_fivetran_name() -> str:
         """Generates the unique fivetran name based on uuid."""
         uuid_value = str(uuid.uuid4())[:8]
         unique_policy_name = f"fivetran-{uuid_value}"
         return unique_policy_name
 
-    def create_aws_policy(self, bucket_name: str, access_key: str, secret_key: str):
+    def _create_aws_policy(self, bucket_name: str, access_key: str, secret_key: str):
         """
         Creates the AWS IAM policy to read and list the S3 Bucket.
         Read more at: https://fivetran.com/docs/files/amazon-s3/setup-guide
@@ -225,7 +225,7 @@ class S3Connector(FivetranConnector):
 
         try:
             response = iam.create_policy(
-                PolicyName=self.generate_unique_fivetran_name(), PolicyDocument=json.dumps(my_managed_policy)
+                PolicyName=self._generate_unique_fivetran_name(), PolicyDocument=json.dumps(my_managed_policy)
             )
         except ClientError:
             logging.error(f"Couldn't create policy with config {my_managed_policy}")
@@ -233,7 +233,7 @@ class S3Connector(FivetranConnector):
         return response
 
     @staticmethod
-    def create_role(
+    def _create_role(
         role_name: str, fivetran_aws_vpc_account_id: str, group_id: str, access_key: str, secret_key: str
     ):
         """
@@ -272,7 +272,7 @@ class S3Connector(FivetranConnector):
             return role
 
     @staticmethod
-    def attach_to_role(role_name: str, policy_arn: str, access_key: str, secret_key: str):
+    def _attach_to_role(role_name: str, policy_arn: str, access_key: str, secret_key: str):
         """
         Attaches a policy to a role.
 

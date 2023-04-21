@@ -61,7 +61,7 @@ class SnowflakeDestination(FivetranDestination):
         if snowflake_dejson.get("account") is None:
             for key, value in extras.items():
                 extras[key] = f"extra__snowflake__{value}"
-        account = self.get_snowflake_account(
+        account = self._get_snowflake_account(
             snowflake_dejson.get(extras["account"]), snowflake_dejson.get(extras["region"])  # type: ignore
         )
 
@@ -83,7 +83,7 @@ class SnowflakeDestination(FivetranDestination):
         return connection_details
 
     @staticmethod
-    def get_snowflake_account(account: str, region: str | None = None) -> str:
+    def _get_snowflake_account(account: str, region: str | None = None) -> str:
         """
         Create the snowflake account from account and region.
 
