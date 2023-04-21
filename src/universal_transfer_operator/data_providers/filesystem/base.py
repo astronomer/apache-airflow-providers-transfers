@@ -11,7 +11,7 @@ import pandas as pd
 import smart_open
 from airflow.hooks.base import BaseHook
 
-from universal_transfer_operator.constants import FileType, Location
+from universal_transfer_operator.constants import FileType, Location, TransferMode
 from universal_transfer_operator.data_providers.base import DataProviders, DataStream
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.file.types import create_file_type
@@ -84,7 +84,16 @@ class BaseFilesystemProviders(DataProviders[File]):
 
     def read(self) -> Iterator[DataStream]:
         """Read the remote or local file dataset and returns i/o buffers"""
-        return self.read_using_smart_open()
+        if self.transfer_mode == TransferMode.NATIVE:
+            return iter(
+                [
+                    DataStream(
+                        actual_file=self.dataset, remote_obj_buffer=io.BytesIO(), actual_filename=Path("")
+                    )
+                ]
+            )
+        else:
+            return self.read_using_smart_open()
 
     def read_using_smart_open(self) -> Iterator[DataStream]:
         """Read the file dataset using smart open returns i/o buffer"""
@@ -221,3 +230,13 @@ class BaseFilesystemProviders(DataProviders[File]):
         Given a dataset, check if the dataset has metadata.
         """
         pass
+
+    def get_snowflake_stage_auth_sub_statement(self) -> str:  # skipcq: PYL-R0201
+        raise NotImplementedError("In order to create a stage, `storage_integration` is required.")
+
+    @property
+    def snowflake_stage_path(self) -> str:
+        """
+        Get the altered path if needed for stage creation in snowflake stage creation
+        """
+        return self.dataset.path
