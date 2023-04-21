@@ -73,7 +73,7 @@ with DAG(
         transfer_mode=TransferMode.THIRDPARTY,
         transfer_params=FiveTranOptions(
             conn_id="fivetran_default",
-            connector_id="filing_muppet",
+            connector_id="wrap_warehouse",
             group=Group(name="test_group"),
             connector=Connector(
                 service="s3",
