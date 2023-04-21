@@ -9,13 +9,14 @@ from urllib.parse import urlparse, urlunparse
 
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 
-from universal_transfer_operator.constants import Location, TransferMode
+from universal_transfer_operator.constants import FileLocation, Location, TransferMode
 from universal_transfer_operator.data_providers.filesystem.base import (
     BaseFilesystemProviders,
     Path,
     TempFile,
 )
 from universal_transfer_operator.datasets.file.base import File
+from universal_transfer_operator.exceptions import DatabaseCustomError
 from universal_transfer_operator.integrations.base import TransferIntegrationOptions
 
 
@@ -23,6 +24,8 @@ class S3DataProvider(BaseFilesystemProviders):
     """
     DataProviders interactions with S3 Dataset.
     """
+
+    location_type = FileLocation.S3
 
     def __init__(
         self,
@@ -203,3 +206,15 @@ class S3DataProvider(BaseFilesystemProviders):
             object_name = object_name[1:]
         obj = self.hook.head_object(key=object_name, bucket_name=bucket_name)
         return obj.get("ContentLength") if obj else -1  # type: ignore
+
+    def get_snowflake_stage_auth_sub_statement(self) -> str:
+        aws = self.hook.get_credentials()
+        if aws.access_key and aws.secret_key:
+            auth = f"credentials=(aws_key_id='{aws.access_key}' aws_secret_key='{aws.secret_key}');"
+        else:
+            raise DatabaseCustomError(
+                "In order to create an stage for S3, one of the following is required: "
+                "* `storage_integration`"
+                "* AWS_KEY_ID and SECRET_KEY_ID"
+            )
+        return auth

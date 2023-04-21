@@ -45,7 +45,18 @@ LOAD_TABLE_AUTODETECT_ROWS_COUNT = conf.getint(
     section=SECTION_KEY, key="load_table_autodetect_rows_count", fallback=1000
 )
 
+
 # Fivetran AWS VPC Account ID. Read more at https://fivetran.com/docs/files/amazon-s3/setup-guide#createaniamrole
 FIVETRAN_AWS_VPC_ACCOUNT_ID = conf.getint(
     section=SECTION_KEY, key="fivetran_aws_vpc_account_id", fallback="834469178297"
 )
+
+SNOWFLAKE_STORAGE_INTEGRATION_AMAZON = conf.get(
+    section=SECTION_KEY, key="snowflake_storage_integration_amazon", fallback=None
+)
+
+SNOWFLAKE_STORAGE_INTEGRATION_GOOGLE = conf.get(
+    section=SECTION_KEY, key="snowflake_storage_integration_google", fallback=None
+)
+
+LOAD_FILE_ENABLE_NATIVE_FALLBACK = conf.get(SECTION_KEY, "load_file_enable_native_fallback", fallback=False)
