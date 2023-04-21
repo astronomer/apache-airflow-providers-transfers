@@ -57,7 +57,7 @@ with DAG(
         source_dataset=File(path=f"{s3_bucket}/uto/", conn_id="aws_default"),
         destination_dataset=Table(name="fivetran_test", conn_id="snowflake_default"),
         transfer_mode=TransferMode.THIRDPARTY,
-        transfer_params=FiveTranOptions(conn_id="fivetran_default", connector_id="filing_muppet"),
+        transfer_params=FiveTranOptions(conn_id="fivetran_default", connector_id="wrap_warehouse"),
     )
     # [END fivetran_transfer_with_setup]
 
