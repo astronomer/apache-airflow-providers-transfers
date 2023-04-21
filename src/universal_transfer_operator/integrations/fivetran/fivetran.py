@@ -458,7 +458,21 @@ class FivetranIntegration(TransferIntegration):
         connector_dict = self.transfer_params.connector
         if connector_dict is None:
             logging.info("connector passed is none")
-        connector = get_fivetran_connector(source_dataset=source_dataset, **connector_dict.to_dict())  # type: ignore
+        connector = get_fivetran_connector(
+            source_dataset=source_dataset,
+            connector_id=self.transfer_params.connector.connector_id,  # type: ignore
+            service=connector_service,  # type: ignore
+            config=self.transfer_params.connector.config,  # type: ignore
+            paused=self.transfer_params.connector.paused,  # type: ignore
+            pause_after_trial=self.transfer_params.connector.pause_after_trial,  # type: ignore
+            sync_frequency=self.transfer_params.connector.sync_frequency,  # type: ignore
+            daily_sync_time=self.transfer_params.connector.daily_sync_time,  # type: ignore
+            schedule_type=self.transfer_params.connector.schedule_type,  # type: ignore
+            trust_certificates=self.transfer_params.connector.trust_certificates,  # type: ignore
+            trust_fingerprints=self.transfer_params.connector.trust_fingerprints,  # type: ignore
+            run_setup_tests=self.transfer_params.connector.run_setup_tests,  # type: ignore
+            connect_card_config=self.transfer_params.connector.connect_card_config,  # type: ignore
+        )  # type: ignore
         config = connector.create_config(
             source_dataset=source_dataset, destination_dataset=destination_dataset, group_id=group_id
         )
