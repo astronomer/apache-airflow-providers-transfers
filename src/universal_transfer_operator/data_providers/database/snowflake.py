@@ -1,18 +1,151 @@
 from __future__ import annotations
 
+import logging
+import os
+import random
+import string
+from dataclasses import dataclass, field
 from typing import Sequence
+from urllib.parse import urlparse
 
 import attr
 import pandas as pd
 from airflow.providers.snowflake.hooks.snowflake import SnowflakeHook
 from snowflake.connector import pandas_tools
+from snowflake.connector.errors import (
+    ProgrammingError,
+)
 
-from universal_transfer_operator.constants import DEFAULT_CHUNK_SIZE, ColumnCapitalization, LoadExistStrategy
+from universal_transfer_operator.constants import (
+    DEFAULT_CHUNK_SIZE,
+    FileLocation,
+    FileType,
+    LoadExistStrategy,
+)
 from universal_transfer_operator.data_providers.database.base import DatabaseDataProvider
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Metadata, Table
-from universal_transfer_operator.settings import LOAD_TABLE_AUTODETECT_ROWS_COUNT, SNOWFLAKE_SCHEMA
+from universal_transfer_operator.exceptions import DatabaseCustomError
+from universal_transfer_operator.settings import (
+    LOAD_TABLE_AUTODETECT_ROWS_COUNT,
+    SNOWFLAKE_SCHEMA,
+    SNOWFLAKE_STORAGE_INTEGRATION_AMAZON,
+    SNOWFLAKE_STORAGE_INTEGRATION_GOOGLE,
+)
 from universal_transfer_operator.universal_transfer_operator import TransferIntegrationOptions
+
+DEFAULT_STORAGE_INTEGRATION = {
+    FileLocation.S3: SNOWFLAKE_STORAGE_INTEGRATION_AMAZON,
+    FileLocation.GS: SNOWFLAKE_STORAGE_INTEGRATION_GOOGLE,
+}
+
+ASTRO_SDK_TO_SNOWFLAKE_FILE_FORMAT_MAP = {
+    FileType.CSV: "CSV",
+    FileType.NDJSON: "JSON",
+    FileType.PARQUET: "PARQUET",
+}
+
+COPY_INTO_COMMAND_FAIL_STATUS = "LOAD_FAILED"
+
+NATIVE_LOAD_SUPPORTED_FILE_TYPES = (FileType.CSV, FileType.NDJSON, FileType.PARQUET)
+NATIVE_LOAD_SUPPORTED_FILE_LOCATIONS = (
+    FileLocation.GS,
+    FileLocation.S3,
+)
+
+
+@dataclass
+class SnowflakeStage:
+    """
+    Dataclass which abstracts properties of a Snowflake Stage.
+
+    Snowflake Stages are used to loading tables and unloading data from tables into files.
+
+    Example:
+
+    .. code-block:: python
+
+        snowflake_stage = SnowflakeStage(
+            name="stage_name",
+            url="gcs://bucket/prefix",
+            metadata=Metadata(database="SNOWFLAKE_DATABASE", schema="SNOWFLAKE_SCHEMA"),
+        )
+
+    .. seealso::
+            `Snowflake official documentation on stage creation
+            <https://docs.snowflake.com/en/sql-reference/sql/create-stage.html>`_
+    """
+
+    name: str = ""
+    _name: str = field(init=False, repr=False, default="")
+    url: str = ""
+    metadata: Metadata = field(default_factory=Metadata)
+
+    @staticmethod
+    def _create_unique_name() -> str:
+        """
+        Generate a valid Snowflake stage name.
+
+        :return: unique stage name
+        """
+        return (
+            "stage_"
+            + random.choice(string.ascii_lowercase)
+            + "".join(random.choice(string.ascii_lowercase + string.digits) for _ in range(7))
+        )
+
+    def set_url_from_file(self, file: File) -> None:
+        """
+        Given a file to be loaded/unloaded to from Snowflake, identifies its folder and
+        sets as self.url.
+
+        It is also responsible for adjusting any path specific requirements for Snowflake.
+
+        :param file: File to be loaded/unloaded to from Snowflake
+        """
+        # the stage URL needs to be the folder where the files are
+        # https://docs.snowflake.com/en/sql-reference/sql/create-stage.html#external-stage-parameters-externalstageparams
+        url = urlparse(file.location.snowflake_stage_path)
+        url = url._replace(path=url.path[: url.path.rfind("/") + 1])
+        url = url._replace(scheme="gcs") if url.scheme == "gs" else url
+        self.url = url.geturl()
+
+    @property  # type: ignore
+    def name(self) -> str:
+        """
+        Return either the user-defined name or auto-generated one.
+
+        :return: stage name
+        :sphinx-autoapi-skip:
+        """
+        if not self._name:
+            self._name = self._create_unique_name()
+        return self._name
+
+    @name.setter
+    def name(self, value: str) -> None:
+        """
+        Set the stage name.
+
+        :param value: Stage name.
+        """
+        if not isinstance(value, property) and value != self._name:
+            self._name = value
+
+    @property
+    def qualified_name(self) -> str:
+        """
+        Return stage qualified name. In Snowflake, it is the database, schema and table
+
+        :return: Snowflake stage qualified name (e.g. database.schema.table)
+        """
+        qualified_name_lists = [
+            self.metadata.database,
+            self.metadata.schema,
+            self.name,
+        ]
+        qualified_name = ".".join(name for name in qualified_name_lists if name)
+        return qualified_name
 
 
 @attr.define
@@ -24,6 +157,7 @@ class SnowflakeOptions(TransferIntegrationOptions):
     file_options: dict = attr.field(factory=dict)
     copy_options: dict = attr.field(factory=dict)
     storage_integration: str | None = attr.field(default=None)
+    validation_mode: str | None = attr.field(default=None)
 
 
 class SnowflakeDataProvider(DatabaseDataProvider):
@@ -36,10 +170,10 @@ class SnowflakeDataProvider(DatabaseDataProvider):
         self,
         dataset: Table,
         transfer_mode,
-        transfer_params: TransferIntegrationOptions = TransferIntegrationOptions(),
+        transfer_params: SnowflakeOptions = SnowflakeOptions(),
     ):
         self.dataset = dataset
-        self.transfer_params = transfer_params
+        self.transfer_params: SnowflakeOptions = transfer_params
         self.transfer_mode = transfer_mode
         self.transfer_mapping = set()
         self.LOAD_DATA_NATIVELY_FROM_SOURCE: dict = {}
@@ -131,7 +265,6 @@ class SnowflakeDataProvider(DatabaseDataProvider):
         table: Table,
         file: File | None = None,
         dataframe: pd.DataFrame | None = None,
-        columns_names_capitalization: ColumnCapitalization = "original",
     ) -> None:  # skipcq PYL-W0613
         """
         Create a SQL table, automatically inferring the schema using the given file.
@@ -140,8 +273,6 @@ class SnowflakeDataProvider(DatabaseDataProvider):
         :param table: The table to be created.
         :param file: File used to infer the new table columns.
         :param dataframe: Dataframe used to infer the new table columns if there is no file
-        :param columns_names_capitalization: determines whether to convert all columns to lowercase/uppercase
-            in the resulting dataframe
         """
         if file is None:
             if dataframe is None:
@@ -264,3 +395,201 @@ class SnowflakeDataProvider(DatabaseDataProvider):
         https://github.com/OpenLineage/OpenLineage/blob/main/spec/Naming.md
         """
         return f"{self.openlineage_dataset_namespace}{self.openlineage_dataset_name}"
+
+    def is_native_path_available(
+        self,
+        source_dataset: File | Table,  # skipcq PYL-W0613, PYL-R0201
+    ) -> bool:
+        """
+        Check if there is an optimised path for source to destination.
+
+        :param source_dataset: File | Table from which we need to transfer data
+        """
+        if isinstance(source_dataset, Table):
+            return False
+        is_file_type_supported = source_dataset.type.name in NATIVE_LOAD_SUPPORTED_FILE_TYPES
+        is_file_location_supported = (
+            source_dataset.location.location_type in NATIVE_LOAD_SUPPORTED_FILE_LOCATIONS
+        )
+        return is_file_type_supported and is_file_location_supported
+
+    def load_file_to_table_natively(
+        self,
+        source_file: File,
+        target_table: Table,
+        if_exists: LoadExistStrategy = "replace",
+        native_support_kwargs: dict | None = None,
+        **kwargs,
+    ):  # skipcq PYL-W0613
+        """
+        Load the content of a file to an existing Snowflake table natively by:
+        - Creating a Snowflake external stage
+        - Using Snowflake COPY INTO statement
+
+        Requirements:
+        - The user must have permissions to create a STAGE in Snowflake.
+        - If loading from GCP Cloud Storage, `native_support_kwargs` must define `storage_integration`
+        - If loading from AWS S3, the credentials for creating the stage may be
+        retrieved from the Airflow connection or from the `storage_integration`
+        attribute within `native_support_kwargs`.
+
+        :param source_file: File from which we need to transfer data
+        :param target_table: Table to which the content of the file will be loaded to
+        :param if_exists: Strategy used to load (currently supported: "append" or "replace")
+        :param native_support_kwargs: may be used for the stage creation, as described above.
+
+        .. seealso::
+            `Snowflake official documentation on COPY INTO
+            <https://docs.snowflake.com/en/sql-reference/sql/copy-into-table.html>`_
+            `Snowflake official documentation on CREATE STAGE
+            <https://docs.snowflake.com/en/sql-reference/sql/create-stage.html>`_
+
+        """
+        native_support_kwargs = native_support_kwargs or {}
+        # if not self.load_options:
+        #     self.load_options = SnowflakeLoadOptions()
+
+        storage_integration = native_support_kwargs.get("storage_integration", None)
+        if storage_integration is None:
+            storage_integration = self.transfer_params.storage_integration
+
+        stage = self.create_stage(file=source_file, storage_integration=storage_integration)
+
+        rows = self._copy_into_table_from_stage(
+            source_file=source_file, target_table=target_table, stage=stage
+        )
+        self.evaluate_results(rows)
+
+    @staticmethod
+    def _create_stage_auth_sub_statement(file: File, storage_integration: str | None = None) -> str:
+        """
+        Create authentication-related line for the Snowflake CREATE STAGE.
+        Raise an exception if it is not defined.
+
+        :param file: File to be copied from/to using stage
+        :param storage_integration: Previously created Snowflake storage integration
+        :return: String containing line to be used for authentication on the remote storage
+        """
+        storage_integration = storage_integration or DEFAULT_STORAGE_INTEGRATION.get(
+            file.location.location_type
+        )
+        if storage_integration is not None:
+            return f"storage_integration = {storage_integration};"
+        return file.location.get_snowflake_stage_auth_sub_statement()  # type: ignore
+
+    def create_stage(
+        self,
+        file: File,
+        storage_integration: str | None = None,
+        metadata: Metadata | None = None,
+    ) -> SnowflakeStage:
+        """
+        Creates a new named external stage to use for loading data from files into Snowflake
+        tables and unloading data from tables into files.
+
+        At the moment, the following ways of authenticating to the backend are supported:
+        * Google Cloud Storage (GCS): using storage_integration, previously created
+        * Amazon (S3): one of the following:
+        (i) using storage_integration or
+        (ii) retrieving the AWS_KEY_ID and AWS_SECRET_KEY from the Airflow file connection
+
+        :param file: File to be copied from/to using stage
+        :param storage_integration: Previously created Snowflake storage integration
+        :param metadata: Contains Snowflake database and schema information
+        :return: Stage created
+
+        .. seealso::
+            `Snowflake official documentation on stage creation
+            <https://docs.snowflake.com/en/sql-reference/sql/create-stage.html>`_
+        """
+
+        auth = self._create_stage_auth_sub_statement(file=file, storage_integration=storage_integration)
+
+        # if not self.load_options:
+        #     self.load_options = SnowflakeLoadOptions()
+        metadata = metadata or self.default_metadata
+        stage = SnowflakeStage(metadata=metadata)
+        stage.set_url_from_file(file)
+
+        file_format = ASTRO_SDK_TO_SNOWFLAKE_FILE_FORMAT_MAP[file.type.name]
+        copy_options = []
+        copy_options.extend([f"{k}={v}" for k, v in self.transfer_params.copy_options.items()])
+        file_options = [f"{k}={v}" for k, v in self.transfer_params.file_options.items()]
+        file_options.extend([f"TYPE={file_format}", "TRIM_SPACE=TRUE"])
+        file_options_str = ", ".join(file_options)
+        copy_options_str = ", ".join(copy_options)
+        sql_statement = "".join(
+            [
+                f"CREATE OR REPLACE STAGE {stage.qualified_name} URL='{stage.url}' ",
+                f"FILE_FORMAT=({file_options_str}) ",
+                f"COPY_OPTIONS=({copy_options_str}) ",
+                auth,
+            ]
+        )
+        logging.debug("SQL statement executed: %s ", sql_statement)
+        self.run_sql(sql_statement)
+
+        return stage
+
+    def _copy_into_table_from_stage(self, source_file, target_table, stage):
+        table_name = self.get_table_qualified_name(target_table)
+        file_path = os.path.basename(source_file.path) or ""
+        sql_statement = f"COPY INTO {table_name} FROM @{stage.qualified_name}/{file_path}"
+
+        self._validate_before_copy_into(source_file, target_table, stage)
+
+        # Below code is added due to breaking change in apache-airflow-providers-snowflake==3.2.0,
+        # we need to pass handler param to get the rows. But in version apache-airflow-providers-snowflake==3.1.0
+        # if we pass the handler provider raises an exception AttributeError
+        try:
+            rows = self.hook.run(sql_statement, handler=lambda cur: cur.fetchall())
+        except AttributeError:
+            try:
+                rows = self.hook.run(sql_statement)
+            except ValueError as exe:
+                raise DatabaseCustomError from exe
+        except ValueError as exe:
+            raise DatabaseCustomError from exe
+        finally:
+            self.drop_stage(stage)
+        return rows
+
+    def _validate_before_copy_into(
+        self, source_file: File, target_table: Table, stage: SnowflakeStage
+    ) -> None:
+        """Validate COPY INTO command to tests the files for errors but does not load them."""
+        if self.transfer_params:
+            if self.transfer_params.validation_mode is None:
+                return
+            table_name = self.get_table_qualified_name(target_table)
+            file_path = os.path.basename(source_file.path) or ""
+            sql_statement = (
+                f"COPY INTO {table_name} FROM "
+                f"@{stage.qualified_name}/{file_path} VALIDATION_MODE='{self.transfer_params.validation_mode}'"
+            )
+            try:
+                self.hook.run(sql_statement, handler=lambda cur: cur.fetchall())
+            except ProgrammingError as load_exception:
+                self.drop_stage(stage)
+                raise load_exception
+
+    def drop_stage(self, stage: SnowflakeStage) -> None:
+        """
+        Runs the snowflake query to drop stage if it exists.
+
+        :param stage: Stage to be dropped
+        """
+        sql_statement = f"DROP STAGE IF EXISTS {stage.qualified_name};"
+        self.hook.run(sql_statement, autocommit=True)
+
+    @staticmethod
+    def evaluate_results(rows):
+        """check the error state returned by snowflake when running `copy into` query."""
+        try:
+            # Handle case for apache-airflow-providers-snowflake<4.0.1
+            if any(row["status"] == COPY_INTO_COMMAND_FAIL_STATUS for row in rows):
+                raise DatabaseCustomError(rows)
+        except TypeError:
+            # Handle case for apache-airflow-providers-snowflake>=4.0.1
+            if any(row[0] == COPY_INTO_COMMAND_FAIL_STATUS for row in rows):
+                raise DatabaseCustomError(rows)

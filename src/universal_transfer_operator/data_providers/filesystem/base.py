@@ -39,7 +39,6 @@ class BaseFilesystemProviders(DataProviders[File]):
         self.transfer_mode = transfer_mode
         self.transfer_mapping = set()
         self.LOAD_DATA_NATIVELY_FROM_SOURCE: dict = {}
-        self.location_type: Location | None= None
         super().__init__(
             dataset=self.dataset, transfer_mode=self.transfer_mode, transfer_params=self.transfer_params
         )
@@ -86,8 +85,15 @@ class BaseFilesystemProviders(DataProviders[File]):
     def read(self) -> Iterator[DataStream]:
         """Read the remote or local file dataset and returns i/o buffers"""
         if self.transfer_mode == TransferMode.NATIVE:
-            yield DataStream(actual_file=self.dataset, remote_obj_buffer=io.BytesIO(), actual_filename="")
-        return self.read_using_smart_open()
+            return iter(
+                [
+                    DataStream(
+                        actual_file=self.dataset, remote_obj_buffer=io.BytesIO(), actual_filename=Path("")
+                    )
+                ]
+            )
+        else:
+            return self.read_using_smart_open()
 
     def read_using_smart_open(self) -> Iterator[DataStream]:
         """Read the file dataset using smart open returns i/o buffer"""
@@ -224,3 +230,13 @@ class BaseFilesystemProviders(DataProviders[File]):
         Given a dataset, check if the dataset has metadata.
         """
         pass
+
+    def get_snowflake_stage_auth_sub_statement(self) -> str:  # skipcq: PYL-R0201
+        raise NotImplementedError("In order to create a stage, `storage_integration` is required.")
+
+    @property
+    def snowflake_stage_path(self) -> str:
+        """
+        Get the altered path if needed for stage creation in snowflake stage creation
+        """
+        return self.dataset.path

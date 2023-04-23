@@ -10,7 +10,8 @@ import pandas as pd
 import smart_open
 from airflow.hooks.base import BaseHook
 
-from universal_transfer_operator.constants import Location
+
+from universal_transfer_operator.constants import FileLocation
 from universal_transfer_operator.data_providers.base import DataStream
 from universal_transfer_operator.data_providers.filesystem.base import BaseFilesystemProviders
 
@@ -18,7 +19,7 @@ from universal_transfer_operator.data_providers.filesystem.base import BaseFiles
 class LocalDataProvider(BaseFilesystemProviders):
     """Handler Local file path operations"""
 
-    location_type = Location.LOCAL
+    location_type = FileLocation.LOCAL
 
     @property
     def paths(self) -> list[str]:

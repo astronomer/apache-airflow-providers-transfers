@@ -108,9 +108,7 @@ def test_create_schema_if_needed_replace(
     dp.create_schema_and_table_if_needed_from_dataframe(table=table, dataframe=df)
     mock_drop_table.assert_called_once_with(table)
     mock_table_exists.assert_not_called()
-    mock_create_table.assert_called_once_with(
-        table, dataframe=df, columns_names_capitalization="original", use_native_support=True
-    )
+    mock_create_table.assert_called_once_with(table, dataframe=df, use_native_support=True)
 
 
 @mock.patch(
@@ -134,6 +132,4 @@ def test_create_schema_if_needed_append(
     dp.create_schema_and_table_if_needed_from_dataframe(table=table, dataframe=df, if_exists="append")
     mock_drop_table.assert_not_called()
     mock_table_exists.assert_called_once_with(table)
-    mock_create_table.assert_called_once_with(
-        table, dataframe=df, columns_names_capitalization="original", use_native_support=True
-    )
+    mock_create_table.assert_called_once_with(table, dataframe=df, use_native_support=True)
