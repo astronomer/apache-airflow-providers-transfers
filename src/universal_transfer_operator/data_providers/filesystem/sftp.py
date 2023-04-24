@@ -8,7 +8,7 @@ import pandas as pd
 import smart_open
 from airflow.providers.sftp.hooks.sftp import SFTPHook
 
-from universal_transfer_operator.constants import FileLocation, Location, TransferMode
+from universal_transfer_operator.constants import Location, TransferMode
 from universal_transfer_operator.data_providers.base import DataStream
 from universal_transfer_operator.data_providers.filesystem.base import BaseFilesystemProviders
 from universal_transfer_operator.datasets.file.base import File
@@ -20,7 +20,7 @@ class SFTPDataProvider(BaseFilesystemProviders):
     DataProviders interactions with GS Dataset.
     """
 
-    location_type = FileLocation.SFTP
+    location_type = Location.SFTP
 
     def __init__(
         self,
