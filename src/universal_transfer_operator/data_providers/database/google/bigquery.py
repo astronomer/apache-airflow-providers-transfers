@@ -3,6 +3,7 @@ from __future__ import annotations
 import time
 from typing import Any, Callable, Mapping
 
+import attr
 import pandas as pd
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 from airflow.providers.google.cloud.hooks.bigquery_dts import BiqQueryDataTransferServiceHook
@@ -51,6 +52,13 @@ NATIVE_PATHS_SUPPORTED_FILE_TYPES = {
 BIGQUERY_WRITE_DISPOSITION = {"replace": "WRITE_TRUNCATE", "append": "WRITE_APPEND"}
 
 
+@attr.define
+class BigqueryOptions(TransferIntegrationOptions):
+    ignore_unknown_values: bool = attr.field(factory=bool)
+    allow_jagged_rows: bool = attr.field(factory=bool)
+    skip_leading_rows: int = attr.field(default=1)
+
+
 class BigqueryDataProvider(DatabaseDataProvider):
     """BigqueryDataProvider represent all the DataProviders interactions with Bigquery Databases."""
 
@@ -94,15 +102,16 @@ class BigqueryDataProvider(DatabaseDataProvider):
     illegal_column_name_chars_replacement: list[str] = ["_"]
 
     _create_schema_statement: str = "CREATE SCHEMA IF NOT EXISTS {} OPTIONS (location='{}')"
+    OPTIONS_CLASS = BigqueryOptions
 
     def __init__(
         self,
         dataset: Table,
         transfer_mode,
-        transfer_params: TransferIntegrationOptions = TransferIntegrationOptions(),
+        transfer_params: BigqueryOptions = BigqueryOptions(),
     ):
         self.dataset = dataset
-        self.transfer_params = transfer_params
+        self.transfer_params: BigqueryOptions = transfer_params
         self.transfer_mode = transfer_mode
         self.transfer_mapping = set()
         self.LOAD_DATA_NATIVELY_FROM_SOURCE: dict = {}
