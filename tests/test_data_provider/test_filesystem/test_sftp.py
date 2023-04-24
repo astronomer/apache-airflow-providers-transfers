@@ -27,11 +27,11 @@ def test_sftp_read():
 
     dataprovider = create_dataprovider(dataset=File(path=f"sftp:/{remote_path}", conn_id="sftp_conn"))
     iterator_obj = dataprovider.read()
-    for data in iterator_obj:
-        source_data = data
-        sftp_df = pd.read_csv(source_data.remote_obj_buffer)
-        true_df = pd.read_csv(filepath)
-        assert sftp_df.equals(true_df)
+    source_data = iterator_obj.__next__()
+
+    sftp_df = pd.read_csv(source_data.remote_obj_buffer)
+    true_df = pd.read_csv(filepath)
+    assert sftp_df.equals(true_df)
 
 
 def download_file_from_sftp(conn_id: str, local_path: str, remote_path: str):
