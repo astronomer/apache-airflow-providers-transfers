@@ -1,3 +1,5 @@
+# TODO: Once the following PR is merged and released, we can
+# remove the Fivetran hook: https://github.com/fivetran/airflow-provider-fivetran/pull/74
 """
 Unittest module to test Fivetran Hooks.
 
