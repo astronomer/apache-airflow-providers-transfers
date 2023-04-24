@@ -59,6 +59,7 @@ class FiveTranOptions(TransferIntegrationOptions):
     :param schedule_type: Define the schedule type
     :param connector: Connector in FiveTran
     :param group: Group in FiveTran
+    :param group_name: Group name in Fivetran system
     :param destination: Destination in Fivetran
     """
 

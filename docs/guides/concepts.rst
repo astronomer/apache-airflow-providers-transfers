@@ -202,8 +202,8 @@ Here is an example of how to use Fivetran for transfers:
 
 .. literalinclude:: ../../example_dags/example_dag_fivetran.py
    :language: python
-   :start-after: [START fivetran_transfer_with_setup]
-   :end-before: [END fivetran_transfer_with_setup]
+   :start-after: [START fivetran_transfer_without_setup]
+   :end-before: [END fivetran_transfer_without_setup]
 
 .. _file_pattern:
 
