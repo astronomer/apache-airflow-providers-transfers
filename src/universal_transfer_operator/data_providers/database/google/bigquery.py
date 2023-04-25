@@ -61,7 +61,6 @@ BIGQUERY_WRITE_DISPOSITION = {"replace": "WRITE_TRUNCATE", "append": "WRITE_APPE
 class BigqueryOptions(TransferIntegrationOptions):
     s3_transfer_parameters: dict = attr.field(factory=dict)
     gs_transfer_parameters: dict = attr.field(factory=dict)
-    local_transfer_parameters: dict = attr.field(factory=dict)
 
 
 class BigqueryDataProvider(DatabaseDataProvider):
@@ -409,7 +408,6 @@ class BigqueryDataProvider(DatabaseDataProvider):
         :param target_table: Table that will be created on the bigquery
         :param if_exists: Overwrite table if exists. Default 'replace'
         """
-        native_support_kwargs = self.transfer_params.local_transfer_parameters or {}
         # We need to maintain file_type to biqquery_format and not use NATIVE_PATHS_SUPPORTED_FILE_TYPES
         # because the load_table_from_file expects 'JSON' value for ndjson file.
         file_types_to_bigquery_format = {
@@ -425,7 +423,6 @@ class BigqueryDataProvider(DatabaseDataProvider):
             "write_disposition": BIGQUERY_WRITE_DISPOSITION[if_exists],
             "autodetect": True,
         }
-        config.update(native_support_kwargs)
         job_config = bigquery.LoadJobConfig(**config)
 
         # Deepsource pointed out - OWASP Top 10 2021 Category A01 - Broken Access Control
