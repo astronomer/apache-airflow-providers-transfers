@@ -1,6 +1,7 @@
 """Nox automation definitions."""
 
 import pathlib
+
 import nox
 
 nox.options.sessions = ["dev"]

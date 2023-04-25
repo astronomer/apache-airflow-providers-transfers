@@ -30,7 +30,7 @@ Follow the steps described in [development](DEVELOPMENT.md).
 1. Update the local sources to address the issue you are working on.
 
    * Create a local branch for your development. Make sure to use the latest
-     [astronomer/apache-airflow-provider-transfers/main](https://github.com/astronomer/apache-airflow-provider-transfers) 
+     [astronomer/apache-airflow-provider-transfers/main](https://github.com/astronomer/apache-airflow-provider-transfers)
      as base for the branch. This allows you to easily compare
      changes, have several changes that you work on at the same time and many more.
 

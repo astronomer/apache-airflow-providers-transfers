@@ -11,7 +11,7 @@ import pandas as pd
 import smart_open
 from airflow.hooks.base import BaseHook
 
-from universal_transfer_operator.constants import FileType, Location
+from universal_transfer_operator.constants import FileType, Location, TransferMode
 from universal_transfer_operator.data_providers.base import DataProviders, DataStream
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.file.types import create_file_type
@@ -82,7 +82,16 @@ class BaseFilesystemProviders(DataProviders[File]):
 
     def read(self) -> Iterator[DataStream]:
         """Read the remote or local file dataset and returns i/o buffers"""
-        return self.read_using_smart_open()
+        if self.transfer_mode == TransferMode.NATIVE:
+            return iter(
+                [
+                    DataStream(
+                        actual_file=self.dataset, remote_obj_buffer=io.BytesIO(), actual_filename=Path("")
+                    )
+                ]
+            )
+        else:
+            return self.read_using_smart_open()
 
     def read_using_smart_open(self) -> Iterator[DataStream]:
         """Read the file dataset using smart open returns i/o buffer"""

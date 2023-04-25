@@ -6,13 +6,24 @@ import pandas as pd
 import pytest
 import sqlalchemy
 from sqlalchemy.exc import ProgrammingError
+from utils.test_dag_runner import run_dag
+from utils.test_utils import export_to_dataframe
 
-from universal_transfer_operator.constants import TransferMode
+from universal_transfer_operator.constants import FileType, TransferMode
+from universal_transfer_operator.data_providers import create_dataprovider
 from universal_transfer_operator.data_providers.base import DataStream
 from universal_transfer_operator.data_providers.database.snowflake import SnowflakeDataProvider
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Metadata, Table
-from universal_transfer_operator.settings import SNOWFLAKE_SCHEMA
+from universal_transfer_operator.settings import (
+    SNOWFLAKE_SCHEMA,
+    SNOWFLAKE_STORAGE_INTEGRATION_AMAZON,
+    SNOWFLAKE_STORAGE_INTEGRATION_GOOGLE,
+)
+from universal_transfer_operator.universal_transfer_operator import UniversalTransferOperator
+
+SNOWFLAKE_STORAGE_INTEGRATION_AMAZON = SNOWFLAKE_STORAGE_INTEGRATION_AMAZON or "aws_int_python_sdk"
+SNOWFLAKE_STORAGE_INTEGRATION_GOOGLE = SNOWFLAKE_STORAGE_INTEGRATION_GOOGLE or "gcs_int_python_sdk"
 
 DEFAULT_CONN_ID = "snowflake_default"
 CUSTOM_CONN_ID = "snowflake_conn"
@@ -156,3 +167,109 @@ def test_write_method(dataset_table_fixture):
     rows = dp.fetch_all_rows(table=dp.dataset)
     rows.sort(key=lambda x: x[0])
     assert rows == [(1, "First"), (2, "Second"), (3, "Third with unicode पांचाल")]
+
+
+@pytest.mark.parametrize(
+    "src_dataset_fixture",
+    [
+        {
+            "name": "SnowflakeDataProvider",
+        }
+    ],
+    indirect=True,
+    ids=lambda dp: dp["name"],
+)
+def test_s3_to_snowflake_native_path(sample_dag, src_dataset_fixture):
+    """
+    Test the native path of S3 to Snowflake
+    """
+    table_dataprovider, table_dataset = src_dataset_fixture
+    file_dataset = File(path="s3://astro-sdk/sample.csv", conn_id="aws_default", filetype=FileType.CSV)
+    file_dataprovider = create_dataprovider(file_dataset)
+    with sample_dag:
+        # [START transfer_from_s3_to_snowflake_natively]
+        # file_dataset = File(path="s3://astro-sdk/sample.csv", conn_id="aws_default", filetype=FileType.CSV)
+        # table_dataset = Table(conn_id="snowflake_conn")
+        UniversalTransferOperator(
+            task_id="s3_to_bigquery",
+            source_dataset=file_dataset,
+            destination_dataset=table_dataset,
+            transfer_params={
+                "file_options": {"SKIP_HEADER": 1},
+                "storage_integration": SNOWFLAKE_STORAGE_INTEGRATION_AMAZON,
+            },
+            transfer_mode=TransferMode.NATIVE,
+        )
+        # [END transfer_from_s3_to_snowflake_natively]
+    run_dag(sample_dag)
+    file_dataframe = export_to_dataframe(file_dataprovider)
+    table_dataframe = export_to_dataframe(table_dataprovider)
+    assert file_dataframe.equals(table_dataframe)
+
+
+@pytest.mark.parametrize(
+    "src_dataset_fixture",
+    [
+        {
+            "name": "SnowflakeDataProvider",
+        }
+    ],
+    indirect=True,
+    ids=lambda dp: dp["name"],
+)
+def test_gcs_to_snowflake_native_path(sample_dag, src_dataset_fixture):
+    """
+    Test the native path of GCS to Snowflake
+    """
+    table_dataprovider, table_dataset = src_dataset_fixture
+    file_dataset = File(
+        path="gs://astro-sdk/workspace/sample.csv", conn_id="google_cloud_default", filetype=FileType.CSV
+    )
+    file_dataprovider = create_dataprovider(dataset=file_dataset)
+    with sample_dag:
+        # [START transfer_from_gcs_to_snowflake_natively]
+        # file_dataset = File(
+        #     path="gs://astro-sdk/workspace/sample.csv", conn_id="google_cloud_default", filetype=FileType.CSV
+        # )
+        # table_dataset = Table(conn_id="snowflake_conn")
+        UniversalTransferOperator(
+            task_id="gcp_to_bigquery",
+            source_dataset=file_dataset,
+            destination_dataset=table_dataset,
+            transfer_params={
+                "storage_integration": SNOWFLAKE_STORAGE_INTEGRATION_GOOGLE,
+                "copy_options": {"ON_ERROR": "CONTINUE"},
+                "file_options": {"TYPE": "CSV", "TRIM_SPACE": True},
+            },
+            transfer_mode=TransferMode.NATIVE,
+        )
+        # [END transfer_from_gcs_to_snowflake_natively]
+    run_dag(sample_dag)
+    file_dataframe = export_to_dataframe(file_dataprovider)
+    table_dataframe = export_to_dataframe(table_dataprovider)
+    assert file_dataframe.equals(table_dataframe)
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    "src_dataset_fixture",
+    [
+        {
+            "name": "SnowflakeDataProvider",
+        }
+    ],
+    indirect=True,
+    ids=["snowflake"],
+)
+def test_create_table_using_schema_autodetection(src_dataset_fixture):
+    """Test create_table_using_schema_autodetection"""
+    dp, dataset_object = src_dataset_fixture
+    filepath = str(pathlib.Path(CWD.parent, "../data/sample.csv"))
+    dp.create_table_using_schema_autodetection(table=dataset_object, file=File(filepath))
+
+    statement = f"DESCRIBE TABLE {dp.get_table_qualified_name(dataset_object)}"
+    cols = dp.run_sql(statement, handler=lambda x: x.fetchall())
+    assert cols[0][0] == "ID"
+    assert str(cols[0][1]).startswith("NUMBER")
+    assert cols[1][0] == "NAME"
+    assert str(cols[1][1]).startswith("VARCHAR")
