@@ -35,7 +35,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 from tenacity import retry, stop_after_attempt
 
-from universal_transfer_operator.constants import DEFAULT_CHUNK_SIZE, FileType, LoadExistStrategy, Location
+from universal_transfer_operator.constants import (
+    DEFAULT_CHUNK_SIZE,
+    FileLocation,
+    FileType,
+    LoadExistStrategy,
+)
 from universal_transfer_operator.data_providers.database.base import DatabaseDataProvider
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Metadata, Table
@@ -54,9 +59,9 @@ BIGQUERY_WRITE_DISPOSITION = {"replace": "WRITE_TRUNCATE", "append": "WRITE_APPE
 
 @attr.define
 class BigqueryOptions(TransferIntegrationOptions):
-    ignore_unknown_values: bool = attr.field(factory=bool)
-    allow_jagged_rows: bool = attr.field(factory=bool)
-    skip_leading_rows: int = attr.field(default=1)
+    s3_transfer_parameters: dict = attr.field(factory=dict)
+    gs_transfer_parameters: dict = attr.field(factory=dict)
+    local_transfer_parameters: dict = attr.field(factory=dict)
 
 
 class BigqueryDataProvider(DatabaseDataProvider):
@@ -69,20 +74,20 @@ class BigqueryDataProvider(DatabaseDataProvider):
 
     _create_schema_statement: str = "CREATE SCHEMA IF NOT EXISTS {} OPTIONS (location='{}')"
     NATIVE_PATHS = {
-        Location.GS: "load_gs_file_to_table",
-        Location.S3: "load_s3_file_to_table",
-        Location.LOCAL: "load_local_file_to_table",
+        FileLocation.GS: "load_gs_file_to_table",
+        FileLocation.S3: "load_s3_file_to_table",
+        FileLocation.LOCAL: "load_local_file_to_table",
     }
-    NATIVE_AUTODETECT_SCHEMA_CONFIG: Mapping[Location, Mapping[str, list[FileType] | Callable]] = {
-        Location.GS: {
+    NATIVE_AUTODETECT_SCHEMA_CONFIG: Mapping[FileLocation, Mapping[str, list[FileType] | Callable]] = {
+        FileLocation.GS: {
             "filetype": [FileType.CSV, FileType.NDJSON, FileType.PARQUET],
             "method": lambda table, file: None,
         },
     }
 
-    FILE_PATTERN_BASED_AUTODETECT_SCHEMA_SUPPORTED: set[Location] = {
-        Location.GS,
-        Location.LOCAL,
+    FILE_PATTERN_BASED_AUTODETECT_SCHEMA_SUPPORTED: set[FileLocation] = {
+        FileLocation.GS,
+        FileLocation.LOCAL,
     }
 
     NATIVE_LOAD_EXCEPTIONS: Any = (
@@ -281,7 +286,6 @@ class BigqueryDataProvider(DatabaseDataProvider):
         source_file: File,
         target_table: Table,
         if_exists: LoadExistStrategy = "replace",
-        native_support_kwargs: dict | None = None,
         **kwargs,
     ):
         """
@@ -290,7 +294,6 @@ class BigqueryDataProvider(DatabaseDataProvider):
         :param source_file: File from which we need to transfer data
         :param target_table: Table that needs to be populated with file data
         :param if_exists: Overwrite file if exists. Default False
-        :param native_support_kwargs: kwargs to be used by method involved in native support flow
         """
         method_name = self.NATIVE_PATHS.get(source_file.location.location_type)
         if method_name:
@@ -299,7 +302,6 @@ class BigqueryDataProvider(DatabaseDataProvider):
                 source_file=source_file,
                 target_table=target_table,
                 if_exists=if_exists,
-                native_support_kwargs=native_support_kwargs,
                 **kwargs,
             )
         else:
@@ -313,17 +315,16 @@ class BigqueryDataProvider(DatabaseDataProvider):
         source_file: File,
         target_table: Table,
         if_exists: LoadExistStrategy = "replace",
-        native_support_kwargs: dict | None = None,
         **kwargs,
     ):
         """
         Transfer data from gcs to bigquery
+
         :param source_file: Source file that is used as source of data
         :param target_table: Table that will be created on the bigquery
         :param if_exists: Overwrite table if exists. Default 'replace'
-        :param native_support_kwargs: kwargs to be used by method involved in native support flow
         """
-        native_support_kwargs = native_support_kwargs or {}
+        native_support_kwargs = self.transfer_params.gs_transfer_parameters or {}
 
         load_job_config = {
             "sourceUris": [source_file.path],
@@ -360,7 +361,6 @@ class BigqueryDataProvider(DatabaseDataProvider):
         self,
         source_file: File,
         target_table: Table,
-        native_support_kwargs: dict | None = None,
         **kwargs,
     ):
         """
@@ -372,9 +372,8 @@ class BigqueryDataProvider(DatabaseDataProvider):
         :param source_file: Source file that is used as source of data
         :param target_table: Table that will be created on the bigquery
         :param if_exists: Overwrite table if exists. Default 'replace'
-        :param native_support_kwargs: kwargs to be used by method involved in native support flow
         """
-        native_support_kwargs = native_support_kwargs or {}
+        native_support_kwargs = self.transfer_params.s3_transfer_parameters or {}
 
         project_id = self.get_project_id(target_table)
         transfer = S3ToBigqueryDataTransfer(
@@ -401,11 +400,16 @@ class BigqueryDataProvider(DatabaseDataProvider):
         source_file: File,
         target_table: Table,
         if_exists: LoadExistStrategy = "replace",
-        native_support_kwargs: dict | None = None,
         **kwargs,
     ):
-        """Transfer data from local to bigquery"""
-        native_support_kwargs = native_support_kwargs or {}
+        """
+        Transfer data from local to bigquery
+
+        :param source_file: Source file that is used as source of data
+        :param target_table: Table that will be created on the bigquery
+        :param if_exists: Overwrite table if exists. Default 'replace'
+        """
+        native_support_kwargs = self.transfer_params.local_transfer_parameters or {}
         # We need to maintain file_type to biqquery_format and not use NATIVE_PATHS_SUPPORTED_FILE_TYPES
         # because the load_table_from_file expects 'JSON' value for ndjson file.
         file_types_to_bigquery_format = {
