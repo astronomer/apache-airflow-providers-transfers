@@ -1,18 +1,42 @@
 from __future__ import annotations
 
+from typing import Any, Callable, Mapping
+
+import attr
 import pandas as pd
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 from google.api_core.exceptions import (
+    ClientError,
+    Conflict,
+    Forbidden,
+    GoogleAPIError,
+    InvalidArgument,
     NotFound as GoogleNotFound,
+    ResourceExhausted,
+    RetryError,
+    ServerError,
+    ServiceUnavailable,
+    TooManyRequests,
+    Unauthorized,
+    Unknown,
 )
+from google.resumable_media import InvalidResponse
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 
-from universal_transfer_operator.constants import DEFAULT_CHUNK_SIZE, LoadExistStrategy
+from universal_transfer_operator.constants import DEFAULT_CHUNK_SIZE, FileType, LoadExistStrategy, Location
 from universal_transfer_operator.data_providers.database.base import DatabaseDataProvider
 from universal_transfer_operator.datasets.table import Metadata, Table
+from universal_transfer_operator.exceptions import DatabaseCustomError
 from universal_transfer_operator.settings import BIGQUERY_SCHEMA, BIGQUERY_SCHEMA_LOCATION
 from universal_transfer_operator.universal_transfer_operator import TransferIntegrationOptions
+
+
+@attr.define
+class BigqueryOptions(TransferIntegrationOptions):
+    ignore_unknown_values: bool = attr.field(factory=bool)
+    allow_jagged_rows: bool = attr.field(factory=bool)
+    skip_leading_rows: int = attr.field(default=1)
 
 
 class BigqueryDataProvider(DatabaseDataProvider):
@@ -24,15 +48,50 @@ class BigqueryDataProvider(DatabaseDataProvider):
     illegal_column_name_chars_replacement: list[str] = ["_"]
 
     _create_schema_statement: str = "CREATE SCHEMA IF NOT EXISTS {} OPTIONS (location='{}')"
+    NATIVE_PATHS = {
+        Location.GS: "load_gs_file_to_table",
+        Location.S3: "load_s3_file_to_table",
+        Location.LOCAL: "load_local_file_to_table",
+    }
+    NATIVE_AUTODETECT_SCHEMA_CONFIG: Mapping[Location, Mapping[str, list[FileType] | Callable]] = {
+        Location.GS: {
+            "filetype": [FileType.CSV, FileType.NDJSON, FileType.PARQUET],
+            "method": lambda table, file: None,
+        },
+    }
+
+    FILE_PATTERN_BASED_AUTODETECT_SCHEMA_SUPPORTED: set[Location] = {
+        Location.GS,
+        Location.LOCAL,
+    }
+
+    NATIVE_LOAD_EXCEPTIONS: Any = (
+        GoogleNotFound,
+        ClientError,
+        GoogleAPIError,
+        RetryError,
+        InvalidArgument,
+        Unauthorized,
+        Forbidden,
+        Conflict,
+        TooManyRequests,
+        ResourceExhausted,
+        ServerError,
+        Unknown,
+        ServiceUnavailable,
+        InvalidResponse,
+        DatabaseCustomError,
+    )
+    OPTIONS_CLASS = BigqueryOptions
 
     def __init__(
         self,
         dataset: Table,
         transfer_mode,
-        transfer_params: TransferIntegrationOptions = TransferIntegrationOptions(),
+        transfer_params: BigqueryOptions = BigqueryOptions(),
     ):
         self.dataset = dataset
-        self.transfer_params = transfer_params
+        self.transfer_params: BigqueryOptions = transfer_params
         self.transfer_mode = transfer_mode
         self.transfer_mapping = set()
         self.LOAD_DATA_NATIVELY_FROM_SOURCE: dict = {}
