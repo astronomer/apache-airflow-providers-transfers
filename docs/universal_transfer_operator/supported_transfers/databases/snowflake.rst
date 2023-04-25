@@ -30,7 +30,15 @@ Following transfer modes are supported:
        :start-after: [START transfer_non_native_s3_to_snowflake]
        :end-before: [END transfer_non_native_s3_to_snowflake]
 
-2. :ref:`third_party`
+2. :ref:`native`
+    Following is an example of native transfers between AWS S3 to Snowflake using non-native transfer:
+
+    .. literalinclude:: ../../../../tests_integration/test_data_provider/test_databases/test_snowflake.py
+               :language: python
+               :start-after: [START transfer_from_s3_to_snowflake_natively]
+               :end-before: [END transfer_from_s3_to_snowflake_natively]
+
+3. :ref:`third_party`
 
 Examples
 ########

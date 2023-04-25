@@ -30,6 +30,35 @@ Following transfer modes are supported:
        :start-after: [START transfer_non_native_gs_to_bigquery]
        :end-before: [END transfer_non_native_gs_to_bigquery]
 
+2. :ref:`native`
+    Following is an example of a non-native transfer between S3 to BigQuery using non-native transfer:
+
+    .. literalinclude:: ../../../../tests_integration/test_data_provider/test_databases/test_bigquery.py
+           :language: python
+           :start-after: [START transfer_from_s3_to_bigquery_natively]
+           :end-before: [END transfer_from_s3_to_bigquery_natively]
+
+Supported native transfers parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. list-table::
+   :widths: auto
+
+   * - File Location
+     - Database
+     - transfer_params
+     - Permission
+     - transfer_params_key
+   * - S3
+     - Bigquery
+     - https://cloud.google.com/bigquery-transfer/docs/s3-transfer#bq
+     - https://cloud.google.com/bigquery/docs/s3-transfer#required_permissions and ``bigquery.jobs.create``
+     - "s3_transfer_parameters"
+   * - GCS
+     - Bigquery
+     - https://cloud.google.com/bigquery-transfer/docs/cloud-storage-transfer#bq
+     - https://cloud.google.com/bigquery/docs/cloud-storage-transfer#required_permissions and ``bigquery.jobs.create``
+     - "gs_transfer_parameters"
+
 Examples
 ########
 1. AWS S3 to Google Bigquery transfers
@@ -41,6 +70,14 @@ Examples
                :start-after: [START transfer_non_native_s3_to_bigquery]
                :end-before: [END transfer_non_native_s3_to_bigquery]
 
+    - :ref:`native`
+        Following is an example of a native transfer between S3 to BigQuery using non-native transfer:
+
+        .. literalinclude:: ../../../../tests_integration/test_data_provider/test_databases/test_bigquery.py
+               :language: python
+               :start-after: [START transfer_from_s3_to_bigquery_natively]
+               :end-before: [END transfer_from_s3_to_bigquery_natively]
+
 2. GCS to Google Bigquery transfers
     - :ref:`non_native`
         Following is an example of a non-native transfer between GCS to BigQuery using non-native transfer:
@@ -49,6 +86,14 @@ Examples
                :language: python
                :start-after: [START transfer_non_native_gs_to_bigquery]
                :end-before: [END transfer_non_native_gs_to_bigquery]
+
+    - :ref:`native`
+        Following is an example of a native transfer between GCS to BigQuery using non-native transfer:
+
+        .. literalinclude:: ../../../../tests_integration/test_data_provider/test_databases/test_bigquery.py
+               :language: python
+               :start-after: [START transfer_from_gcs_to_bigquery_natively]
+               :end-before: [END transfer_from_gcs_to_bigquery_natively]
 
 Transfer from Google Bigquery as source dataset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
