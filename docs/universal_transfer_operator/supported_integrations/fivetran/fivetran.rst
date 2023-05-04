@@ -9,7 +9,7 @@ You can transfer using Fivetran, with two scenarios:
 
 1. Fivetran :ref:`connector <fivetran_connector>` setup already done using Fivetran UI.
 
-    When you sets the connector on Fivetran UI using the following steps are involved:
+    You can set the connector on Fivetran UI using the following steps:
 
     * Create Fivetran Group
     * Create Fivetran Destination
