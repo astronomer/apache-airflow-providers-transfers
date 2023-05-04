@@ -5,7 +5,7 @@ Transfer using Fivetran
 The :py:mod:`universal_transfer_operator operator <universal_transfer_operator.universal_transfer_operator>` allows data transfers between any supported source :ref:`dataset` and destination :ref:`dataset` using :ref:`third_party` mode of transfer.
 
 
-Users can transfer using Fivetran, with two scenarios:
+You can transfer using Fivetran, with two scenarios:
 
 1. Fivetran :ref:`connector <fivetran_connector>` setup already done using Fivetran UI.
 
