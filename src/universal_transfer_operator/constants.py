@@ -78,6 +78,24 @@ class Database(Enum):
         return f"{self}"
 
 
+class FivetranConnectorSupported(Enum):
+    # [START FivetranConnectorSupported]
+    S3 = "S3"
+    # [END FivetranConnectorSupported]
+
+    def __str__(self) -> str:
+        return self.value
+
+
+class FivetranDestinationSupported(Enum):
+    # [START FivetranDestinationSupported]
+    SNOWFLAKE = "snowflake"
+    # [END FivetranDestinationSupported]
+
+    def __str__(self) -> str:
+        return self.value
+
+
 SUPPORTED_FILE_LOCATIONS = [const.value for const in FileLocation]
 SUPPORTED_FILE_TYPES = [const.value for const in FileType]
 SUPPORTED_DATABASES = [const.value for const in Database]
@@ -89,3 +107,4 @@ LoadExistStrategy = Literal["replace", "append"]
 DEFAULT_CHUNK_SIZE = 1000000
 ColumnCapitalization = Literal["upper", "lower", "original"]
 DEFAULT_SCHEMA = "tmp_transfers"
+IAM_ROLE_ACTIVATION_WAIT_TIME = 60
