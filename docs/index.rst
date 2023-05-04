@@ -26,11 +26,11 @@ Welcome to the Universal Transfer Operator documentation!
    :caption: Third-party transfers:
    :glob:
 
-   universal_transfer_operator/supported_integrations/fivetran/*
-   universal_transfer_operator/supported_integrations/fivetran/connector/*
-   universal_transfer_operator/supported_integrations/fivetran/connector/supported_connectors/*
-   universal_transfer_operator/supported_integrations/fivetran/destination/*
-   universal_transfer_operator/supported_integrations/fivetran/destination/supported_destinations/*
+   universal_transfer_operator/integrations/fivetran/*
+   universal_transfer_operator/integrations/fivetran/connector/*
+   universal_transfer_operator/integrations/fivetran/connector/supported_connectors/*
+   universal_transfer_operator/integrations/fivetran/destination/*
+   universal_transfer_operator/integrations/fivetran/destination/supported_destinations/*
 
 .. toctree::
    :maxdepth: 2

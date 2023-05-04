@@ -11,6 +11,7 @@ import attr
 from airflow.exceptions import AirflowException
 from attr import field
 
+from universal_transfer_operator.constants import IAM_ROLE_ACTIVATION_WAIT_TIME
 from universal_transfer_operator.datasets.base import Dataset
 from universal_transfer_operator.integrations.base import TransferIntegration, TransferIntegrationOptions
 from universal_transfer_operator.integrations.fivetran.connector import get_fivetran_connector
@@ -24,7 +25,6 @@ from universal_transfer_operator.integrations.fivetran.destination.base import (
     airflow_connection_type_to_fivetran_destination_mapping,
 )
 from universal_transfer_operator.integrations.hooks.fivetran import FivetranHook
-from universal_transfer_operator.settings import IAM_ROLE_ACTIVATION_WAIT_TIME
 
 
 @attr.define
@@ -494,7 +494,7 @@ class FivetranIntegration(TransferIntegration):
         }
 
         # wait for 60 seconds for IAM roles to be effective
-        time.sleep(int(IAM_ROLE_ACTIVATION_WAIT_TIME))
+        time.sleep(IAM_ROLE_ACTIVATION_WAIT_TIME)
 
         api_response = self.hook._do_api_call(
             ("POST", endpoint), json=json.dumps(payload)

@@ -107,3 +107,4 @@ LoadExistStrategy = Literal["replace", "append"]
 DEFAULT_CHUNK_SIZE = 1000000
 ColumnCapitalization = Literal["upper", "lower", "original"]
 DEFAULT_SCHEMA = "tmp_transfers"
+IAM_ROLE_ACTIVATION_WAIT_TIME = 60
