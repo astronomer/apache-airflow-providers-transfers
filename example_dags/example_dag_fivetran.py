@@ -6,7 +6,7 @@ from airflow import DAG
 from universal_transfer_operator.constants import TransferMode
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Metadata, Table
-from universal_transfer_operator.integrations.fivetran.fivetran import FiveTranOptions
+from universal_transfer_operator.integrations.fivetran.fivetran import FivetranOptions
 from universal_transfer_operator.universal_transfer_operator import UniversalTransferOperator
 
 s3_bucket = os.getenv("S3_BUCKET", "s3://astro-sdk")
@@ -27,7 +27,7 @@ with DAG(
         source_dataset=File(path=f"{s3_bucket}/uto/", conn_id="aws_default"),
         destination_dataset=Table(name="fivetran_test", conn_id="snowflake_fivetran_conn"),
         transfer_mode=TransferMode.THIRDPARTY,
-        transfer_params=FiveTranOptions(conn_id="fivetran_default", connector_id="replication_assess"),
+        transfer_params=FivetranOptions(conn_id="fivetran_default", connector_id="replication_assess"),
     )
     # [END fivetran_transfer_with_setup]
 

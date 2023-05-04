@@ -43,7 +43,7 @@ class SnowflakeDestination(FivetranDestination):
         https://fivetran.com/docs/rest-api/destinations/config#snowflake
         https://airflow.apache.org/docs/apache-airflow-providers-snowflake/stable/connections/snowflake.html
 
-        :param conn_id: Airflow connection id
+        :param conn_id: Airflow connection ID
         :param database_overridden: Database name to be overridden
         :param schema_overridden: Schema name to be overridden
         """
@@ -56,8 +56,8 @@ class SnowflakeDestination(FivetranDestination):
             "warehouse": "warehouse",
         }
         snowflake_dejson = conn.extra_dejson
-        # At some point the extras removed a prefix extra__snowflake__ when the provider got updated... handling that
-        # here.
+        # At some point, the prefix extra__snowflake__ for the keys in extras was removed in a provider release.
+        # We handle the backward compatibility here by prepending the required prefix to the extras keys.
         if snowflake_dejson.get("account") is None:
             for key, value in extras.items():
                 extras[key] = f"extra__snowflake__{value}"

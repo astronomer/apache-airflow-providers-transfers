@@ -60,3 +60,8 @@ SNOWFLAKE_STORAGE_INTEGRATION_GOOGLE = conf.get(
 )
 
 LOAD_FILE_ENABLE_NATIVE_FALLBACK = conf.get(SECTION_KEY, "load_file_enable_native_fallback", fallback=False)
+IAM_ROLE_ACTIVATION_WAIT_TIME = conf.get(
+    SECTION_KEY,
+    "IAM_ROLE_ACTIVATION_WAIT_TIME",
+    fallback=60,
+)

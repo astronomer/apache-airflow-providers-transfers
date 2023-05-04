@@ -139,7 +139,7 @@ class S3Connector(FivetranConnector):
         )
 
         # Attach IAM policy to role. Read more at: Read more at: https://fivetran.com/docs/files/amazon-s3/setup-guide
-        self._attach_to_role(
+        self._attach_policy_to_role(
             role_name=iam_role["Role"]["RoleName"],
             policy_arn=iam_policy["Policy"]["Arn"],
             access_key=access_key,
@@ -272,7 +272,7 @@ class S3Connector(FivetranConnector):
             return role
 
     @staticmethod
-    def _attach_to_role(role_name: str, policy_arn: str, access_key: str, secret_key: str):
+    def _attach_policy_to_role(role_name: str, policy_arn: str, access_key: str, secret_key: str):
         """
         Attaches a policy to a role.
 

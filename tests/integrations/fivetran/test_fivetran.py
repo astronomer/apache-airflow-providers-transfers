@@ -11,7 +11,7 @@ from universal_transfer_operator.integrations.fivetran.connector.base import Fiv
 from universal_transfer_operator.integrations.fivetran.destination.base import FivetranDestination
 from universal_transfer_operator.integrations.fivetran.fivetran import (
     FivetranIntegration,
-    FiveTranOptions,
+    FivetranOptions,
     Group,
 )
 
@@ -48,7 +48,7 @@ class TestFivetranIntegration:
         assert fivetran_integrations.check_for_connector_id() is False
 
         # return True when connector_id is passed
-        fivetran_options = FiveTranOptions(connector_id="dummy_connector_id")
+        fivetran_options = FivetranOptions(connector_id="dummy_connector_id")
         fivetran_integrations = FivetranIntegration(transfer_params=fivetran_options)
         assert fivetran_integrations.check_for_connector_id() is True
 
@@ -232,7 +232,7 @@ class TestFivetranIntegration:
                 json=MOCK_GROUPS_RESPONSE_SUCCESS,
             )
 
-            fivetran_options = FiveTranOptions(
+            fivetran_options = FivetranOptions(
                 connector_id="dummy_connector_id", group=Group(name="dummy_name")
             )
             fivetran_integrations = FivetranIntegration(transfer_params=fivetran_options)
@@ -251,7 +251,7 @@ class TestFivetranIntegration:
                 json=MOCK_GROUPS_RESPONSE_FAILURE,
             )
 
-            fivetran_options = FiveTranOptions(
+            fivetran_options = FivetranOptions(
                 connector_id="dummy_connector_id", group=Group(name="dummy_name")
             )
             fivetran_integrations = FivetranIntegration(transfer_params=fivetran_options)
@@ -280,7 +280,7 @@ class TestFivetranIntegration:
                 json=MOCK_DESTINATION_RESPONSE_SUCCESS,
             )
 
-            fivetran_options = FiveTranOptions(
+            fivetran_options = FivetranOptions(
                 connector_id="dummy_connector_id", group=Group(name="dummy_name")
             )
             fivetran_integrations = FivetranIntegration(transfer_params=fivetran_options)
@@ -302,7 +302,7 @@ class TestFivetranIntegration:
                 json=MOCK_DESTINATION_RESPONSE_Fail,
             )
 
-            fivetran_options = FiveTranOptions(
+            fivetran_options = FivetranOptions(
                 connector_id="dummy_connector_id", group=Group(name="dummy_name")
             )
             fivetran_integrations = FivetranIntegration(transfer_params=fivetran_options)
@@ -332,7 +332,7 @@ class TestFivetranIntegration:
                 json=MOCK_GROUPS_RESPONSE_SUCCESS,
             )
 
-            fivetran_options = FiveTranOptions(
+            fivetran_options = FivetranOptions(
                 connector_id="dummy_connector_id", group=Group(name="dummy_name")
             )
             fivetran_integrations = FivetranIntegration(transfer_params=fivetran_options)
@@ -349,7 +349,7 @@ class TestFivetranIntegration:
             )
 
             # test for API response error
-            fivetran_options = FiveTranOptions(
+            fivetran_options = FivetranOptions(
                 connector_id="dummy_connector_id", group=Group(name="dummy_name")
             )
             fivetran_integrations = FivetranIntegration(transfer_params=fivetran_options)
@@ -357,7 +357,7 @@ class TestFivetranIntegration:
                 fivetran_integrations.fetch_group_id_from_name()
 
             # test for group name not found in api response.
-            fivetran_options = FiveTranOptions(
+            fivetran_options = FivetranOptions(
                 connector_id="dummy_connector_id", group=Group(name="random_name")
             )
             fivetran_integrations = FivetranIntegration(transfer_params=fivetran_options)
@@ -410,7 +410,7 @@ class TestFivetranIntegration:
                 json=MOCK_DESTINATION_RESPONSE_SUCCESS,
             )
 
-            fivetran_options = FiveTranOptions(
+            fivetran_options = FivetranOptions(
                 connector_id="dummy_connector_id",
                 group=Group(name="dummy_name"),
                 destination=FivetranDestination(config=""),
@@ -449,7 +449,7 @@ class TestFivetranIntegration:
                 json=MOCK_DESTINATION_RESPONSE_FAILURE,
             )
 
-            fivetran_options = FiveTranOptions(
+            fivetran_options = FivetranOptions(
                 connector_id="dummy_connector_id",
                 group=Group(name="dummy_name"),
                 destination=FivetranDestination(config=""),
@@ -493,7 +493,7 @@ class TestFivetranIntegration:
                 json=MOCK_DESTINATION_RESPONSE_SUCCESS,
             )
 
-            fivetran_options = FiveTranOptions(
+            fivetran_options = FivetranOptions(
                 connector_id="dummy_connector_id",
                 group=Group(name="dummy_name"),
                 destination=FivetranDestination(config=""),
@@ -567,7 +567,7 @@ class TestFivetranIntegration:
                 json=MOCK_CONNECTOR_RESPONSE_SUCCESS,
             )
 
-            fivetran_options = FiveTranOptions(
+            fivetran_options = FivetranOptions(
                 connector_id="dummy_connector_id", connector=FivetranConnector(config={})
             )
             fivetran_integrations = FivetranIntegration(transfer_params=fivetran_options)
@@ -643,7 +643,7 @@ class TestFivetranIntegration:
                 json=MOCK_CONNECTOR_RESPONSE_SUCCESS,
             )
 
-            fivetran_options = FiveTranOptions(
+            fivetran_options = FivetranOptions(
                 connector_id="dummy_connector_id", connector=FivetranConnector(config={})
             )
             fivetran_integrations = FivetranIntegration(transfer_params=fivetran_options)
@@ -669,7 +669,7 @@ class TestFivetranIntegration:
         """
         mock_check_for_connector_id.return_value = True
         mock_transfer_using_connector_id.return_value = "success"
-        fivetran_options = FiveTranOptions(
+        fivetran_options = FivetranOptions(
             connector_id="dummy_connector_id",
             group=Group(name="dummy_name"),
             destination=FivetranDestination(config=""),
@@ -711,7 +711,7 @@ class TestFivetranIntegration:
         mock_fetch_connector_id_from_destination.return_value = "dummy_connector_id"
         mock_transfer_using_connector_id.return_value = "success"
 
-        fivetran_options = FiveTranOptions(
+        fivetran_options = FivetranOptions(
             connector_id="dummy_connector_id",
             group=Group(name="dummy_name"),
         )
@@ -767,7 +767,7 @@ class TestFivetranIntegration:
         mock_create_destination.return_value = {}
         mock_create_connector.return_value = "dummy_connector_id"
 
-        fivetran_options = FiveTranOptions(
+        fivetran_options = FivetranOptions(
             connector_id="dummy_connector_id",
             group=Group(name="dummy_name"),
         )

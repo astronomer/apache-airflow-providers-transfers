@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import abstractmethod
 from typing import Any
 
 from universal_transfer_operator.integrations.fivetran.connector import Dataset
@@ -81,6 +82,7 @@ class FivetranConnector:
         )
         return self.config | mapped_connection_details  # type: ignore
 
+    @abstractmethod
     def map_airflow_connection_to_fivetran(
         self, source_dataset: Dataset, destination_dataset: Dataset, group_id: str
     ) -> dict[str, str]:
@@ -91,4 +93,4 @@ class FivetranConnector:
         :param destination_dataset: Destination dataset
         :param group_id: Group id in fivetran system
         """
-        return {}
+        raise NotImplementedError

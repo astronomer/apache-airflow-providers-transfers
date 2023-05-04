@@ -9,7 +9,7 @@ from universal_transfer_operator.integrations.fivetran.connector.base import Fiv
 from universal_transfer_operator.integrations.fivetran.destination.base import FivetranDestination
 from universal_transfer_operator.integrations.fivetran.fivetran import (
     FivetranIntegration,
-    FiveTranOptions,
+    FivetranOptions,
     Group,
 )
 
@@ -18,7 +18,7 @@ from universal_transfer_operator.integrations.fivetran.fivetran import (
     "transfer",
     [
         {
-            "params": FiveTranOptions(
+            "params": FivetranOptions(
                 conn_id="fivetran_default",
                 connector_id="filing_muppet",
                 group=Group(name="test_group"),
@@ -50,7 +50,7 @@ def test_create_dataprovider(transfer):
     "transfer",
     [
         {
-            "params": FiveTranOptions(
+            "params": FivetranOptions(
                 conn_id="fivetran_default",
                 connector_id="filing_muppet",
                 group=Group(name="test_group"),
@@ -67,7 +67,7 @@ def test_create_dataprovider(transfer):
                     config={},
                 ),
             ),
-            "expected": FiveTranOptions,
+            "expected": FivetranOptions,
         },
     ],
     ids=lambda d: d["params"].conn_id,

@@ -24,6 +24,7 @@ from universal_transfer_operator.integrations.fivetran.destination.base import (
     airflow_connection_type_to_fivetran_destination_mapping,
 )
 from universal_transfer_operator.integrations.hooks.fivetran import FivetranHook
+from universal_transfer_operator.settings import IAM_ROLE_ACTIVATION_WAIT_TIME
 
 
 @attr.define
@@ -32,7 +33,7 @@ class Group:
     Fivetran group details.
 
     :param name: The name of the group within Fivetran account.
-    :param group_id: Group id in fivetran system
+    :param group_id: Group ID in fivetran system
 
     """
 
@@ -47,7 +48,7 @@ class Group:
 
 
 @attr.define
-class FiveTranOptions(TransferIntegrationOptions):
+class FivetranOptions(TransferIntegrationOptions):
     """
     FiveTran load options.
 
@@ -84,7 +85,7 @@ class FiveTranOptions(TransferIntegrationOptions):
 class FivetranIntegration(TransferIntegration):
     """Fivetran integration to transfer datasets using Fivetran APIs."""
 
-    OPTIONS_CLASS = FiveTranOptions
+    OPTIONS_CLASS = FivetranOptions
 
     api_user_agent = "airflow_provider_fivetran/1.1.3"
     api_protocol = "https"
@@ -93,8 +94,8 @@ class FivetranIntegration(TransferIntegration):
     api_path_groups = "v1/groups/"
     api_path_destinations = "v1/destinations/"
 
-    def __init__(self, transfer_params: FiveTranOptions = FiveTranOptions()):
-        self.transfer_params: FiveTranOptions = transfer_params
+    def __init__(self, transfer_params: FivetranOptions = FivetranOptions()):
+        self.transfer_params: FivetranOptions = transfer_params
         self.transfer_mapping = {}
         super().__init__(transfer_params=self.transfer_params)
 
@@ -493,7 +494,8 @@ class FivetranIntegration(TransferIntegration):
         }
 
         # wait for 60 seconds for IAM roles to be effective
-        time.sleep(60)
+        time.sleep(int(IAM_ROLE_ACTIVATION_WAIT_TIME))
+
         api_response = self.hook._do_api_call(
             ("POST", endpoint), json=json.dumps(payload)
         )  # skipcq: PYL-W0212

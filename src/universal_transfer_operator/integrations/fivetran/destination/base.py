@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import abstractmethod
 from typing import Any
 
 airflow_connection_type_to_fivetran_destination_mapping = {"snowflake": "snowflake"}
@@ -54,6 +55,7 @@ class FivetranDestination:
         )
         return self.config | mapped_connection_details  # type: ignore
 
+    @abstractmethod
     def map_airflow_connection_to_fivetran(
         self,
         conn_id: str,
@@ -67,4 +69,4 @@ class FivetranDestination:
         :param database_overridden: Database name to be overridden
         :param schema_overridden: Schema name to be overridden
         """
-        return {}
+        raise NotImplementedError
