@@ -15,3 +15,12 @@ In the Destination section of your dashboard, you can view all the destinations 
 
 .. note::
     More details on parameters which can be pass as part of Fivetran destination config is documented `here <https://fivetran.com/docs/rest-api/destinations#createadestination>`_
+
+.. _supported_destination:
+
+Supported Destination
+~~~~~~~~~~~~~~~~~~~~~
+.. literalinclude:: ../../../../../src/universal_transfer_operator/constants.py
+   :language: python
+   :start-after: [START FivetranDestinationSupported]
+   :end-before: [END FivetranDestinationSupported]

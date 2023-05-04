@@ -15,3 +15,12 @@ In the Connectors section of your dashboard, you can view all the connectors tha
 
 .. note::
     More details on parameters which can be pass as part of Fivetran connector config is documented `here <https://fivetran.com/docs/rest-api/connectors#createaconnector>`_
+
+.. _supported_connector:
+
+Supported Connector
+~~~~~~~~~~~~~~~~~~~
+.. literalinclude:: ../../../../../src/universal_transfer_operator/constants.py
+   :language: python
+   :start-after: [START FivetranConnectorSupported]
+   :end-before: [END FivetranConnectorSupported]
