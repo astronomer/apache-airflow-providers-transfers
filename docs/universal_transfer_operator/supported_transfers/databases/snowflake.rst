@@ -31,7 +31,7 @@ Following transfer modes are supported:
        :end-before: [END transfer_non_native_s3_to_snowflake]
 
 2. :ref:`native`
-    Following is an example of native transfers between AWS S3 to Snowflake using non-native transfer:
+    Following is an example of native transfers between AWS S3 to Snowflake using native transfer:
 
     .. literalinclude:: ../../../../tests_integration/test_data_provider/test_databases/test_snowflake.py
                :language: python

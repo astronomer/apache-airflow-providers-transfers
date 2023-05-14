@@ -13,7 +13,6 @@ from google.api_core.exceptions import (
     Forbidden,
     GoogleAPIError,
     InvalidArgument,
-    NotFound as GoogleNotFound,
     ResourceExhausted,
     RetryError,
     ServerError,
@@ -21,6 +20,9 @@ from google.api_core.exceptions import (
     TooManyRequests,
     Unauthorized,
     Unknown,
+)
+from google.api_core.exceptions import (
+    NotFound as GoogleNotFound,
 )
 from google.cloud import bigquery, bigquery_datatransfer  # type: ignore
 from google.cloud.bigquery_datatransfer_v1.types import (
@@ -317,7 +319,7 @@ class BigqueryDataProvider(DatabaseDataProvider):
         **kwargs,
     ):
         """
-        Transfer data from gcs to bigquery
+        Transfer data from google cloud store to bigquery
 
         :param source_file: Source file that is used as source of data
         :param target_table: Table that will be created on the bigquery

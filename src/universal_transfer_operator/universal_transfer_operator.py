@@ -45,7 +45,6 @@ class UniversalTransferOperator(BaseOperator):
         self.destination_dataset = destination_dataset
         self.transfer_mode = transfer_mode
         self._transfer_params = transfer_params
-        # TODO: revisit names of transfer_mode
         super().__init__(**kwargs)
 
     def execute(self, context: Context) -> Any:  # skipcq: PYL-W0613
@@ -70,9 +69,11 @@ class UniversalTransferOperator(BaseOperator):
             source_dataset=self.source_dataset
         )
         if self.transfer_mode == TransferMode.NATIVE and native_path_available is False:
-            raise ValueError(f"No native path available for {source_dataprovider.dataset} to"
-                             f" {destination_dataprovider.dataset}. You can try TransferMode - {TransferMode.NONNATIVE}"
-                             f" or {TransferMode.THIRDPARTY}")
+            raise ValueError(
+                f"No native path available for {source_dataprovider.dataset} to"
+                f" {destination_dataprovider.dataset}. You can try TransferMode - {TransferMode.NONNATIVE}"
+                f" or {TransferMode.THIRDPARTY}"
+            )
 
         destination_references = []
         for source_data in source_dataprovider.read():
