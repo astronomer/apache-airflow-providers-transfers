@@ -84,14 +84,14 @@ pip install apache-airflow-provider-transfers[amazon,google,snowflake]
    https://github.com/astronomer/apache-airflow-provider-transfers/blob/a80dc84b7f33bb86ae244f79411b240f4f4c7e22/example_dags/example_snowflake_transfers.py#L1-L46
 
    Alternatively, you can download `example_transfer_and_return_files.py`
-       ```shell
-        curl -O https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_transfer_and_return_files.py
-       ```
+   ```shell
+    curl -O https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_transfer_and_return_files.py
+   ```
 
    Alternatively, you can download `example_snowflake_transfers.py`
-       ```shell
-       curl -O https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_snowflake_transfers.py
-       ```
+   ```shell
+   curl -O https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_snowflake_transfers.py
+   ```
 
   * To start running your project in a local Airflow environment, run the following command from your project directory:
 
@@ -124,14 +124,14 @@ pip install apache-airflow-provider-transfers[amazon,google,snowflake]
    https://github.com/astronomer/apache-airflow-provider-transfers/blob/a80dc84b7f33bb86ae244f79411b240f4f4c7e22/example_dags/example_snowflake_transfers.py#L1-L46
 
    Alternatively, you can download `example_transfer_and_return_files.py`
-       ```shell
-        curl -O https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_transfer_and_return_files.py
-       ```
+   ```shell
+    curl -O https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_transfer_and_return_files.py
+   ```
 
    Alternatively, you can download `example_snowflake_transfers.py`
-       ```shell
-       curl -O https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_snowflake_transfers.py
-       ```
+   ```shell
+   curl -O https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_snowflake_transfers.py
+   ```
 
   * Run your project in a local Airflow environment.
   * After your project builds successfully, open the Airflow UI in your web browser at https://localhost:8080/. Find your DAGs in the dags directory in the Airflow UI.
