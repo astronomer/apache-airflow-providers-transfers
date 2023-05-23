@@ -96,6 +96,7 @@ Users can get started quickly with following two approaches:
     curl -O https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_snowflake_transfers.py
    ```
 
+  * Create the environment variable for AWS bucket, Snowflake and google cloud bucket for the transfer.
   * To start running the example DAGs in a local Airflow environment, run the following command from your project directory:
 
     ```shell
@@ -103,6 +104,15 @@ Users can get started quickly with following two approaches:
     ```
   * After your project builds successfully, open the Airflow UI in your web browser at https://localhost:8080/. Find your DAGs in the dags directory in the Airflow UI.
   * Create airflow connection for snowflake, google, SFTP and amazon using airflow UI and run the DAGs.
+  * Create airflow connection for snowflake, google and amazon using airflow UI as per documentation below.
+
+    | Cloud Provider | Connection name      |  Documentation link                                                                                                          |
+    |----------------|----------------------|------------------------------------------------------------------------------------------------------------------------------|
+    | Amazon         | aws_default          | [aws connection](https://airflow.apache.org/docs/apache-airflow-providers-amazon/stable/connections/aws.html)                |
+    | Google         | google_cloud_default | [google cloud connection](https://airflow.apache.org/docs/apache-airflow-providers-google/stable/connections/gcp.html)       |
+    | Snowflake      | snowflake_conn       | [snowflake connection](https://airflow.apache.org/docs/apache-airflow-providers-snowflake/stable/connections/snowflake.html) |
+
+  * Trigger the DAGs and validate the transfers.
 
 
 ### Run `UniversalTransferOperator` using vanilla [airflow documentation](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html) and python
@@ -133,10 +143,18 @@ Users can get started quickly with following two approaches:
     curl -O https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_snowflake_transfers.py
    ```
 
+  * Create the environment variable for AWS bucket, Snowflake and google cloud bucket for the transfer.
   * Run your project in a local Airflow environment.
   * After your project builds successfully, open the Airflow UI in your web browser at https://localhost:8080/. Find your DAGs in the dags directory in the Airflow UI.
-  * Create airflow connection for snowflake, google, SFTP and amazon using airflow UI and run the DAGs.
+  * Create airflow connection for snowflake, google and amazon using airflow UI as per documentation below.
 
+    | Cloud Provider | Connection name      |  Documentation link                                                                                                          |
+    |----------------|----------------------|------------------------------------------------------------------------------------------------------------------------------|
+    | Amazon         | aws_default          | [aws connection](https://airflow.apache.org/docs/apache-airflow-providers-amazon/stable/connections/aws.html)                |
+    | Google         | google_cloud_default | [google cloud connection](https://airflow.apache.org/docs/apache-airflow-providers-google/stable/connections/gcp.html)       |
+    | Snowflake      | snowflake_conn       | [snowflake connection](https://airflow.apache.org/docs/apache-airflow-providers-snowflake/stable/connections/snowflake.html) |
+
+  * Trigger the DAGs and validate the transfers.
 
 ## Example DAGs
 
