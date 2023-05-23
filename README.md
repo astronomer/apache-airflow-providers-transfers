@@ -36,9 +36,14 @@ pip install apache-airflow-provider-transfers[amazon,google,snowflake]
 ```
 
 ## Quickstart
+Users can get started quickly with following two approaches:
+1. Spinning up a local Airflow infrastructure using the open-source Astro CLI and Docker
+2. Using vanilla Airflow and Python
+
 ### Run `UniversalTransferOperator` using [astro](https://docs.astronomer.io/astro/create-first-dag)
 * Create an [Astro project](https://docs.astronomer.io/astro/create-first-dag).
   * Open your terminal or IDE
+  * Install [docker](https://docs.docker.com/engine/install/) and  [astro-cli](https://docs.astronomer.io/astro/cli/overview) using this [documentation](https://docs.astronomer.io/astro/cli/install-cli).
   * Create a new directory for your Astro project:
 
     ```shell
@@ -56,20 +61,21 @@ pip install apache-airflow-provider-transfers[amazon,google,snowflake]
   * This command generates the following files in the directory:
 
 
-    .
-    ├── .env # Local environment variables
-    ├── dags # Where your DAGs go
-    │   ├── example-dag-basic.py # Example DAG that showcases a simple ETL data pipeline
-    │   └── example-dag-advanced.py # Example DAG that showcases more advanced Airflow features, such as the TaskFlow API
-    ├── Dockerfile # For the Astro Runtime Docker image, environment variables, and overrides
-    ├── include # For any other files you'd like to include
-    ├── plugins # For any custom or community Airflow plugins
-    │   └── example-plugin.py
-    ├── tests # For any DAG unit test files to be run with pytest
-    │   └── test_dag_integrity.py # Test that checks for basic errors in your DAGs
-    ├── airflow_settings.yaml # For your Airflow connections, variables and pools (local only)
-    ├── packages.txt # For OS-level packages
-    └── requirements.txt # For Python packages (add apache-airflow-provider-transfers here)
+        .
+        ├── .env # Local environment variables
+        ├── dags # Where your DAGs go
+        │   ├── example-dag-basic.py # Example DAG that showcases a simple ETL data pipeline
+        │   └── example-dag-advanced.py # Example DAG that showcases more advanced Airflow features, such as the TaskFlow API
+        ├── Dockerfile # For the Astro Runtime Docker image, environment variables, and overrides
+        ├── include # For any other files you'd like to include
+        ├── plugins # For any custom or community Airflow plugins
+        │   └── example-plugin.py
+        ├── tests # For any DAG unit test files to be run with pytest
+        │   └── test_dag_integrity.py # Test that checks for basic errors in your DAGs
+        ├── airflow_settings.yaml # For your Airflow connections, variables and pools (local only)
+        ├── packages.txt # For OS-level packages
+        └── requirements.txt # For Python packages (add apache-airflow-provider-transfers here)
+
 
   * Add the following in requirements.txt
 
@@ -83,17 +89,14 @@ pip install apache-airflow-provider-transfers[amazon,google,snowflake]
 
    https://github.com/astronomer/apache-airflow-provider-transfers/blob/a80dc84b7f33bb86ae244f79411b240f4f4c7e22/example_dags/example_snowflake_transfers.py#L1-L46
 
-   Alternatively, you can download `example_transfer_and_return_files.py`
+   Alternatively, you can download `example_transfer_and_return_files.py` and `example_snowflake_transfers.py`.
    ```shell
     curl -O https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_transfer_and_return_files.py
+
+    curl -O https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_snowflake_transfers.py
    ```
 
-   Alternatively, you can download `example_snowflake_transfers.py`
-   ```shell
-   curl -O https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_snowflake_transfers.py
-   ```
-
-  * To start running your project in a local Airflow environment, run the following command from your project directory:
+  * To start running the example DAGs in a local Airflow environment, run the following command from your project directory:
 
     ```shell
     astro dev start
@@ -102,7 +105,7 @@ pip install apache-airflow-provider-transfers[amazon,google,snowflake]
   * Create airflow connection for snowflake, google, SFTP and amazon using airflow UI and run the DAGs.
 
 
-### Run `UniversalTransferOperator` using [airflow documentation](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html)
+### Run `UniversalTransferOperator` using vanilla [airflow documentation](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html) and python
   * Install airflow and setup project following this [documentation](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html).
   * Ensure that your Airflow environment is set up correctly by running the following commands:
 
@@ -123,14 +126,11 @@ pip install apache-airflow-provider-transfers[amazon,google,snowflake]
 
    https://github.com/astronomer/apache-airflow-provider-transfers/blob/a80dc84b7f33bb86ae244f79411b240f4f4c7e22/example_dags/example_snowflake_transfers.py#L1-L46
 
-   Alternatively, you can download `example_transfer_and_return_files.py`
+   Alternatively, you can download `example_transfer_and_return_files.py` and `example_snowflake_transfers.py`.
    ```shell
     curl -O https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_transfer_and_return_files.py
-   ```
 
-   Alternatively, you can download `example_snowflake_transfers.py`
-   ```shell
-   curl -O https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_snowflake_transfers.py
+    curl -O https://github.com/astronomer/apache-airflow-provider-transfers/blob/main/example_dags/example_snowflake_transfers.py
    ```
 
   * Run your project in a local Airflow environment.
