@@ -31,7 +31,7 @@ Following transfer modes are supported:
        :end-before: [END transfer_non_native_gs_to_bigquery]
 
 2. :ref:`native`
-    Following is an example of a native transfer between S3 to BigQuery using non-native transfer:
+    Following is an example of a native transfer between S3 to BigQuery using native transfer:
 
     .. literalinclude:: ../../../../tests_integration/test_data_provider/test_databases/test_bigquery.py
            :language: python

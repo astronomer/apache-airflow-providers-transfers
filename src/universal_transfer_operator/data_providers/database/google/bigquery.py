@@ -240,9 +240,7 @@ class BigqueryDataProvider(DatabaseDataProvider):
         """Truncate table"""
         self.run_sql(f"TRUNCATE {self.get_table_qualified_name(table)}")
 
-    def is_native_autodetect_schema_available(  # skipcq: PYL-R0201
-        self, file: File  # skipcq: PYL-W0613
-    ) -> bool:
+    def is_native_autodetect_schema_available(self, file: File) -> bool:
         """
         Check if native auto-detection of schema is available.
 
@@ -253,7 +251,7 @@ class BigqueryDataProvider(DatabaseDataProvider):
             return True
         return False
 
-    def create_table_using_native_schema_autodetection(  # skipcq: PYL-R0201
+    def create_table_using_native_schema_autodetection(
         self,
         table: Table,
         file: File,
@@ -264,6 +262,8 @@ class BigqueryDataProvider(DatabaseDataProvider):
         :param file: File used to infer the new table columns.
         """
         supported_config = self.NATIVE_AUTODETECT_SCHEMA_CONFIG.get(file.location.location_type)
+        if not supported_config:
+            raise ValueError("Unsupported file location.")
         return supported_config["method"](table=table, file=file)  # type: ignore
 
     # Require skipcq because method overriding we need param target_table
@@ -292,6 +292,7 @@ class BigqueryDataProvider(DatabaseDataProvider):
         """
         Checks if optimised path for transfer between File location to database exists
         and if it does, it transfers it and returns true else false.
+
         :param source_file: File from which we need to transfer data
         :param target_table: Table that needs to be populated with file data
         :param if_exists: Overwrite file if exists. Default False
