@@ -258,6 +258,7 @@ class BigqueryDataProvider(DatabaseDataProvider):
     ) -> None:
         """
         Create a SQL table, automatically inferring the schema using the given file via native database support.
+
         :param table: The table to be created.
         :param file: File used to infer the new table columns.
         """
@@ -273,6 +274,7 @@ class BigqueryDataProvider(DatabaseDataProvider):
     ) -> bool:
         """
         Check if there is an optimised path for source to destination.
+
         :param source_file: File from which we need to transfer data
         :param target_table: Table that needs to be populated with file data
         """
@@ -288,7 +290,7 @@ class BigqueryDataProvider(DatabaseDataProvider):
         target_table: Table,
         if_exists: LoadExistStrategy = "replace",
         **kwargs,
-    ):
+    ) -> None:
         """
         Checks if optimised path for transfer between File location to database exists
         and if it does, it transfers it and returns true else false.
@@ -318,9 +320,9 @@ class BigqueryDataProvider(DatabaseDataProvider):
         target_table: Table,
         if_exists: LoadExistStrategy = "replace",
         **kwargs,
-    ):
+    ) -> None:
         """
-        Transfer data from google cloud store to bigquery
+        Transfer data from Google cloud store to bigquery
 
         :param source_file: Source file that is used as source of data
         :param target_table: Table that will be created on the bigquery
@@ -364,13 +366,13 @@ class BigqueryDataProvider(DatabaseDataProvider):
         source_file: File,
         target_table: Table,
         **kwargs,
-    ):
+    ) -> None:
         """
         Load content of multiple files in S3 to output_table in Bigquery by using a datatransfer job
-        Note - To use this function we need
         1. Enable API on Bigquery
         2. Enable Data transfer service on Bigquery, which is a chargeable service
         for more information refer - https://cloud.google.com/bigquery-transfer/docs/enable-transfer-service
+
         :param source_file: Source file that is used as source of data
         :param target_table: Table that will be created on the bigquery
         :param if_exists: Overwrite table if exists. Default 'replace'
@@ -390,6 +392,7 @@ class BigqueryDataProvider(DatabaseDataProvider):
     def get_project_id(self, target_table) -> str:
         """
         Get project id from the hook.
+
         :param target_table: table object that the hook is derived from.
         """
         try:
@@ -403,7 +406,7 @@ class BigqueryDataProvider(DatabaseDataProvider):
         target_table: Table,
         if_exists: LoadExistStrategy = "replace",
         **kwargs,
-    ):
+    ) -> None:
         """
         Transfer data from local to bigquery
 
@@ -509,7 +512,7 @@ class S3ToBigqueryDataTransfer:
         self.native_support_kwargs = native_support_kwargs
         self.kwargs = kwargs
 
-    def run(self):
+    def run(self) -> None:
         """Algo to run S3 to Bigquery datatransfer"""
         transfer_config_id = self.create_transfer_config()
         try:
@@ -536,7 +539,7 @@ class S3ToBigqueryDataTransfer:
     @staticmethod
     def get_transfer_config_id(config: TransferConfig) -> str:
         """Extract transfer_config_id from TransferConfig object"""
-        # ToDo: Look for a native way to extract 'transfer_config_id'
+        # TODO: Look for a native way to extract 'transfer_config_id'
         # name - 'projects/103191871648/locations/us/transferConfigs/6302bf19-0000-26cf-a568-94eb2c0a61ee'
         # We need extract transferConfigs which is at the end of string.
         tokens = config.name.split("transferConfigs/")
@@ -545,7 +548,7 @@ class S3ToBigqueryDataTransfer:
     @staticmethod
     def get_run_id(config: StartManualTransferRunsResponse) -> str:
         """Extract run_id from StartManualTransferRunsResponse object"""
-        # ToDo: Look for a native way to extract 'run_id'
+        # TODO: Look for a native way to extract 'run_id'
         # config.runs[0].name - "projects/103191871648/locations/us/
         # transferConfigs/62d38894-0000-239c-a4d8-089e08325b54/runs/62d6a4df-0000-2fad-8752-d4f547e68ef4'
         # We need extract transferConfigs which is at the end of string.
