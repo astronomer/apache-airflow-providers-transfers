@@ -222,3 +222,10 @@ class BaseFilesystemProviders(DataProviders[File]):
     def size(self) -> int:
         """Return the size in bytes of the given file"""
         raise NotImplementedError
+
+    @property
+    def snowflake_stage_path(self) -> str:
+        """
+        Get the altered path if needed for stage creation in snowflake stage creation
+        """
+        return self.dataset.path
