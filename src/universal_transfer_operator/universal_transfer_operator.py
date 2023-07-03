@@ -67,8 +67,8 @@ class UniversalTransferOperator(BaseOperator):
             transfer_mode=self.transfer_mode,
         )
         native_path_available = False
-        if isinstance(destination_dataprovider, (File, Table)):
-            native_path_available = destination_dataprovider.is_native_path_available(
+        if isinstance(self.destination_dataset, (File, Table)):
+            native_path_available = destination_dataprovider.is_native_path_available(  # type: ignore
                 source_dataset=self.source_dataset
             )
         if self.transfer_mode == TransferMode.NATIVE and native_path_available is False:
