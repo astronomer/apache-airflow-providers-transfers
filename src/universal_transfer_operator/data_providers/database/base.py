@@ -23,6 +23,7 @@ from universal_transfer_operator.constants import (
     TransferMode,
 )
 from universal_transfer_operator.data_providers.base import DataProviders, DataStream
+from universal_transfer_operator.data_providers.dataframe.Pandasdataframe import PandasdataframeDataProvider
 from universal_transfer_operator.data_providers.filesystem import resolve_file_path_pattern
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Metadata, Table
@@ -224,7 +225,7 @@ class DatabaseDataProvider(DataProviders[Table]):
     ) -> str:
         """
         Load content of dataframe in output_table.
-        
+
         :param input_dataframe: dataframe
         :param output_table: Table to create
         :param if_exists: Overwrite file if exists
@@ -378,6 +379,10 @@ class DatabaseDataProvider(DataProviders[Table]):
             source_dataframe = file.export_to_dataframe(nrows=LOAD_TABLE_AUTODETECT_ROWS_COUNT)
 
         db = SQLDatabase(engine=self.sqlalchemy_engine)
+
+        if isinstance(source_dataframe, PandasdataframeDataProvider):
+            source_dataframe = source_dataframe.dataset
+
         db.prep_table(
             source_dataframe,
             table.name.lower(),
