@@ -3,14 +3,13 @@ from datetime import datetime
 
 from airflow import DAG
 from airflow.providers.snowflake.operators.snowflake import SnowflakeOperator
-
 from universal_transfer_operator.constants import FileType
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Table
 from universal_transfer_operator.universal_transfer_operator import UniversalTransferOperator
 
-s3_bucket = os.getenv("S3_BUCKET", "s3://astro-sdk-test")
-gcs_bucket = os.getenv("GCS_BUCKET", "gs://uto-test")
+s3_bucket_path = os.getenv("S3_BUCKET_PATH", "s3://astro-sdk-test/uto/csv_files/")
+snowflake_table = os.getenv("SNOWFLAKE_TABLE", "uto_s3_table_to_snowflake")
 
 transform_table = """
     SELECT
@@ -27,9 +26,7 @@ with DAG(
     # [START howto_transfer_data_from_s3_to_snowflake_using_universal_transfer_operator]
     uto_transfer_non_native_s3_to_snowflake = UniversalTransferOperator(
         task_id="uto_transfer_non_native_s3_to_snowflake",
-        source_dataset=File(
-            path="s3://astro-sdk-test/uto/csv_files/", conn_id="aws_default", filetype=FileType.CSV
-        ),
+        source_dataset=File(path=s3_bucket_path, conn_id="aws_default", filetype=FileType.CSV),
         destination_dataset=Table(name="uto_s3_table_to_snowflake", conn_id="snowflake_conn"),
     )
     # [END howto_transfer_data_from_s3_to_snowflake_using_universal_transfer_operator]
@@ -38,7 +35,7 @@ with DAG(
     snowflake_sql_query = SnowflakeOperator(
         task_id="snowflake_sql_query",
         sql=transform_table,
-        params={"table_name": "uto_s3_table_to_snowflake"},
+        params={"table_name": snowflake_table},
         snowflake_conn_id="snowflake_conn",
     )
     # [END howto_run_sql_table_check]

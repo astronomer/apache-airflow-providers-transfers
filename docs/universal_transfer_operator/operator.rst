@@ -36,8 +36,8 @@ Case 3: Transfer using third-party platform
 
     .. literalinclude:: ../../example_dags/example_dag_fivetran.py
        :language: python
-       :start-after: [START fivetran_transfer_with_setup]
-       :end-before: [END fivetran_transfer_with_setup]
+       :start-after: [START fivetran_transfer_without_setup]
+       :end-before: [END fivetran_transfer_without_setup]
 
 .. _cross_database_transfers:
 

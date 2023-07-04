@@ -4,12 +4,14 @@ from datetime import datetime
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.amazon.aws.operators.s3 import S3ListOperator
-
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.universal_transfer_operator import UniversalTransferOperator
 
+s3_bucket_name = os.getenv("S3_BUCKET_NAME", "astro-sdk-test")
 s3_bucket = os.getenv("S3_BUCKET", "s3://astro-sdk-test")
 gcs_bucket = os.getenv("GCS_BUCKET", "gs://uto-test")
+s3_bucket_prefix = os.getenv("S3_BUCKET_PREFIX", "uto")
+gcs_bucket_prefix = os.getenv("GCS_BUCKET_PREFIX", "uto")
 
 
 def calculate_the_file_transferred(ti):
@@ -27,15 +29,18 @@ with DAG(
 ) as dag:
     transfer_non_native_s3_to_gs = UniversalTransferOperator(
         task_id="transfer_non_native_s3_to_gs",
-        source_dataset=File(path=f"{s3_bucket}/uto/", conn_id="aws_default"),
+        source_dataset=File(path=f"{s3_bucket}/{s3_bucket_prefix}/", conn_id="aws_default"),
         destination_dataset=File(
-            path=f"{gcs_bucket}/uto/",
+            path=f"{gcs_bucket}/{gcs_bucket_prefix}/",
             conn_id="google_cloud_default",
         ),
     )
 
     list_s3_files = S3ListOperator(
-        task_id="list_s3_files", bucket="astro-sdk-test", prefix="uto/", aws_conn_id="aws_default"
+        task_id="list_s3_files",
+        bucket=s3_bucket_name,
+        prefix=f"{s3_bucket_prefix}/",
+        aws_conn_id="aws_default",
     )
 
     files_transferred = PythonOperator(

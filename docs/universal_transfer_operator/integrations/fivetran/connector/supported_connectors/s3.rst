@@ -1,0 +1,18 @@
+.. _fivetran_s3_connector:
+
+S3 Connector
+~~~~~~~~~~~~
+:py:obj:`S3Connector <universal_transfer_operator.integrations.fivetran.connector.aws.s3.S3Connector>` creates the connector on Fivetran for S3. Here is an example of parameters that can be passed:
+
+.. literalinclude:: ../../../../../../example_dags/example_dag_fivetran.py
+       :language: python
+       :start-after: [START fivetran_transfer_without_setup]
+       :end-before: [END fivetran_transfer_without_setup]
+
+.. note::
+    Universal Transfer Operator also takes care of mapping the airflow connections and creating the corresponding Fivetran :ref:`destination <fivetran_snowflake_destination>` and Fivetran :ref:`connector <fivetran_connector>`.
+
+Possible parameters that can be passed as config for :py:obj:`S3Connector <universal_transfer_operator.integrations.fivetran.connector.aws.s3.S3Connector>` are listed `here <https://fivetran.com/docs/rest-api/connectors/config#amazons3>`_
+
+.. note::
+    AWS account specified in the connection needs to have permissions to create IAM policies and IAM role in the account.
