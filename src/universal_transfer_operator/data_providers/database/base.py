@@ -652,11 +652,13 @@ class DatabaseDataProvider(DataProviders[Table]):
         )
 
     @staticmethod
-    def _assert_not_empty_df(df):
+    def _assert_not_empty_df(df: pd.DataFrame):
         """Raise error if dataframe empty
 
         param df: A dataframe
         """
+        if isinstance(df, PandasdataframeDataProvider):
+            df = df.dataset
         if df.empty:
             raise ValueError("Can't load empty dataframe")
 
