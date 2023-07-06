@@ -23,7 +23,6 @@ from universal_transfer_operator.constants import (
     TransferMode,
 )
 from universal_transfer_operator.data_providers.base import DataProviders, DataStream
-from universal_transfer_operator.data_providers.dataframe.Pandasdataframe import PandasdataframeDataProvider
 from universal_transfer_operator.data_providers.filesystem import resolve_file_path_pattern
 from universal_transfer_operator.datasets.file.base import File
 from universal_transfer_operator.datasets.table import Metadata, Table
@@ -380,8 +379,8 @@ class DatabaseDataProvider(DataProviders[Table]):
 
         db = SQLDatabase(engine=self.sqlalchemy_engine)
 
-        if isinstance(source_dataframe, PandasdataframeDataProvider):
-            source_dataframe = source_dataframe.dataset
+        # if isinstance(source_dataframe, PandasdataframeDataProvider):
+        #     source_dataframe = source_dataframe.dataset
 
         db.prep_table(
             source_dataframe,
@@ -657,8 +656,8 @@ class DatabaseDataProvider(DataProviders[Table]):
 
         param df: A dataframe
         """
-        if isinstance(df, PandasdataframeDataProvider):
-            df = df.dataset
+        # if isinstance(df, PandasdataframeDataProvider):
+        #     df = df.dataset
         if df.empty:
             raise ValueError("Can't load empty dataframe")
 
@@ -747,9 +746,10 @@ class DatabaseDataProvider(DataProviders[Table]):
             raise ValueError(f"The table {self.dataset.name} does not exist")
 
         sqla_table = self.get_sqla_table(self.dataset)
-        df = pd.read_sql(sql=sqla_table.select(), con=self.sqlalchemy_engine)
-        from universal_transfer_operator.data_providers.dataframe.Pandasdataframe import (
-            PandasdataframeDataProvider,
-        )
-
-        return PandasdataframeDataProvider.from_pandas_df(df)
+        # df = pd.read_sql(sql=sqla_table.select(), con=self.sqlalchemy_engine)
+        # from universal_transfer_operator.data_providers.dataframe.Pandasdataframe import (
+        #     PandasdataframeDataProvider,
+        # )
+        #
+        # return PandasdataframeDataProvider.from_pandas_df(df)
+        return pd.read_sql(sql=sqla_table.select(), con=self.sqlalchemy_engine)
