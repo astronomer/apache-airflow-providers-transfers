@@ -48,7 +48,7 @@ def create_dataprovider(
     return data_provider
 
 
-def get_dataprovider_class(dataset: Table | File) -> type[DataProviders]:
+def get_dataprovider_class(dataset: Table | File | Dataframe) -> type[DataProviders]:
     """
     Get dataprovider class based on the dataset
     """

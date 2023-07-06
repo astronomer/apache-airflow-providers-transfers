@@ -6,7 +6,6 @@ import string
 from typing import ClassVar, Iterator
 
 import pandas as pd
-
 from universal_transfer_operator import settings
 from universal_transfer_operator.constants import FileType
 from universal_transfer_operator.data_providers.base import DataStream
@@ -65,7 +64,7 @@ class PandasdataframeDataProvider(DataframeProvider):
     def equals(self, other: PandasdataframeDataProvider):
         """Check equality of two PandasdataframeDataProvider"""
         if isinstance(other, PandasdataframeDataProvider):
-            return self.dataset.equals(other.dataset)
+            return self.dataset.dataset.equals(other.dataset)
         if isinstance(other, pd.DataFrame):
             return self.dataset.equals(other)
         return False
