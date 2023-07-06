@@ -1,26 +1,12 @@
 from __future__ import annotations
 
 import time
-from typing import Any, Callable, Mapping
+from typing import Callable, Mapping
 
 import attr
 import pandas as pd
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 from airflow.providers.google.cloud.hooks.bigquery_dts import BiqQueryDataTransferServiceHook
-from google.api_core.exceptions import (
-    ClientError,
-    Conflict,
-    Forbidden,
-    GoogleAPIError,
-    InvalidArgument,
-    ResourceExhausted,
-    RetryError,
-    ServerError,
-    ServiceUnavailable,
-    TooManyRequests,
-    Unauthorized,
-    Unknown,
-)
 from google.api_core.exceptions import (
     NotFound as GoogleNotFound,
 )
@@ -30,9 +16,10 @@ from google.cloud.bigquery_datatransfer_v1.types import (
     TransferConfig,
     TransferState,
 )
+
+# type ignore as the library stubs is not installed for "google.protobuf"
 from google.protobuf import timestamp_pb2  # type: ignore
 from google.protobuf.struct_pb2 import Struct  # type: ignore
-from google.resumable_media import InvalidResponse
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 from tenacity import retry, stop_after_attempt
@@ -86,28 +73,6 @@ class BigqueryDataProvider(DatabaseDataProvider):
         },
     }
 
-    FILE_PATTERN_BASED_AUTODETECT_SCHEMA_SUPPORTED: set[FileLocation] = {
-        FileLocation.GS,
-        FileLocation.LOCAL,
-    }
-
-    NATIVE_LOAD_EXCEPTIONS: Any = (
-        GoogleNotFound,
-        ClientError,
-        GoogleAPIError,
-        RetryError,
-        InvalidArgument,
-        Unauthorized,
-        Forbidden,
-        Conflict,
-        TooManyRequests,
-        ResourceExhausted,
-        ServerError,
-        Unknown,
-        ServiceUnavailable,
-        InvalidResponse,
-        DatabaseCustomError,
-    )
     OPTIONS_CLASS = BigqueryOptions
 
     def __init__(
