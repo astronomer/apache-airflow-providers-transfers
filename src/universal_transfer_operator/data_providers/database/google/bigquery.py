@@ -267,16 +267,11 @@ class BigqueryDataProvider(DatabaseDataProvider):
             raise ValueError("Unsupported file location.")
         return supported_config["method"](table=table, file=file)  # type: ignore
 
-    # Require skipcq because method overriding we need param target_table
-    def is_native_path_available(  # skipcq: PYL-R0201
-        self,
-        source_dataset: File | Table,  # skipcq PYL-W0613
-    ) -> bool:
+    def is_native_path_available(self, source_dataset: File | Table) -> bool:
         """
         Check if there is an optimised path for source to destination.
 
-        :param source_file: File from which we need to transfer data
-        :param target_table: Table that needs to be populated with file data
+        :param source_dataset: File from which we need to transfer data
         """
         if isinstance(source_dataset, Table):
             return False
@@ -375,7 +370,6 @@ class BigqueryDataProvider(DatabaseDataProvider):
 
         :param source_file: Source file that is used as source of data
         :param target_table: Table that will be created on the bigquery
-        :param if_exists: Overwrite table if exists. Default 'replace'
         """
         native_support_kwargs = self.transfer_params.s3_transfer_parameters or {}
 
@@ -477,8 +471,9 @@ class BigqueryDataProvider(DatabaseDataProvider):
 class S3ToBigqueryDataTransfer:
     """
     Create and run Datatransfer job from S3 to Bigquery
-    :param source_file: Source file that is used as source of data
+
     :param target_table: Table that will be created on the bigquery
+    :param source_file: Source file that is used as source of data
     :param project_id: Bigquery project id
     :param poll_duration: sleep duration between two consecutive job status checks. Unit - seconds. Default 1 sec.
     :param native_support_kwargs: kwargs to be used by method involved in native support flow
