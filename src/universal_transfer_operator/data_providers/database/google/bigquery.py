@@ -260,19 +260,20 @@ class BigqueryDataProvider(DatabaseDataProvider):
         :param if_exists: Overwrite file if exists. Default False
         """
         method_name = self.NATIVE_PATHS.get(source_file.location.location_type)
-        if method_name:
-            transfer_method = self.__getattribute__(method_name)
-            transfer_method(
-                source_file=source_file,
-                target_table=target_table,
-                if_exists=if_exists,
-                **kwargs,
-            )
-        else:
+        if not method_name:
             raise DatabaseCustomError(
                 f"No transfer performed since there is no optimised path "
                 f"for {source_file.location.location_type} to bigquery."
             )
+
+        transfer_method = self.__getattribute__(method_name)
+        transfer_method(
+            source_file=source_file,
+            target_table=target_table,
+            if_exists=if_exists,
+            **kwargs,
+        )
+
 
     def load_gs_file_to_table(
         self,
