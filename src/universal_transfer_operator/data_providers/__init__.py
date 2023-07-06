@@ -53,7 +53,7 @@ def get_dataprovider_class(dataset: Table | File | Dataframe) -> type[DataProvid
     Get dataprovider class based on the dataset
     """
     conn_type = None
-    if getattr(dataset, "conn_id", None) and dataset.conn_id:
+    if isinstance(dataset, (Table, File)) and getattr(dataset, "conn_id", None):
         conn_type = BaseHook.get_connection(dataset.conn_id).conn_type
     module_path = DATASET_CONN_ID_TO_DATAPROVIDER_MAPPING[(conn_type, type(dataset))]
     module = importlib.import_module(module_path)

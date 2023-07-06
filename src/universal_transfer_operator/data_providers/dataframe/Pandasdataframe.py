@@ -64,7 +64,7 @@ class PandasdataframeDataProvider(DataframeProvider):
     def equals(self, other: PandasdataframeDataProvider):
         """Check equality of two PandasdataframeDataProvider"""
         if isinstance(other, PandasdataframeDataProvider):
-            return self.dataset.dataset.equals(other.dataset)
+            return self.dataset.dataframe.equals(other.dataset)
         if isinstance(other, pd.DataFrame):
             return self.dataset.equals(other)
         return False
