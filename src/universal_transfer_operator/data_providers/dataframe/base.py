@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Iterator
 
 import pandas as pd
-
 from universal_transfer_operator.data_providers.base import DataProviders, DataStream
 from universal_transfer_operator.datasets.dataframe.base import Dataframe
 
@@ -34,3 +33,14 @@ class DataframeProvider(DataProviders[Dataframe]):
     def deserialize(data: dict, version: int):
         # Extract from metadata DB
         raise NotImplementedError
+
+    def is_native_path_available(
+        self,
+        source_dataset: Dataframe,  # skipcq PYL-W0613, PYL-R0201
+    ) -> bool:
+        """
+        Check if there is an optimised path for source to destination.
+
+        :param source_dataset: Dataframe from which we need to transfer data
+        """
+        return False

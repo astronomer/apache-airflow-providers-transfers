@@ -229,3 +229,14 @@ class BaseFilesystemProviders(DataProviders[File]):
         Get the altered path if needed for stage creation in snowflake stage creation
         """
         return self.dataset.path
+
+    def is_native_path_available(
+        self,
+        source_dataset: File,  # skipcq PYL-W0613, PYL-R0201
+    ) -> bool:
+        """
+        Check if there is an optimised path for source to destination.
+
+        :param source_dataset: File from which we need to transfer data
+        """
+        return False

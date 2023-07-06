@@ -753,3 +753,14 @@ class DatabaseDataProvider(DataProviders[Table]):
         #
         # return PandasdataframeDataProvider.from_pandas_df(df)
         return pd.read_sql(sql=sqla_table.select(), con=self.sqlalchemy_engine)
+
+    def is_native_path_available(
+        self,
+        source_dataset: Table,  # skipcq PYL-W0613, PYL-R0201
+    ) -> bool:
+        """
+        Check if there is an optimised path for source to destination.
+
+        :param source_dataset: Dataframe from which we need to transfer data
+        """
+        return False
