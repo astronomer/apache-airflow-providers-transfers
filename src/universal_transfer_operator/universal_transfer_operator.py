@@ -45,7 +45,6 @@ class UniversalTransferOperator(BaseOperator):
         self.destination_dataset = destination_dataset
         self.transfer_mode = transfer_mode
         self._transfer_params = transfer_params
-        # TODO: revisit names of transfer_mode
         super().__init__(**kwargs)
 
     def execute(self, context: Context) -> Any:  # skipcq: PYL-W0613
