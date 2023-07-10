@@ -4,7 +4,6 @@ from pathlib import Path
 
 import pandas as pd
 import smart_open
-
 from universal_transfer_operator.data_providers.base import DataStream
 from universal_transfer_operator.data_providers.dataframe.Pandasdataframe import PandasdataframeDataProvider
 from universal_transfer_operator.datasets.dataframe.base import Dataframe
@@ -19,14 +18,14 @@ def test_read():
     dp = PandasdataframeDataProvider(Dataframe(dataframe=df, name="test"))
     returned_dfs = dp.read()
     for returned_df in returned_dfs:
-        assert returned_df.dataframe.equals(df)
+        assert returned_df.equals(df)
 
 
 def test_write_with_dataframe():
     df = pd.read_csv(DATA_DIR + "sample.csv")
     dp = PandasdataframeDataProvider(Dataframe(dataframe=df, name="test"))
     returned_df = dp.write(df)
-    assert returned_df.equals(df)
+    assert returned_df.dataset.dataframe.equals(df)
 
 
 def get_datastream_object(path: str, mode):
@@ -46,4 +45,4 @@ def test_write_with_io_bytesio():
     dp = PandasdataframeDataProvider(Dataframe(name="test"))
     ds = get_datastream_object(path=DATA_DIR + "sample.csv", mode="r")
     returned_df = dp.write(ds)
-    assert returned_df.equals(df)
+    assert returned_df.dataset.dataframe.equals(df)
