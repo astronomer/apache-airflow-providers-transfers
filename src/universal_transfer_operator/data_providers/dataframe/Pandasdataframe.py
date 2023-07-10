@@ -10,6 +10,7 @@ from universal_transfer_operator import settings
 from universal_transfer_operator.constants import FileType
 from universal_transfer_operator.data_providers.base import DataStream
 from universal_transfer_operator.data_providers.dataframe.base import DataframeProvider
+from universal_transfer_operator.datasets.dataframe.base import Dataframe
 from universal_transfer_operator.datasets.file.base import File
 
 logger = logging.getLogger(__name__)
@@ -52,22 +53,31 @@ class PandasdataframeDataProvider(DataframeProvider):
 
     def read(self) -> Iterator[pd.DataFrame]:
         """Read from dataframe dataset and write to local reference locations or dataframes"""
-        yield self.dataset
+        yield self.dataset.dataframe
 
-    def write(self, source_ref: pd.DataFrame | DataStream) -> pd.DataFrame:
+    def write(self, source_ref: pd.DataFrame | DataStream):
         """Write the data to the dataframe dataset or filesystem dataset"""
         if isinstance(source_ref, pd.DataFrame):
-            return source_ref
-        elif isinstance(source_ref, DataStream):
-            return source_ref.actual_file.type.export_to_dataframe(stream=source_ref.remote_obj_buffer)
+            return PandasdataframeDataProvider(dataset=Dataframe(dataframe=source_ref))
+        else:
+            return PandasdataframeDataProvider(
+                dataset=Dataframe(
+                    dataframe=source_ref.actual_file.type.export_to_dataframe(
+                        stream=source_ref.remote_obj_buffer
+                    )
+                )
+            )
 
     def equals(self, other: PandasdataframeDataProvider):
         """Check equality of two PandasdataframeDataProvider"""
         if isinstance(other, PandasdataframeDataProvider):
-            return self.dataset.dataframe.equals(other.dataset)
+            return self.dataset.dataframe.equals(other.dataset.dataframe)
         if isinstance(other, pd.DataFrame):
             return self.dataset.equals(other)
         return False
+
+    def __eq__(self, other):
+        return self.equals(other)
 
     def serialize(self):
         # Store in the metadata DB if Dataframe < 100 kb
