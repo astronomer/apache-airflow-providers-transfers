@@ -26,12 +26,6 @@ class ParquetFileTypes(FileTypes):
         byte_io_buffer = self._convert_remote_file_to_byte_stream(stream)
 
         return pd.read_parquet(byte_io_buffer, **kwargs_copy)
-        # df = pd.read_parquet(byte_io_buffer, **kwargs_copy)
-        # from universal_transfer_operator.data_providers.dataframe.Pandasdataframe import (
-        #     PandasdataframeDataProvider,
-        # )
-        #
-        # return PandasdataframeDataProvider.from_pandas_df(df)
 
     @staticmethod
     def _convert_remote_file_to_byte_stream(stream) -> io.IOBase:
