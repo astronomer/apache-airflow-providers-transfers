@@ -379,8 +379,6 @@ class DatabaseDataProvider(DataProviders[Table]):
 
         db = SQLDatabase(engine=self.sqlalchemy_engine)
 
-        # if isinstance(source_dataframe, PandasdataframeDataProvider):
-        #     source_dataframe = source_dataframe.dataset
 
         db.prep_table(
             source_dataframe,
