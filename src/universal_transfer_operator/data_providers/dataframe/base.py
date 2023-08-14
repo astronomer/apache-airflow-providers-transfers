@@ -31,7 +31,7 @@ class DataframeProvider(DataProviders[Dataframe]):
 
     @staticmethod
     def deserialize(data: dict, version: int):
-        # Extract from metadata DB
+        """Extract from metadata DB"""
         raise NotImplementedError
 
     def is_native_path_available(
