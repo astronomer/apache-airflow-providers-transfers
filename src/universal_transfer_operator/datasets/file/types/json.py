@@ -29,12 +29,6 @@ class JSONFileTypes(FileTypes):
         # Pandas `read_json` does not support the `nrows` parameter unless we're using NDJSON
         kwargs_copy.pop("nrows", None)
         return pd.read_json(stream, **kwargs_copy)
-        # df = pd.read_json(stream, **kwargs_copy)
-        # from universal_transfer_operator.data_providers.dataframe.Pandasdataframe import (
-        #     PandasdataframeDataProvider,
-        # )
-        #
-        # return PandasdataframeDataProvider.from_pandas_df(df)
 
     # We need skipcq because it's a method overloading so we don't want to make it a static method
     def create_from_dataframe(self, df: pd.DataFrame, stream: io.TextIOWrapper) -> None:  # skipcq PYL-R0201
