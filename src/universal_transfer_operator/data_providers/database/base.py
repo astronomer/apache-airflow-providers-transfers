@@ -742,12 +742,6 @@ class DatabaseDataProvider(DataProviders[Table]):
             raise ValueError(f"The table {self.dataset.name} does not exist")
 
         sqla_table = self.get_sqla_table(self.dataset)
-        # df = pd.read_sql(sql=sqla_table.select(), con=self.sqlalchemy_engine)
-        # from universal_transfer_operator.data_providers.dataframe.Pandasdataframe import (
-        #     PandasdataframeDataProvider,
-        # )
-        #
-        # return PandasdataframeDataProvider.from_pandas_df(df)
         return pd.read_sql(sql=sqla_table.select(), con=self.sqlalchemy_engine)
 
     def is_native_path_available(
