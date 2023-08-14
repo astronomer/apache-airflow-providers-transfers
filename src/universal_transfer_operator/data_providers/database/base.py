@@ -654,8 +654,6 @@ class DatabaseDataProvider(DataProviders[Table]):
 
         param df: A dataframe
         """
-        # if isinstance(df, PandasdataframeDataProvider):
-        #     df = df.dataset
         if df.empty:
             raise ValueError("Can't load empty dataframe")
 
