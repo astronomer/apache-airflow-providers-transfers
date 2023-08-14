@@ -13,7 +13,7 @@ class DataframeProvider(DataProviders[Dataframe]):
     def __init__(
         self,
         dataset: Dataframe,
-    ):
+    ) -> None:
         self.dataset = dataset
         super().__init__(dataset=self.dataset)
 
