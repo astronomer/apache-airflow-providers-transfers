@@ -26,7 +26,7 @@ class DataframeProvider(DataProviders[Dataframe]):
         raise NotImplementedError
 
     def serialize(self):
-        # Store in the metadata DB if Dataframe
+        """Store in the metadata DB if Dataframe"""
         raise NotImplementedError
 
     @staticmethod
