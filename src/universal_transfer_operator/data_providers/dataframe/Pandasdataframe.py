@@ -76,7 +76,7 @@ class PandasdataframeDataProvider(DataframeProvider):
             return self.dataset.equals(other)
         return False
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return self.equals(other)
 
     def serialize(self):
