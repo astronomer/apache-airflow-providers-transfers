@@ -22,12 +22,6 @@ class NDJsonFileTypes(FileTypes):
             in the resulting dataframe
         """
         return NDJsonFileTypes.flatten(self.normalize_config, stream, **kwargs)
-        # df = NDJsonFileTypes.flatten(self.normalize_config, stream, **kwargs)
-        # from universal_transfer_operator.data_providers.dataframe.Pandasdataframe import (
-        #     PandasdataframeDataProvider,
-        # )
-        #
-        # return PandasdataframeDataProvider.from_pandas_df(df)
 
     # We need skipcq because it's a method overloading so we don't want to make it a static method
     def create_from_dataframe(self, df: pd.DataFrame, stream: io.TextIOWrapper) -> None:  # skipcq PYL-R0201
