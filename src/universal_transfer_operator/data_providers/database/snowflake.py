@@ -542,12 +542,10 @@ class SnowflakeDataProvider(DatabaseDataProvider):
         # we need to pass handler param to get the rows. But in version apache-airflow-providers-snowflake==3.1.0
         # if we pass the handler provider raises an exception AttributeError
         try:
-            rows = self.hook.run(sql_statement, handler=lambda cur: cur.fetchall())
+            rows = self.hook.run(sql_statement)
+            rows = rows.fetchall()
         except AttributeError:
-            try:
-                rows = self.hook.run(sql_statement)
-            except ValueError as exe:
-                raise DatabaseCustomError from exe
+            pass
         except ValueError as exe:
             raise DatabaseCustomError from exe
         finally:
