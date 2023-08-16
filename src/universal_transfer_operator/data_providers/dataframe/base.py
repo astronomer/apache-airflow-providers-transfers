@@ -21,7 +21,7 @@ class DataframeProvider(DataProviders[Dataframe]):
         """Read from dataframe dataset and write to local reference locations or dataframes"""
         raise NotImplementedError
 
-    def write(self, source_ref: pd.DataFrame | DataStream) -> str:  # type: ignore
+    def write(self, source_ref: pd.DataFrame | DataStream) -> DataframeProvider:  # type: ignore
         """Write the data to the dataframe dataset or filesystem dataset"""
         raise NotImplementedError
 

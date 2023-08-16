@@ -55,7 +55,7 @@ class PandasdataframeDataProvider(DataframeProvider):
         """Read from dataframe dataset and write to local reference locations or dataframes"""
         yield self.dataset.dataframe
 
-    def write(self, source_ref: pd.DataFrame | DataStream):
+    def write(self, source_ref: pd.DataFrame | DataStream) -> PandasdataframeDataProvider:
         """Write the data to the dataframe dataset or filesystem dataset"""
         if isinstance(source_ref, pd.DataFrame):
             return PandasdataframeDataProvider(dataset=Dataframe(dataframe=source_ref))
@@ -71,7 +71,7 @@ class PandasdataframeDataProvider(DataframeProvider):
     def equals(self, other: PandasdataframeDataProvider) -> bool:
         """Check equality of two PandasdataframeDataProvider"""
         if isinstance(other, PandasdataframeDataProvider):
-            return self.dataset.dataframe.equals(other.dataset.dataframe)
+            return bool(self.dataset.dataframe.equals(other.dataset.dataframe))
         if isinstance(other, pd.DataFrame):
             return self.dataset.equals(other)
         return False

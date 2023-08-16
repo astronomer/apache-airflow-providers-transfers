@@ -379,7 +379,6 @@ class DatabaseDataProvider(DataProviders[Table]):
 
         db = SQLDatabase(engine=self.sqlalchemy_engine)
 
-
         db.prep_table(
             source_dataframe,
             table.name.lower(),
@@ -649,7 +648,7 @@ class DatabaseDataProvider(DataProviders[Table]):
         )
 
     @staticmethod
-    def _assert_not_empty_df(df: pd.DataFrame):
+    def _assert_not_empty_df(df: pd.DataFrame) -> None:
         """Raise error if dataframe empty
 
         param df: A dataframe

@@ -41,7 +41,7 @@ class DataProviders(ABC, Generic[DatasetType]):
         """Read from filesystem dataset or databases dataset and write to local reference locations or dataframes"""
         raise NotImplementedError
 
-    def write(self, source_ref: pd.DataFrame | DataStream) -> str:  # type: ignore
+    def write(self, source_ref: pd.DataFrame | DataStream) -> str | DataProviders:  # type: ignore
         """Write the data from local reference location or a dataframe to the database dataset or filesystem dataset
 
         :param source_ref: Stream of data to be loaded into output table or a pandas dataframe.
