@@ -543,9 +543,8 @@ class SnowflakeDataProvider(DatabaseDataProvider):
         # if we pass the handler provider raises an exception AttributeError
         try:
             rows = self.hook.run(sql_statement)
-            rows = rows.fetchall()
-        except AttributeError:
-            pass
+            if rows is None:
+                rows = self.hook.run(sql_statement, handler=lambda cur: cur.fetchall())
         except ValueError as exe:
             raise DatabaseCustomError from exe
         finally:
