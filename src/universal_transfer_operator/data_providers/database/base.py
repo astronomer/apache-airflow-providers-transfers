@@ -753,3 +753,17 @@ class DatabaseDataProvider(DataProviders[Table]):
         :param source_dataset: Dataframe from which we need to transfer data
         """
         return False
+
+    def create_schema_if_applicable(self, schema: str | None) -> None:
+        """
+        This function checks if the expected schema exists in the database. If the schema does not exist,
+        it will attempt to create it.
+
+        :param schema: DB Schema - a namespace that contains named objects like (tables, functions, etc)
+        :param assume_exists: If assume exists is True, does not check or attempt to create the schema
+        """
+        # We check if the schema exists first because snowflake will fail on a create schema query even if it
+        # doesn't actually create a schema.
+        if schema and not self.schema_exists(schema):
+            statement = self._create_schema_statement.format(schema)
+            self.run_sql(statement)

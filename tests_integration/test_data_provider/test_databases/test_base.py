@@ -29,6 +29,10 @@ dataset_name = create_unique_str(10)
             "local_file_path": f"{str(CWD)}/../../data/sample.csv",
         },
         {
+            "name": "PostgresDataProvider",
+            "local_file_path": f"{str(CWD)}/../../data/sample.csv",
+        },
+        {
             "name": "S3DataProvider",
             "object": File(path=f"s3://tmp9/{dataset_name}.csv"),
             "local_file_path": f"{str(CWD)}/../../data/sample.csv",
@@ -62,6 +66,7 @@ dataset_name = create_unique_str(10)
         {"name": "SqliteDataProvider", "object": Table(name=dataset_name)},
         {"name": "BigqueryDataProvider", "object": Table(name=dataset_name)},
         {"name": "SnowflakeDataProvider", "object": Table(name=dataset_name)},
+        {"name": "PostgresDataProvider", "object": Table(name=dataset_name)},
         {
             "name": "S3DataProvider",
             "object": File(path=f"s3://tmp9/{dataset_name}.csv"),
