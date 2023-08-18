@@ -541,7 +541,7 @@ class SnowflakeDataProvider(DatabaseDataProvider):
         self._validate_before_copy_into(source_file, target_table, stage)
 
         # Below code is added due to breaking change in apache-airflow-providers-snowflake==3.2.0,
-        # we need to pass handler param to get the rows. But in version apache-airflow-providers-snowflake==3.1.0
+        # we need to pass handler param to get the rows. But in version apache-airflow-providers-snowflake<=3.1.0
         # if we pass the handler provider raises an exception AttributeError
         try:
             if packaging_version.parse(
