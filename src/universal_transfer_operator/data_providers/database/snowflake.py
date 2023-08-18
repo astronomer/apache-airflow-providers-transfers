@@ -5,12 +5,14 @@ import os
 import random
 import string
 from dataclasses import dataclass, field
+from importlib.metadata import version
 from typing import Sequence
 from urllib.parse import urlparse
 
 import attr
 import pandas as pd
 from airflow.providers.snowflake.hooks.snowflake import SnowflakeHook
+from packaging import version as packaging_version
 from snowflake.connector import pandas_tools
 from snowflake.connector.errors import (
     ProgrammingError,
@@ -542,8 +544,11 @@ class SnowflakeDataProvider(DatabaseDataProvider):
         # we need to pass handler param to get the rows. But in version apache-airflow-providers-snowflake==3.1.0
         # if we pass the handler provider raises an exception AttributeError
         try:
-            rows = self.hook.run(sql_statement)
-            if rows is None:
+            if packaging_version.parse(
+                version("apache-airflow-providers-snowflake")
+            ) <= packaging_version.parse("3.1.0"):
+                rows = self.hook.run(sql_statement)
+            else:
                 rows = self.hook.run(sql_statement, handler=lambda cur: cur.fetchall())
         except ValueError as exe:
             raise DatabaseCustomError from exe
