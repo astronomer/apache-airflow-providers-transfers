@@ -12,7 +12,7 @@ from universal_transfer_operator.settings import SCHEMA
 CWD = pathlib.Path(__file__).parent
 
 DEFAULT_CONN_ID = "postgres_default"
-CUSTOM_CONN_ID = "postgres_conn_pagila"
+CUSTOM_CONN_ID = "postgres_conn"
 SUPPORTED_CONN_IDS = [DEFAULT_CONN_ID, CUSTOM_CONN_ID]
 
 
