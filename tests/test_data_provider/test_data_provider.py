@@ -3,6 +3,7 @@ import pytest
 
 from universal_transfer_operator.data_providers import create_dataprovider, get_dataprovider_options_class
 from universal_transfer_operator.data_providers.base import DataProviders
+from universal_transfer_operator.data_providers.database.postgres import PostgresDataProvider
 from universal_transfer_operator.data_providers.database.snowflake import (
     SnowflakeDataProvider,
     SnowflakeOptions,
@@ -26,6 +27,7 @@ from universal_transfer_operator.integrations.base import TransferIntegrationOpt
         {"dataset": File("sftp://upload/sample.csv", conn_id="sftp_default"), "expected": SFTPDataProvider},
         {"dataset": Table("some_table", conn_id="sqlite_default"), "expected": SqliteDataProvider},
         {"dataset": Table("some_table", conn_id="snowflake_conn"), "expected": SnowflakeDataProvider},
+        {"dataset": Table("some_table", conn_id="postgres_conn"), "expected": PostgresDataProvider},
         {"dataset": Dataframe(dataframe=pd.DataFrame()), "expected": PandasdataframeDataProvider},
     ],
     ids=lambda d: d["expected"],
@@ -52,6 +54,7 @@ def test_create_dataprovider(datasets):
             "expected": TransferIntegrationOptions,
         },
         {"dataset": Table("some_table", conn_id="sqlite_default"), "expected": TransferIntegrationOptions},
+        {"dataset": Table("some_table", conn_id="postgres_conn"), "expected": TransferIntegrationOptions},
         {"dataset": Table("some_table", conn_id="snowflake_conn"), "expected": SnowflakeOptions},
     ],
     ids=lambda d: d["dataset"].conn_id,

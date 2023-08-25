@@ -23,6 +23,7 @@ DATASET_CONN_ID_TO_DATAPROVIDER_MAPPING = {
     ("gs", Table): "universal_transfer_operator.data_providers.database.google.bigquery",
     ("sqlite", Table): "universal_transfer_operator.data_providers.database.sqlite",
     ("snowflake", Table): "universal_transfer_operator.data_providers.database.snowflake",
+    ("postgres", Table): "universal_transfer_operator.data_providers.database.postgres",
     (None, File): "universal_transfer_operator.data_providers.filesystem.local",
     (None, Dataframe): "universal_transfer_operator.data_providers.dataframe.Pandasdataframe",
 }

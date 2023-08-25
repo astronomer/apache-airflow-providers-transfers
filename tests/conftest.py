@@ -36,11 +36,13 @@ DATASET_NAME_TO_CONN_ID = {
     "GCSDataProvider": "google_cloud_default",
     "LocalDataProvider": "",
     "SFTPDataProvider": "sftp_conn",
+    "PostgresDataProvider": "postgres_conn",
 }
 DATASET_NAME_TO_PROVIDER_TYPE = {
     "SqliteDataProvider": "database",
     "SnowflakeDataProvider": "database",
     "BigqueryDataProvider": "database",
+    "PostgresDataProvider": "database",
     "S3DataProvider": "file",
     "GCSDataProvider": "file",
     "LocalDataProvider": "file",
