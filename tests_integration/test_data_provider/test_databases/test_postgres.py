@@ -18,24 +18,21 @@ SUPPORTED_CONN_IDS = [DEFAULT_CONN_ID, CUSTOM_CONN_ID]
 
 @pytest.mark.integration
 @pytest.mark.parametrize(
-    "conn_id,expected_db_path",
+    "conn_id",
     [
-        (
-            DEFAULT_CONN_ID,
-            BaseHook.get_connection(DEFAULT_CONN_ID).schema,
-        ),  # Linux and MacOS have different hosts
-        (CUSTOM_CONN_ID, BaseHook.get_connection(CUSTOM_CONN_ID).schema),
+        DEFAULT_CONN_ID,  # Linux and MacOS have different hosts
+        CUSTOM_CONN_ID,
     ],
     ids=SUPPORTED_CONN_IDS,
 )
-def test_postgres_sqlalchemy_engine(conn_id, expected_db_path):
+def test_postgres_sqlalchemy_engine(conn_id):
     """Confirm that the SQLAlchemy is created successfully and verify DB path."""
     dp = PostgresDataProvider(
         dataset=Table("some_table", conn_id=conn_id), transfer_mode=TransferMode.NONNATIVE
     )
     engine = dp.sqlalchemy_engine
     assert isinstance(engine, sqlalchemy.engine.base.Engine)
-    assert engine.url.database == expected_db_path
+    assert engine.url.database == BaseHook.get_connection(conn_id).schema
 
 
 @pytest.mark.integration
