@@ -5,10 +5,7 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "apache-airflow-provider-transfers"
 dynamic = ["version"]
-description = """This project contains the Universal Transfer Operator which can transfer all the data
-that could be read from the source Dataset into the destination Dataset.
-From a DAG author standpoint, all transfers would be performed through the invocation of only the
-Universal Transfer Operator."""
+description = "⚠️ DEPRECATED: This project is no longer maintained. The GitHub repository has been archived."
 
 authors = [
     { name = "Astronomer", email = "humans@astronomer.io" },
@@ -30,7 +27,7 @@ dependencies = [
 
 keywords = ["airflow", "provider", "astronomer", "sql", "decorator", "task flow", "elt", "etl", "dag"]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
+    "Development Status :: 7 - Inactive",  # <-- Signals deprecation in PyPI UI
     "License :: OSI Approved :: Apache Software License",
     "Topic :: Database",
     "Framework :: Apache Airflow",
