@@ -405,12 +405,6 @@ jobs:
   build-n-publish:
     if: github.event_name == 'release'
     name: Build and publish Python 🐍 distributions 📦 to PyPI
-    needs:
-      - Type-Check
-      - Build-Docs
-      - Run-UTO-tests-unit-tests
-      - Run-UTO-tests-integrations
-      - Run-UTO-tests-example-dags-2_2_5
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
