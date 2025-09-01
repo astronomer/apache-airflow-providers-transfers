@@ -1,7 +1,7 @@
 name: Build and test Universal Transfer Operator
 on:
   push:
-    branches: [ 'main', 'release-**', 'deprecate_it' ]
+    branches: [ 'main', 'release-**' ]
     paths:
       - '**'
 
@@ -62,14 +62,14 @@ jobs:
       TERM: xterm-color
       SETUPTOOLS_USE_DISTUTILS: stdlib
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v3
         with:
           python-version: '3.8'
           architecture: 'x64'
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v3
         with:
            path: |
              ~/.cache/pip
@@ -89,12 +89,12 @@ jobs:
     if: github.event.action != 'labeled'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
         with:
           python-version: '3.9'
           architecture: 'x64'
-      - uses: actions/cache@v4
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.cache/pip
@@ -141,21 +141,21 @@ jobs:
         ports:
           - 2222:22
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v3
         if: github.event_name != 'pull_request_target'
 
       - name: Checkout pull/${{ github.event.number }}
-        uses: actions/checkout@v5
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
         if: github.event_name == 'pull_request_target'
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v3
         with:
           python-version: '${{ matrix.python }}'
           architecture: 'x64'
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.cache/pip
@@ -177,7 +177,7 @@ jobs:
         run: nox -s "test-${{ matrix.python }}(airflow='${{ matrix.airflow }}')" -- tests/ --cov=src --cov-report=xml --cov-branch
 
       - name: Upload coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v2
         with:
           name: coverage-${{ matrix.python }}-${{ matrix.airflow }}
           path: .coverage
@@ -230,21 +230,21 @@ jobs:
         ports:
           - 2222:22
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v3
         if: github.event_name != 'pull_request_target'
 
       - name: Checkout pull/${{ github.event.number }}
-        uses: actions/checkout@v5
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
         if: github.event_name == 'pull_request_target'
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v3
         with:
           python-version: '${{ matrix.python }}'
           architecture: 'x64'
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.cache/pip
@@ -266,7 +266,7 @@ jobs:
         run: nox -s "test-${{ matrix.python }}(airflow='${{ matrix.airflow }}')" -- tests_integration/ -k "not test_example_dags.py" --cov=src --cov-report=xml --cov-branch
 
       - name: Upload coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v2
         with:
           name: coverage-${{ matrix.python }}-${{ matrix.airflow }}
           path: .coverage
@@ -320,21 +320,21 @@ jobs:
         ports:
           - 2222:22
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v3
         if: github.event_name != 'pull_request_target'
 
       - name: Checkout pull/${{ github.event.number }}
-        uses: actions/checkout@v5
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
         if: github.event_name == 'pull_request_target'
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v3
         with:
           python-version: '${{ matrix.python }}'
           architecture: 'x64'
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.cache/pip
@@ -356,7 +356,7 @@ jobs:
         run: nox -s "test-${{ matrix.python }}(airflow='${{ matrix.airflow }}')" -- tests_integration/test_example_dags.py --cov=src --cov-report=xml --cov-branch
 
       - name: Upload coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v2
         with:
           name: coverage-${{ matrix.python }}-${{ matrix.airflow }}
           path: .coverage
@@ -377,16 +377,16 @@ jobs:
       - Run-UTO-tests-example-dags-2_2_5
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v3
       - name: Set up Python 3.8
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v3
         with:
           python-version: 3.8
       - name: Install coverage
         run: |
           pip3 install coverage
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v2
         with:
           path: ./coverage
       - name: Run coverage
@@ -405,14 +405,20 @@ jobs:
   build-n-publish:
     if: github.event_name == 'release'
     name: Build and publish Python 🐍 distributions 📦 to PyPI
+    needs:
+      - Type-Check
+      - Build-Docs
+      - Run-UTO-tests-unit-tests
+      - Run-UTO-tests-integrations
+      - Run-UTO-tests-example-dags-2_2_5
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
         with:
           python-version: '3.8'
           architecture: 'x64'
-      - uses: actions/cache@v4
+      - uses: actions/cache@v2
         with:
           path: ~/.cache/pip
           key: ${{ hashFiles('pyproject.toml') }}
