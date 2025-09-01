@@ -1,3 +1,7 @@
+> ⚠️ **DEPRECATED**  
+> This project is no longer maintained. The GitHub repository has been archived, and no further updates will be made.  
+> Please use at your own risk and consider alternatives if available.
+
 <h1 align="center">
   Universal Transfer Operator
 </h1>
