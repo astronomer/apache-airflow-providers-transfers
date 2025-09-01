@@ -1,7 +1,7 @@
 name: Build and test Universal Transfer Operator
 on:
   push:
-    branches: [ 'main', 'release-**', 'deprecate_it' ]
+    branches: [ 'main', 'release-**' ]
     paths:
       - '**'
 
