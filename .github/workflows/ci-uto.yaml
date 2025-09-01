@@ -412,7 +412,7 @@ jobs:
         with:
           python-version: '3.8'
           architecture: 'x64'
-      - uses: actions/cache@v5
+      - uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ hashFiles('pyproject.toml') }}
