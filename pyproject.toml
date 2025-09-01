@@ -5,7 +5,7 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "apache-airflow-provider-transfers"
 dynamic = ["version"]
-description = """⚠️ DEPRECATED: This project is no longer maintained. The GitHub repository has been archived."""
+description = "⚠️ DEPRECATED: This project is no longer maintained. The GitHub repository has been archived."
 
 authors = [
     { name = "Astronomer", email = "humans@astronomer.io" },
