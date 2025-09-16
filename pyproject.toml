@@ -5,10 +5,7 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "apache-airflow-provider-transfers"
 dynamic = ["version"]
-description = """This project contains the Universal Transfer Operator which can transfer all the data
-that could be read from the source Dataset into the destination Dataset.
-From a DAG author standpoint, all transfers would be performed through the invocation of only the
-Universal Transfer Operator."""
+description = "This project provides the Universal Transfer Operator to seamlessly transfer data from source to destination Datasets via a single operator invocation within DAGs."
 
 authors = [
     { name = "Astronomer", email = "humans@astronomer.io" },
